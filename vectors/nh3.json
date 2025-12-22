@@ -1,0 +1,110 @@
+{
+  "schema": "xssbench.vectorfile.v1",
+  "meta": {
+    "tool": "xssbench",
+    "source_url": "https://pypi.org/project/nh3/",
+    "license": {
+      "spdx": "MIT",
+      "url": "https://spdx.org/licenses/MIT.html",
+      "file": "vectors/nh3-LICENSE.txt"
+    }
+  },
+  "vectors": [
+  {
+    "id": "nh3-0.3.2-test_clean-nh3-clean-a-href-https-baidu-com-baidu-a-1c0b08cb7b",
+    "description": "nh3 0.3.2 test_clean (nh3.clean)",
+    "payload_html": "<a href=\"https://baidu.com\">baidu</a>",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/nh3/",
+    "source_section": "nh3-0.3.2/tests/test_nh3.py:14"
+  },
+  {
+    "id": "nh3-0.3.2-test_clean-nh3-clean-b-img-src-onerror-alert-hax-i-m-not-trying-to-xss-you-b-2d79716222",
+    "description": "nh3 0.3.2 test_clean (nh3.clean)",
+    "payload_html": "<b><img src='' onerror='alert(\\'hax\\')'>I'm not trying to XSS you</b>",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/nh3/",
+    "source_section": "nh3-0.3.2/tests/test_nh3.py:7"
+  },
+  {
+    "id": "nh3-0.3.2-test_clean-nh3-clean-div-data-v-foo-div-b5fbd3fffe",
+    "description": "nh3 0.3.2 test_clean (nh3.clean)",
+    "payload_html": "<div data-v=\"foo\"></div>",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/nh3/",
+    "source_section": "nh3-0.3.2/tests/test_nh3.py:30"
+  },
+  {
+    "id": "nh3-0.3.2-test_clean-nh3-clean-my-tag-60b20a3ba5",
+    "description": "nh3 0.3.2 test_clean (nh3.clean)",
+    "payload_html": "<my-tag>",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/nh3/",
+    "source_section": "nh3-0.3.2/tests/test_nh3.py:44"
+  },
+  {
+    "id": "nh3-0.3.2-test_clean-nh3-clean-my-tag-my-attr-val-cc4ee507f8",
+    "description": "nh3 0.3.2 test_clean (nh3.clean)",
+    "payload_html": "<my-tag my-attr=val>",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/nh3/",
+    "source_section": "nh3-0.3.2/tests/test_nh3.py:35"
+  },
+  {
+    "id": "nh3-0.3.2-test_clean-nh3-clean-script-alert-hello-script-style-a-background-fff-style-a38e85708e",
+    "description": "nh3 0.3.2 test_clean (nh3.clean)",
+    "payload_html": "<script>alert('hello')</script><style>a { background: #fff }</style>",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/nh3/",
+    "source_section": "nh3-0.3.2/tests/test_nh3.py:22"
+  },
+  {
+    "id": "nh3-0.3.2-test_clean-nh3-clean-span-class-a-b-c-a-href-class-c-b-a-t-a-span-div-class-a-b-c-u-div-a61e8ece7d",
+    "description": "nh3 0.3.2 test_clean (nh3.clean)",
+    "payload_html": "<span class='a b c'><a href='.' class='c b a'>T</a></span><div class='a b c'>U</div>",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/nh3/",
+    "source_section": "nh3-0.3.2/tests/test_nh3.py:53"
+  },
+  {
+    "id": "nh3-0.3.2-test_clean-nh3-clean-span-style-color-red-position-fixed-font-size-var-something-t-span-span-style-bo-9ae2ef3cf1",
+    "description": "nh3 0.3.2 test_clean (nh3.clean)",
+    "payload_html": "<span style='color: red; position: fixed; font-size: var(--something)'>T</span><span style='border: none'></span><div style='color: red'></div>",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/nh3/",
+    "source_section": "nh3-0.3.2/tests/test_nh3.py:61"
+  },
+  {
+    "id": "nh3-0.3.2-test_clean_text-nh3-clean-text-robert-abuse-065b9cd82e",
+    "description": "nh3 0.3.2 test_clean_text (nh3.clean_text)",
+    "payload_html": "Robert\"); abuse();//",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/nh3/",
+    "source_section": "nh3-0.3.2/tests/test_nh3.py:92"
+  },
+  {
+    "id": "nh3-0.3.2-test_clean_with_attribute_filter-nh3-clean-a-href-img-alt-home-src-foo-a-fb8aec7adf",
+    "description": "nh3 0.3.2 test_clean_with_attribute_filter (nh3.clean)",
+    "payload_html": "<a href=/><img alt=Home src=foo></a>",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/nh3/",
+    "source_section": "nh3-0.3.2/tests/test_nh3.py:79"
+  },
+  {
+    "id": "nh3-0.3.2-test_is_html-nh3-is-html-p-html-p-dcaf459a38",
+    "description": "nh3 0.3.2 test_is_html (nh3.is_html)",
+    "payload_html": "<p>html!</p>",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/nh3/",
+    "source_section": "nh3-0.3.2/tests/test_nh3.py:98"
+  },
+  {
+    "id": "nh3-0.3.2-test_is_html-nh3-is-html-plain-text-579b2140f7",
+    "description": "nh3 0.3.2 test_is_html (nh3.is_html)",
+    "payload_html": "plain text",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/nh3/",
+    "source_section": "nh3-0.3.2/tests/test_nh3.py:97"
+  }
+]
+}

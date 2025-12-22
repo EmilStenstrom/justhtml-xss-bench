@@ -1,0 +1,140 @@
+{
+  "schema": "xssbench.vectorfile.v1",
+  "meta": {
+    "tool": "xssbench",
+    "source_url": "https://pypi.org/project/bleach/",
+    "license": {
+      "spdx": "Apache-2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+      "file": "vectors/bleach-LICENSE.txt"
+    }
+  },
+  "vectors": [
+  {
+    "id": "bleach-sanitize_coverage-css-sanitizer-filters-dangerous-declarations-and-unknown-properties-4da8e662bd",
+    "description": "Inline CSS containing potentially executable constructs",
+    "payload_html": "<p style=\"color: red; position: fixed; background-color: url(http://x); font-weight: bold; font-style: expression(alert(1)); color: @import; text-decoration: javascript:alert(1); font-size: 12px\\6; border-radius: 4px; : x; color: ; broken\">Hi</p>",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/bleach/"
+  },
+  {
+    "id": "bleach-security_attributes-event-handler-attributes-are-always-removed-dee64f8eac",
+    "description": "HTML with event handler attribute (onclick)",
+    "payload_html": "<p onclick=alert(1)>Hi</p><img src=x onerror=alert(1)>",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/bleach/"
+  },
+  {
+    "id": "bleach-security_attributes-srcdoc-is-always-removed-even-if-allowed-by-policy-85bda63d61",
+    "description": "iframe with srcdoc HTML payload",
+    "payload_html": "<iframe srcdoc=\"<p onclick=alert(1)>X</p>\"></iframe>",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/bleach/"
+  },
+  {
+    "id": "bleach-security_invariants-markdown-output-escapes-html-looking-text-when-safe-true-a8a808af4b",
+    "description": "HTML-escaped tag text containing an event handler",
+    "payload_html": "&lt;img src=x onerror=alert(1)&gt;",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/bleach/"
+  },
+  {
+    "id": "bleach-security_invariants-safe-false-must-not-sanitize-used-for-trusted-html-ad8c380641",
+    "description": "HTML with event handler attribute (onclick)",
+    "payload_html": "<!--x--><p onclick='alert(1)'>Hi</p>",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/bleach/"
+  },
+  {
+    "id": "bleach-security_tags-disallowed-tag-escaped-when-strip-false-tag-boundaries-become-literal-text-5e16d94f5d",
+    "description": "Script tag payload",
+    "payload_html": "<script>alert(1)</script>",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/bleach/"
+  },
+  {
+    "id": "bleach-security_tags-disallowed-tag-stripped-default-policy-strip-true-56a7c729bb",
+    "description": "Script tag payload",
+    "payload_html": "<script>alert(1)</script><p>Ok</p>",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/bleach/"
+  },
+  {
+    "id": "bleach-security_tags-migrated-from-bleach-tests-regressions-dat-disallowed-script-stripped-even-with-surroundin-1dbb86a3c2",
+    "description": "Script tag payload",
+    "payload_html": ">\"><script>alert(\"XSS\")</script>&",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/bleach/"
+  },
+  {
+    "id": "bleach-security_tags-migrated-from-bleach-tests-regressions-dat-disallowed-style-stripped-with-its-contents-bf1b6ad217",
+    "description": "STYLE tag payload containing @import/javascript: URL",
+    "payload_html": "\"><STYLE>@import\"javascript:alert('XSS')\";</STYLE>",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/bleach/"
+  },
+  {
+    "id": "bleach-security_tags-migrated-from-bleach-tests-regressions-dat-malformed-script-tag-injection-is-stripped-e26819c1d7",
+    "description": "Malformed nested script-tag injection",
+    "payload_html": "<scr<script></script>ipt type=\"text/javascript\">alert(\"foo\");</<script></script>script<del></del>>",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/bleach/"
+  },
+  {
+    "id": "bleach-security_urls-data-urls-are-removed-from-img-src-9aaee6d358",
+    "description": "IMG with data:text/html URL containing a script tag",
+    "payload_html": "<img src=\"data:text/html,<script>alert(1)</script>\">",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/bleach/"
+  },
+  {
+    "id": "bleach-security_urls-javascript-urls-are-removed-from-href-aab9134f25",
+    "description": "Link with javascript: URL in href",
+    "payload_html": "<a href=\"javascript:alert(1)\">x</a>",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/bleach/"
+  },
+  {
+    "id": "bleach-security_urls-migrated-from-bleach-tests-regressions-dat-javascript-obfuscated-with-a-tab-is-still-remov-e1838a5c95",
+    "description": "Obfuscated Link with javascript: URL in href (tab)",
+    "payload_html": "<a href=\"javas&#x09;cript:alert(1)\">hi</a>",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/bleach/"
+  },
+  {
+    "id": "bleach-security_urls-migrated-from-bleach-tests-regressions-dat-javascript-urls-are-removed-from-img-src-10d44d1865",
+    "description": "IMG with javascript: URL in src",
+    "payload_html": "<IMG SRC=\"javascript:alert('XSS');\">",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/bleach/"
+  },
+  {
+    "id": "bleach-security_urls-migrated-from-bleach-tests-regressions-dat-javascript-with-embedded-newline-is-still-remov-c51cfadccc",
+    "description": "Obfuscated IMG with javascript: URL in src (newline)",
+    "payload_html": "<IMG SRC=\"jav&#x0A;ascript:alert(<WBR>'XSS');\">",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/bleach/"
+  },
+  {
+    "id": "bleach-security_urls-migrated-from-bleach-tests-regressions-dat-mixed-case-javascript-urls-are-removed-from-img-b77767dbbc",
+    "description": "IMG with javascript: URL in src",
+    "payload_html": "<IMG SRC=JaVaScRiPt:alert('XSS')>",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/bleach/"
+  },
+  {
+    "id": "bleach-security_urls-migrated-from-bleach-tests-regressions-dat-unquoted-javascript-urls-are-removed-from-img-s-71a202cfd0",
+    "description": "IMG with javascript: URL in src",
+    "payload_html": "<IMG SRC=javascript:alert('XSS')>",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/bleach/"
+  },
+  {
+    "id": "bleach-security_urls-obfuscated-javascript-via-character-reference-is-still-removed-14d6649d99",
+    "description": "Obfuscated Link with javascript: URL in href (carriage return)",
+    "payload_html": "<a href=\"java&#x0d;script:alert(1)\">x</a>",
+    "payload_context": "html",
+    "source_url": "https://pypi.org/project/bleach/"
+  }
+]
+}

