@@ -160,12 +160,6 @@
     "payload_context": "html"
   },
   {
-    "id": "js-exec-html-026-div-onclick-01",
-    "description": "DIV onclick -> alert(1)",
-    "payload_html": "<div onclick=\"alert(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
     "id": "js-exec-html-027-div-onclick-02",
     "description": "DIV onclick -> confirm(1)",
     "payload_html": "<div onclick=\"confirm(1)\">x</div>",
@@ -196,12 +190,6 @@
     "payload_context": "html"
   },
   {
-    "id": "js-exec-html-032-div-onmouseover-07",
-    "description": "DIV onmouseover -> alert(1)",
-    "payload_html": "<div onmouseover=\"alert(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
     "id": "js-exec-html-033-div-onmouseover-08",
     "description": "DIV onmouseover -> confirm(1)",
     "payload_html": "<div onmouseover=\"confirm(1)\">x</div>",
@@ -229,12 +217,6 @@
     "id": "js-exec-html-037-div-onmouseover-12",
     "description": "DIV onmouseover -> (0,alert)(1)",
     "payload_html": "<div onmouseover=\"(0,alert)(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-038-div-onmouseenter-13",
-    "description": "DIV onmouseenter -> alert(1)",
-    "payload_html": "<div onmouseenter=\"alert(1)\">x</div>",
     "payload_context": "html"
   },
   {
@@ -672,240 +654,6 @@
   {
     "id": "js-exec-js-031-js-iife-1",
     "description": "IIFE alert variant 1",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-032-js-iife-2",
-    "description": "IIFE alert variant 2",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-033-js-iife-3",
-    "description": "IIFE alert variant 3",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-034-js-iife-4",
-    "description": "IIFE alert variant 4",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-035-js-iife-5",
-    "description": "IIFE alert variant 5",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-036-js-iife-6",
-    "description": "IIFE alert variant 6",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-037-js-iife-7",
-    "description": "IIFE alert variant 7",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-038-js-iife-8",
-    "description": "IIFE alert variant 8",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-039-js-iife-9",
-    "description": "IIFE alert variant 9",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-040-js-iife-10",
-    "description": "IIFE alert variant 10",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-041-js-iife-11",
-    "description": "IIFE alert variant 11",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-042-js-iife-12",
-    "description": "IIFE alert variant 12",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-043-js-iife-13",
-    "description": "IIFE alert variant 13",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-044-js-iife-14",
-    "description": "IIFE alert variant 14",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-045-js-iife-15",
-    "description": "IIFE alert variant 15",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-046-js-iife-16",
-    "description": "IIFE alert variant 16",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-047-js-iife-17",
-    "description": "IIFE alert variant 17",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-048-js-iife-18",
-    "description": "IIFE alert variant 18",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-049-js-iife-19",
-    "description": "IIFE alert variant 19",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-050-js-iife-20",
-    "description": "IIFE alert variant 20",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-051-js-iife-21",
-    "description": "IIFE alert variant 21",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-052-js-iife-22",
-    "description": "IIFE alert variant 22",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-053-js-iife-23",
-    "description": "IIFE alert variant 23",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-054-js-iife-24",
-    "description": "IIFE alert variant 24",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-055-js-iife-25",
-    "description": "IIFE alert variant 25",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-056-js-iife-26",
-    "description": "IIFE alert variant 26",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-057-js-iife-27",
-    "description": "IIFE alert variant 27",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-058-js-iife-28",
-    "description": "IIFE alert variant 28",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-059-js-iife-29",
-    "description": "IIFE alert variant 29",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-060-js-iife-30",
-    "description": "IIFE alert variant 30",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-061-js-iife-31",
-    "description": "IIFE alert variant 31",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-062-js-iife-32",
-    "description": "IIFE alert variant 32",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-063-js-iife-33",
-    "description": "IIFE alert variant 33",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-064-js-iife-34",
-    "description": "IIFE alert variant 34",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-065-js-iife-35",
-    "description": "IIFE alert variant 35",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-066-js-iife-36",
-    "description": "IIFE alert variant 36",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-067-js-iife-37",
-    "description": "IIFE alert variant 37",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-068-js-iife-38",
-    "description": "IIFE alert variant 38",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-069-js-iife-39",
-    "description": "IIFE alert variant 39",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-070-js-iife-40",
-    "description": "IIFE alert variant 40",
     "payload_html": "(function(){alert(1)})()",
     "payload_context": "js"
   },
