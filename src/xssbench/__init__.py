@@ -7,6 +7,7 @@ __all__ = [
 	"run_bench",
 	"Vector",
 	"BenchSummary",
+	"normalize_payload",
 ]
 
 from .harness import (
@@ -16,3 +17,4 @@ from .harness import (
 	run_vector_in_browser,
 )
 from .bench import BenchSummary, Vector, load_vectors, run_bench
+from .normalize import normalize_payload
