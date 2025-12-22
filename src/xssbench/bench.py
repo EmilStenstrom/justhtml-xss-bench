@@ -59,6 +59,14 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
         "onerror_attr",
     }
 
+    # Duplicate handling:
+    # - Always error on duplicate (id, context).
+    #
+    # Note: payload deduplication is intentionally NOT done here. Do it once at
+    # vector-pack compilation time (see `xssbench.compile`) so runtime loads are
+    # transparent.
+    seen_id_ctx: set[tuple[str, str]] = set()
+
     for raw_path in paths:
         path = Path(raw_path)
         data = json.loads(path.read_text(encoding="utf-8"))
@@ -109,26 +117,22 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
                         f"Allowed: {sorted(allowed_contexts)}"
                     )
 
+                vector_id = str(item["id"])
+                id_key = (vector_id, payload_context)
+                if id_key in seen_id_ctx:
+                    raise ValueError(f"Duplicate vector id+context: {vector_id}@{payload_context}")
+                seen_id_ctx.add(id_key)
+
+                payload_html = str(item["payload_html"])
+
                 vectors.append(
                     Vector(
-                        id=str(item["id"]),
+                        id=vector_id,
                         description=str(item["description"]),
-                        payload_html=str(item["payload_html"]),
+                        payload_html=payload_html,
                         payload_context=payload_context,  # type: ignore[arg-type]
                     )
                 )
-
-    # Ensure stable ordering + no duplicate (id, context) across multiple files.
-    seen: set[tuple[str, str]] = set()
-    dupes: list[tuple[str, str]] = []
-    for v in vectors:
-        key = (v.id, v.payload_context)
-        if key in seen:
-            dupes.append(key)
-        seen.add(key)
-    if dupes:
-        rendered = ", ".join(sorted({f"{vid}@{ctx}" for (vid, ctx) in dupes}))
-        raise ValueError(f"Duplicate vector id+context: {rendered}")
 
     return vectors
 
@@ -147,6 +151,7 @@ def run_bench(
     timeout_ms: int | None = None,
     runner: Runner = run_vector_in_browser,
     progress: Progress | None = None,
+    fail_fast: bool = False,
 ) -> BenchSummary:
     def _auto_timeout_ms(*, payload_html: str, sanitized_html: str) -> int:
         # Conservative-but-fast heuristics. Most vectors are synchronous; only a
@@ -166,18 +171,18 @@ def run_bench(
                 "await ",
             )
         ):
-            return 800
+            return 250
 
         # Navigation/refresh-ish.
         if "http-equiv" in blob and "refresh" in blob:
-            return 1000
+            return 400
 
         # Common event-based vectors (we synthesize events, but give the engine a beat).
         if re.search(r"\bon(load|error)\s*=", blob):
-            return 200
+            return 25
 
-        # Default: fast.
-        return 100
+        # Default: don't wait. Sync execution is detected via the harness hook.
+        return 0
 
     def _timeout_for_case(*, payload_html: str, sanitized_html: str) -> int:
         return timeout_ms if timeout_ms is not None else _auto_timeout_ms(
@@ -260,6 +265,16 @@ def run_bench(
                         case_index += 1
                         if progress is not None:
                             progress(case_index, total_planned, result)
+                        if fail_fast and result.outcome == "xss":
+                            total_cases = len(results)
+                            total_executed = sum(1 for r in results if r.executed)
+                            total_errors = sum(1 for r in results if r.outcome == "error")
+                            return BenchSummary(
+                                total_cases=total_cases,
+                                total_executed=total_executed,
+                                total_errors=total_errors,
+                                results=results,
+                            )
 
         total_cases = len(results)
         total_executed = sum(1 for r in results if r.executed)
@@ -339,6 +354,16 @@ def run_bench(
                 case_index += 1
                 if progress is not None:
                     progress(case_index, total_planned, result)
+                if fail_fast and result.outcome == "xss":
+                    total_cases = len(results)
+                    total_executed = sum(1 for r in results if r.executed)
+                    total_errors = sum(1 for r in results if r.outcome == "error")
+                    return BenchSummary(
+                        total_cases=total_cases,
+                        total_executed=total_executed,
+                        total_errors=total_errors,
+                        results=results,
+                    )
 
     total_cases = len(results)
     total_executed = sum(1 for r in results if r.executed)

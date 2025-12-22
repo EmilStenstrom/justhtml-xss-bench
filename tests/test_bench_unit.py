@@ -91,3 +91,27 @@ def test_load_vectors_accepts_meta_wrapper() -> None:
         vectors = load_vectors([p])
 
     assert [v.id for v in vectors] == ["v1"]
+
+
+def test_run_bench_fail_fast_stops_after_first_xss() -> None:
+    from xssbench.bench import run_bench, Vector
+    from xssbench.sanitizers import Sanitizer
+
+    vectors = [
+        Vector(id="v1", description="", payload_html="<img src=x onerror=1>", payload_context="html"),
+        Vector(id="v2", description="", payload_html="<b>ok</b>", payload_context="html"),
+    ]
+
+    sanitizer = Sanitizer(name="noop", description="", sanitize=lambda html: html)
+
+    calls: list[str] = []
+
+    def fake_runner(*, payload_html: str, sanitized_html: str, timeout_ms: int, **_kwargs):
+        calls.append(payload_html)
+        return type("VR", (), {"executed": True, "details": "hit"})()
+
+    summary = run_bench(vectors=vectors, sanitizers=[sanitizer], runner=fake_runner, fail_fast=True)
+
+    assert summary.total_cases == 1
+    assert summary.total_executed == 1
+    assert calls == ["<img src=x onerror=1>"]

@@ -44,6 +44,7 @@ _HTML_TEMPLATE = """<!doctype html>
     <head>
         <meta charset=\"utf-8\">
         <base href=\"http://xssbench.local/\">
+                __XSSBENCH_PRELUDE__
     </head>
   <body>
     <div id=\"root\">__XSSBENCH_PAYLOAD__</div>
@@ -57,6 +58,7 @@ _HTML_HEAD_TEMPLATE = """<!doctype html>
     <head>
         <meta charset=\"utf-8\">
         <base href=\"http://xssbench.local/\">
+        __XSSBENCH_PRELUDE__
         __XSSBENCH_PAYLOAD__
     </head>
     <body>
@@ -71,6 +73,7 @@ _HTML_OUTER_TEMPLATE = """<!doctype html>
     <head>
         <meta charset=\"utf-8\">
         <base href=\"http://xssbench.local/\">
+        __XSSBENCH_PRELUDE__
     </head>
     __XSSBENCH_PAYLOAD__
 </html>
@@ -82,6 +85,7 @@ _HREF_TEMPLATE = """<!doctype html>
     <head>
         <meta charset=\"utf-8\">
         <base href=\"http://xssbench.local/\">
+        __XSSBENCH_PRELUDE__
     </head>
     <body>
         <a id=\"xssbench-link\" href=\"__XSSBENCH_PAYLOAD__\">x</a>
@@ -95,6 +99,7 @@ _JS_TEMPLATE = """<!doctype html>
     <head>
         <meta charset=\"utf-8\">
         <base href=\"http://xssbench.local/\">
+        __XSSBENCH_PRELUDE__
     </head>
     <body>
         <script>__XSSBENCH_PAYLOAD__</script>
@@ -108,6 +113,7 @@ _JS_ARG_TEMPLATE = """<!doctype html>
     <head>
         <meta charset=\"utf-8\">
         <base href=\"http://xssbench.local/\">
+        __XSSBENCH_PRELUDE__
     </head>
     <body>
         <script>setTimeout(function(){}, __XSSBENCH_PAYLOAD__);</script>
@@ -121,6 +127,7 @@ _JS_STRING_TEMPLATE = """<!doctype html>
     <head>
         <meta charset=\"utf-8\">
         <base href=\"http://xssbench.local/\">
+        __XSSBENCH_PRELUDE__
     </head>
     <body>
         <script>var __xssbench = '__XSSBENCH_PAYLOAD__';</script>
@@ -134,6 +141,7 @@ _JS_STRING_DOUBLE_TEMPLATE = """<!doctype html>
     <head>
         <meta charset=\"utf-8\">
         <base href=\"http://xssbench.local/\">
+        __XSSBENCH_PRELUDE__
     </head>
     <body>
         <script>var __xssbench = "__XSSBENCH_PAYLOAD__";</script>
@@ -147,12 +155,34 @@ _ONERROR_ATTR_TEMPLATE = """<!doctype html>
     <head>
         <meta charset=\"utf-8\">
         <base href=\"http://xssbench.local/\">
+                __XSSBENCH_PRELUDE__
     </head>
     <body>
         <img id=\"xssbench-img\" src=\"nonexistent://x\" onerror=\"__XSSBENCH_PAYLOAD__\">
     </body>
 </html>
 """
+
+
+_XSSBENCH_PRELUDE_HTML = """<script>
+(() => {
+    try {
+        if (!window.__xssbench) window.__xssbench = { executed: false, details: '' };
+        const mark = (kind, args) => {
+            try {
+                if (window.__xssbench.executed) return;
+                window.__xssbench.executed = true;
+                const msg = (args && args.length) ? String(args[0]) : '';
+                window.__xssbench.details = kind + ':' + msg;
+            } catch { /* ignore */ }
+        };
+
+        window.alert = function(...args) { mark('alert', args); };
+        window.confirm = function(...args) { mark('confirm', args); return true; };
+        window.prompt = function(...args) { mark('prompt', args); return ''; };
+    } catch { /* ignore */ }
+})();
+</script>"""
 
 
 _TRIGGER_EVENTS_JS = """
@@ -269,7 +299,15 @@ class BrowserHarness:
         }[self._browser_name]
 
         try:
-            self._browser_instance = browser_type.launch(headless=self._headless)
+            launch_kwargs: dict[str, Any] = {"headless": self._headless}
+            if self._browser_name == "chromium":
+                launch_kwargs["args"] = [
+                    "--disable-gpu",
+                    "--disable-dev-shm-usage",
+                    "--disable-extensions",
+                    "--mute-audio",
+                ]
+            self._browser_instance = browser_type.launch(**launch_kwargs)
         except Exception as exc:  # pragma: no cover
             message = str(exc)
             hint = (
@@ -408,6 +446,7 @@ class BrowserHarness:
             raise ValueError(f"Unknown payload_context: {payload_context!r}")
 
         html = template.replace("__XSSBENCH_PAYLOAD__", sanitized_html)
+        html = html.replace("__XSSBENCH_PRELUDE__", _XSSBENCH_PRELUDE_HTML)
         self._current_html = html
         # In WebKit, vectors that synchronously trigger a navigation (e.g. via `location = ...`)
         # can prevent the `load` event from ever settling, causing `goto(..., wait_until="load")`
@@ -454,6 +493,17 @@ class BrowserHarness:
                 )
             raise
 
+        def _hook_details() -> str:
+            try:
+                return str(
+                    self._page.evaluate(
+                        "() => (window.__xssbench && window.__xssbench.executed) ? String(window.__xssbench.details || '') : ''"
+                    )
+                    or ""
+                )
+            except Exception:
+                return ""
+
         # Deterministic signal: if the DOM contains any `javascript:` URL attributes,
         # treat that as execution/risk even if a particular engine doesn't reliably
         # execute it for that element type.
@@ -470,6 +520,13 @@ class BrowserHarness:
                     "Executed: javascript-url:"
                     f"{first.get('tag')}[{first.get('attr')}]={first.get('value')}; payload={payload_html!r}"
                 ),
+            )
+
+        hook = _hook_details()
+        if hook:
+            return VectorResult(
+                executed=True,
+                details=f"Executed: hook:{hook}; payload={payload_html!r}",
             )
 
         if self._dialog_events:
@@ -499,6 +556,13 @@ class BrowserHarness:
                 self._page.click("#xssbench-link", no_wait_after=True, timeout=timeout_ms)
             except Exception:
                 pass
+
+            hook = _hook_details()
+            if hook:
+                return VectorResult(
+                    executed=True,
+                    details=f"Executed: hook:{hook}; payload={payload_html!r}",
+                )
         else:
             try:
                 self._page.evaluate(_TRIGGER_EVENTS_JS)
@@ -515,6 +579,13 @@ class BrowserHarness:
                         details=f"Executed: navigation:context-destroyed; payload={payload_html!r}",
                     )
                 raise exc
+
+            hook = _hook_details()
+            if hook:
+                return VectorResult(
+                    executed=True,
+                    details=f"Executed: hook:{hook}; payload={payload_html!r}",
+                )
 
             # Ensure `javascript:`-ish links are clicked with a trusted gesture.
             try:
@@ -539,13 +610,17 @@ class BrowserHarness:
                 details=f"Executed: navigation:{urls}; payload={payload_html!r}",
             )
 
-        # Wait for a dialog to be observed, or timeout.
+        # Fast path: most synchronous payloads will have already tripped the hook
+        # (or a navigation/external-script signal). Only wait when asked.
         if self._timeout_error is None:  # pragma: no cover
             raise RuntimeError("Harness not initialized")
 
-        if not self._dialog_events:
+        if timeout_ms > 0:
             try:
-                self._page.wait_for_event("dialog", timeout=timeout_ms)
+                self._page.wait_for_function(
+                    "() => (window.__xssbench && window.__xssbench.executed) === true",
+                    timeout=timeout_ms,
+                )
             except self._timeout_error:
                 pass
             except Exception as exc:
@@ -561,6 +636,13 @@ class BrowserHarness:
                         details=f"Executed: navigation:context-destroyed; payload={payload_html!r}",
                     )
                 raise exc
+
+        hook = _hook_details()
+        if hook:
+            return VectorResult(
+                executed=True,
+                details=f"Executed: hook:{hook}; payload={payload_html!r}",
+            )
 
         if self._dialog_events:
             details = self._dialog_events[0]
