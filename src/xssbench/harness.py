@@ -6,6 +6,9 @@ from typing import Any
 from typing import Literal
 
 
+_MAX_PLAYWRIGHT_TIMEOUT_MS = 5000
+
+
 def _looks_like_navigation_context_destroyed(exc: Exception) -> bool:
     msg = str(exc)
     return (
@@ -281,6 +284,18 @@ class BrowserHarness:
 
         self._page = self._browser_instance.new_page()
 
+        # Keep runtime low and avoid long stalls (Playwright defaults to ~30s).
+        # Individual operations that pass an explicit timeout (e.g. our adaptive
+        # per-vector waits) will still use their smaller timeouts.
+        try:
+            self._page.set_default_timeout(_MAX_PLAYWRIGHT_TIMEOUT_MS)
+        except Exception:
+            pass
+        try:
+            self._page.set_default_navigation_timeout(_MAX_PLAYWRIGHT_TIMEOUT_MS)
+        except Exception:
+            pass
+
         def _on_dialog(dialog) -> None:
             try:
                 dialog_type = getattr(dialog, "type", "")
@@ -394,7 +409,50 @@ class BrowserHarness:
 
         html = template.replace("__XSSBENCH_PAYLOAD__", sanitized_html)
         self._current_html = html
-        self._page.goto(self._base_url, wait_until="load")
+        # In WebKit, vectors that synchronously trigger a navigation (e.g. via `location = ...`)
+        # can prevent the `load` event from ever settling, causing `goto(..., wait_until="load")`
+        # to hang until Playwright's default 30s timeout.
+        #
+        # We only need a parsed DOM for our triggers and post-load checks, so `domcontentloaded`
+        # is both faster and more stable across engines.
+        try:
+            self._page.goto(
+                self._base_url,
+                wait_until="domcontentloaded",
+                timeout=_MAX_PLAYWRIGHT_TIMEOUT_MS,
+            )
+        except Exception as exc:
+            # If a payload immediately triggers navigation, consider that execution.
+            if self._timeout_error is not None and isinstance(exc, self._timeout_error):
+                if self._navigation_requests:
+                    urls = ", ".join(self._navigation_requests[:3])
+                    return VectorResult(
+                        executed=True,
+                        details=f"Executed: navigation:{urls}; payload={payload_html!r}",
+                    )
+                if self._external_script_requests:
+                    urls = ", ".join(self._external_script_requests[:3])
+                    return VectorResult(
+                        executed=True,
+                        details=f"Executed: external-script:{urls}; payload={payload_html!r}",
+                    )
+                if self._dialog_events:
+                    details = self._dialog_events[0]
+                    return VectorResult(
+                        executed=True,
+                        details=f"Executed: {details}; payload={payload_html!r}",
+                    )
+                return VectorResult(
+                    executed=True,
+                    details=f"Executed: navigation:goto-timeout; payload={payload_html!r}",
+                )
+
+            if _looks_like_navigation_context_destroyed(exc):
+                return VectorResult(
+                    executed=True,
+                    details=f"Executed: navigation:context-destroyed; payload={payload_html!r}",
+                )
+            raise
 
         # Deterministic signal: if the DOM contains any `javascript:` URL attributes,
         # treat that as execution/risk even if a particular engine doesn't reliably
