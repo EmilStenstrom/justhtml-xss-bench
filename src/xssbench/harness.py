@@ -38,10 +38,10 @@ PayloadContext = Literal[
 
 _HTML_TEMPLATE = """<!doctype html>
 <html>
-  <head>
-    <meta charset=\"utf-8\">
+    <head>
+        <meta charset=\"utf-8\">
         <base href=\"http://xssbench.local/\">
-  </head>
+    </head>
   <body>
     <div id=\"root\">__XSSBENCH_PAYLOAD__</div>
   </body>
@@ -189,6 +189,43 @@ _TRIGGER_EVENTS_JS = """
       if (typeof el.focus === 'function') el.focus();
     } catch { /* ignore */ }
   }
+}
+"""
+
+
+_DETECT_JAVASCRIPT_URLS_JS = """
+() => {
+    const attrs = ['href', 'src', 'action', 'formaction', 'data'];
+    const hits = [];
+
+    const normalize = (value) => {
+        if (value == null) return '';
+        const s = String(value).toLowerCase();
+        let out = '';
+        for (let i = 0; i < s.length; i++) {
+            // Remove ASCII whitespace/control chars (<= space) to normalize obfuscation.
+            if (s.charCodeAt(i) <= 0x20) continue;
+            out += s[i];
+        }
+        return out;
+    };
+
+    const elements = document.querySelectorAll('*');
+    for (const el of elements) {
+        for (const attr of attrs) {
+            try {
+                if (!el.hasAttribute(attr)) continue;
+                const raw = el.getAttribute(attr);
+                if (normalize(raw).startsWith('javascript:')) {
+                    hits.push({ tag: (el.tagName || '').toLowerCase(), attr, value: raw });
+                    if (hits.length >= 5) return hits;
+                }
+            } catch {
+                // ignore
+            }
+        }
+    }
+    return hits;
 }
 """
 
@@ -358,6 +395,24 @@ class BrowserHarness:
         html = template.replace("__XSSBENCH_PAYLOAD__", sanitized_html)
         self._current_html = html
         self._page.goto(self._base_url, wait_until="load")
+
+        # Deterministic signal: if the DOM contains any `javascript:` URL attributes,
+        # treat that as execution/risk even if a particular engine doesn't reliably
+        # execute it for that element type.
+        try:
+            js_urls = self._page.evaluate(_DETECT_JAVASCRIPT_URLS_JS)
+        except Exception:
+            js_urls = []
+
+        if js_urls:
+            first = js_urls[0]
+            return VectorResult(
+                executed=True,
+                details=(
+                    "Executed: javascript-url:"
+                    f"{first.get('tag')}[{first.get('attr')}]={first.get('value')}; payload={payload_html!r}"
+                ),
+            )
 
         if self._dialog_events:
             details = self._dialog_events[0]

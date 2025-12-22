@@ -29,6 +29,9 @@ xssbench --list-sanitizers
 # Run a subset
 xssbench --vectors vectors/bleach.json --sanitizers noop
 
+# Write a machine-readable run artifact (repo-local; git-ignored via .xssbench/)
+xssbench --json-out .xssbench
+
 # By default, `xssbench` runs all `vectors/*.json`.
 # If you have a large pack, run a smaller subset by passing `--vectors`.
 

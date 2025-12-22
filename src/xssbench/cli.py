@@ -209,6 +209,10 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.json_out:
         out_path = Path(args.json_out)
+        # Convenience: allow passing a directory hint (e.g. `--json-out .xssbench`)
+        # and auto-create parent directories.
+        if out_path.suffix == "" or (out_path.exists() and out_path.is_dir()):
+            out_path = out_path / "results.json"
         payload = {
             "total_cases": summary.total_cases,
             "total_executed": summary.total_executed,
@@ -227,6 +231,7 @@ def main(argv: list[str] | None = None) -> int:
                 for r in summary.results
             ],
         }
+        out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
     if summary.total_errors > 0:
