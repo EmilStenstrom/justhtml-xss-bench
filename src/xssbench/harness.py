@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from functools import lru_cache
 import importlib
+import importlib.resources
 from typing import Any
 from typing import Literal
 from urllib.parse import urlsplit
@@ -221,173 +223,25 @@ _ONERROR_ATTR_TEMPLATE = """<!doctype html>
 """
 
 
-_XSSBENCH_PRELUDE_HTML = """<script>
-(() => {
-    try {
-        if (!window.__xssbench) window.__xssbench = { executed: false, details: '' };
-        const mark = (kind, args) => {
-            try {
-                if (window.__xssbench.executed) return;
-                window.__xssbench.executed = true;
-                const msg = (args && args.length) ? String(args[0]) : '';
-                window.__xssbench.details = kind + ':' + msg;
-            } catch { /* ignore */ }
-        };
-
-        window.alert = function(...args) { mark('alert', args); };
-        window.confirm = function(...args) { mark('confirm', args); return true; };
-        window.prompt = function(...args) { mark('prompt', args); return ''; };
-    } catch { /* ignore */ }
-})();
-</script>"""
+@lru_cache(maxsize=None)
+def _read_js_asset_text(name: str) -> str:
+    return (
+        importlib.resources.files("xssbench")
+        .joinpath("js")
+        .joinpath(name)
+        .read_text(encoding="utf-8")
+    )
 
 
-_TRIGGER_EVENTS_JS = """
-() => {
-  const root = document.getElementById('root');
-  const scope = root || document;
-
-    // Our synthetic event triggering should not cause the browser to actually navigate
-    // away from the synthetic document (e.g. clicking a normal <a href="https://...">).
-    // Preventing default keeps inline/DOM event handlers running, but avoids treating
-    // benign navigations as XSS.
-    try {
-        document.addEventListener('click', (e) => { try { e.preventDefault(); } catch {} }, true);
-        document.addEventListener('submit', (e) => { try { e.preventDefault(); } catch {} }, true);
-    } catch { /* ignore */ }
-
-  const elements = Array.from(scope.querySelectorAll('*'));
-        const mouseEvents = ['mouseover', 'mouseenter', 'click'];
-        const focusEvents = ['focus', 'focusin'];
-        const directEvents = ['load', 'error'];
-        const keyboardEvents = ['keydown', 'keypress', 'keyup'];
-        const clipboardEvents = ['copy', 'cut', 'paste'];
-        const otherEvents = ['contextmenu', 'toggle', 'scroll', 'wheel', 'input', 'change', 'beforeinput'];
-        const animationEvents = ['animationstart', 'animationiteration', 'animationend'];
-        const transitionEvents = ['transitionrun', 'transitionstart', 'transitionend', 'transitioncancel'];
-
-  for (const el of elements) {
-        for (const type of mouseEvents) {
-            try {
-                el.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true, view: window }));
-            } catch {
-                try { el.dispatchEvent(new Event(type, { bubbles: true, cancelable: true })); } catch { /* ignore */ }
-            }
-        }
-
-        for (const type of focusEvents) {
-            try {
-                el.dispatchEvent(new FocusEvent(type, { bubbles: true, cancelable: true }));
-            } catch {
-                try { el.dispatchEvent(new Event(type, { bubbles: true, cancelable: true })); } catch { /* ignore */ }
-            }
-        }
-
-        for (const type of keyboardEvents) {
-            try {
-                el.dispatchEvent(new KeyboardEvent(type, { bubbles: true, cancelable: true, key: 'A', code: 'KeyA' }));
-            } catch {
-                try { el.dispatchEvent(new Event(type, { bubbles: true, cancelable: true })); } catch { /* ignore */ }
-            }
-        }
-
-        for (const type of clipboardEvents) {
-            try {
-                // ClipboardEvent may be restricted in some engines; fall back to a plain Event.
-                el.dispatchEvent(new ClipboardEvent(type, { bubbles: true, cancelable: true }));
-            } catch {
-                try { el.dispatchEvent(new Event(type, { bubbles: true, cancelable: true })); } catch { /* ignore */ }
-            }
-        }
-
-        for (const type of otherEvents) {
-            try {
-                el.dispatchEvent(new Event(type, { bubbles: true, cancelable: true }));
-            } catch { /* ignore */ }
-        }
-
-        for (const type of animationEvents) {
-            try {
-                el.dispatchEvent(new Event(type, { bubbles: true, cancelable: true }));
-            } catch { /* ignore */ }
-        }
-
-        for (const type of transitionEvents) {
-            try {
-                el.dispatchEvent(new Event(type, { bubbles: true, cancelable: true }));
-            } catch { /* ignore */ }
-        }
-
-    for (const type of directEvents) {
-      try {
-        el.dispatchEvent(new Event(type));
-      } catch { /* ignore */ }
-    }
-
-    try {
-      if (typeof el.focus === 'function') el.focus();
-    } catch { /* ignore */ }
-  }
-}
-"""
+def _script_tag(js: str) -> str:
+    return f"<script>\n{js}\n</script>"
 
 
-_DETECT_JAVASCRIPT_URLS_JS = """
-() => {
-    const attrs = ['href', 'src', 'action', 'formaction', 'data'];
-    const hits = [];
+_XSSBENCH_PRELUDE_HTML = _script_tag(_read_js_asset_text("prelude.js").strip("\n"))
 
-    // Approximate what browsers do for scheme detection:
-    // - Trim leading/trailing ASCII whitespace and C0 control characters
-    // - Do NOT remove internal whitespace (e.g. `jav   ascript:` is not `javascript:`)
-    const normalizeForScheme = (value) => {
-        if (value == null) return '';
-        const s = String(value);
-        // Strip leading/trailing chars <= 0x20.
-        const stripped = s.replace(/^[\u0000-\u0020]+|[\u0000-\u0020]+$/g, '');
-        return stripped.toLowerCase();
-    };
+_TRIGGER_EVENTS_JS = _read_js_asset_text("trigger_events.js")
 
-    const resolvedValue = (el, attr) => {
-        // Use DOM properties where available; these reflect browser URL parsing.
-        try {
-            if (attr === 'href' && typeof el.href === 'string') return el.href;
-            if (attr === 'src' && typeof el.src === 'string') return el.src;
-            if (attr === 'action' && typeof el.action === 'string') return el.action;
-            if (attr === 'formaction' && typeof el.formAction === 'string') return el.formAction;
-        } catch {
-            // ignore
-        }
-        return '';
-    };
-
-    const elements = document.querySelectorAll('*');
-    for (const el of elements) {
-        for (const attr of attrs) {
-            try {
-                if (!el.hasAttribute(attr)) continue;
-                const raw = el.getAttribute(attr);
-                const schemeish = normalizeForScheme(raw);
-                // Primary check: raw attribute after trimming.
-                let isJavascript = schemeish.startsWith('javascript:');
-                // Secondary check: resolved property (more accurate for browser behavior).
-                if (!isJavascript) {
-                    const resolved = normalizeForScheme(resolvedValue(el, attr));
-                    isJavascript = resolved.startsWith('javascript:');
-                }
-
-                if (isJavascript) {
-                    hits.push({ tag: (el.tagName || '').toLowerCase(), attr, value: raw });
-                    if (hits.length >= 5) return hits;
-                }
-            } catch {
-                // ignore
-            }
-        }
-    }
-    return hits;
-}
-"""
+_DETECT_JAVASCRIPT_URLS_JS = _read_js_asset_text("detect_javascript_urls.js")
 
 
 class BrowserHarness:
