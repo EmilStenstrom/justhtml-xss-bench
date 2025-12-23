@@ -3,12 +3,15 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable
 
+from .harness import PayloadContext
+
 
 @dataclass(frozen=True, slots=True)
 class Sanitizer:
     name: str
     description: str
     sanitize: Callable[[str], str]
+    supported_contexts: set[PayloadContext] | None = None
 
 
 def noop(html: str) -> str:
@@ -34,6 +37,8 @@ def _maybe_bleach() -> Sanitizer | None:
         name="bleach",
         description="bleach.clean(html) with default settings",
         sanitize=_sanitize,
+        # bleach is an HTML sanitizer; JS-string and JS-code contexts are out of scope.
+        supported_contexts={"html", "html_head", "html_outer", "href", "onerror_attr"},
     )
 
 
@@ -50,6 +55,8 @@ def _maybe_nh3() -> Sanitizer | None:
         name="nh3",
         description="nh3.clean(html) with default settings",
         sanitize=_sanitize,
+        # nh3 is an HTML sanitizer; JS-string and JS-code contexts are out of scope.
+        supported_contexts={"html", "html_head", "html_outer", "href", "onerror_attr"},
     )
 
 
@@ -64,6 +71,7 @@ def available_sanitizers() -> dict[str, Sanitizer]:
             name="noop",
             description="Baseline: returns HTML unchanged",
             sanitize=noop,
+            supported_contexts=None,
         ),
     }
 

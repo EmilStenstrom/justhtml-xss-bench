@@ -170,26 +170,6 @@ def run_bench(
             sanitizer_input_html = f'<a href="{vector.payload_html}">x</a>'
             return sanitizer_input_html, sanitizer.sanitize(sanitizer_input_html), "html"
 
-        # JS-context vectors are not standalone HTML by themselves; they're meant
-        # to be inserted into a <script> block (or used within one). For HTML
-        # sanitizers, give that minimal script-tag context and then run the
-        # sanitized HTML as normal HTML.
-        if vector.payload_context == "js":
-            sanitizer_input_html = f"<script>{vector.payload_html}</script>"
-            return sanitizer_input_html, sanitizer.sanitize(sanitizer_input_html), "html"
-
-        if vector.payload_context == "js_arg":
-            sanitizer_input_html = f"<script>setTimeout(function(){{}}, {vector.payload_html});</script>"
-            return sanitizer_input_html, sanitizer.sanitize(sanitizer_input_html), "html"
-
-        if vector.payload_context == "js_string":
-            sanitizer_input_html = f"<script>var __xssbench = '{vector.payload_html}';</script>"
-            return sanitizer_input_html, sanitizer.sanitize(sanitizer_input_html), "html"
-
-        if vector.payload_context == "js_string_double":
-            sanitizer_input_html = f'<script>var __xssbench = "{vector.payload_html}";</script>'
-            return sanitizer_input_html, sanitizer.sanitize(sanitizer_input_html), "html"
-
         if vector.payload_context == "onerror_attr":
             sanitizer_input_html = (
                 f'<img src="nonexistent://x" onerror="{vector.payload_html}">'
@@ -248,6 +228,30 @@ def run_bench(
             with BrowserHarness(browser=browser, headless=True) as harness:
                 for sanitizer in sanitizers:
                     for vector in vectors:
+                        if (
+                            sanitizer.supported_contexts is not None
+                            and vector.payload_context not in sanitizer.supported_contexts
+                        ):
+                            result = BenchCaseResult(
+                                sanitizer=sanitizer.name,
+                                browser=browser,
+                                vector_id=vector.id,
+                                payload_context=vector.payload_context,
+                                run_payload_context=vector.payload_context,
+                                outcome="skip",
+                                executed=False,
+                                details=(
+                                    f"Skipped: {sanitizer.name} does not support context {vector.payload_context}"
+                                ),
+                                sanitizer_input_html="",
+                                sanitized_html="",
+                                rendered_html="",
+                            )
+                            results.append(result)
+                            case_index += 1
+                            if progress is not None:
+                                progress(case_index, total_planned, result)
+                            continue
                         try:
                             sanitizer_input_html, sanitized_html, payload_context_to_run = _prepare_for_sanitizer(
                                 vector=vector, sanitizer=sanitizer
@@ -351,6 +355,30 @@ def run_bench(
         for browser in browsers:
             for vector in vectors:
                 try:
+                    if (
+                        sanitizer.supported_contexts is not None
+                        and vector.payload_context not in sanitizer.supported_contexts
+                    ):
+                        result = BenchCaseResult(
+                            sanitizer=sanitizer.name,
+                            browser=browser,
+                            vector_id=vector.id,
+                            payload_context=vector.payload_context,
+                            run_payload_context=vector.payload_context,
+                            outcome="skip",
+                            executed=False,
+                            details=(
+                                f"Skipped: {sanitizer.name} does not support context {vector.payload_context}"
+                            ),
+                            sanitizer_input_html="",
+                            sanitized_html="",
+                            rendered_html="",
+                        )
+                        results.append(result)
+                        case_index += 1
+                        if progress is not None:
+                            progress(case_index, total_planned, result)
+                        continue
                     sanitizer_input_html, sanitized_html, payload_context_to_run = _prepare_for_sanitizer(
                         vector=vector, sanitizer=sanitizer
                     )

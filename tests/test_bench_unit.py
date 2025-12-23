@@ -147,7 +147,7 @@ def test_run_bench_wraps_href_payload_before_sanitizing() -> None:
     assert seen_payload_contexts == ["html"]
 
 
-def test_run_bench_wraps_js_payload_before_sanitizing() -> None:
+def test_run_bench_does_not_wrap_js_payload_before_sanitizing() -> None:
     from xssbench.bench import run_bench, Vector
     from xssbench.sanitizers import Sanitizer
 
@@ -171,8 +171,32 @@ def test_run_bench_wraps_js_payload_before_sanitizing() -> None:
     summary = run_bench(vectors=vectors, sanitizers=[sanitizer], runner=fake_runner)
 
     assert summary.total_cases == 1
-    assert seen_inputs == ["<script>alert(1)</script>"]
-    assert seen_payload_contexts == ["html"]
+    assert seen_inputs == ["alert(1)"]
+    assert seen_payload_contexts == ["js"]
+
+
+def test_run_bench_skips_unsupported_contexts() -> None:
+    from xssbench.bench import run_bench, Vector
+    from xssbench.sanitizers import Sanitizer
+
+    vectors = [
+        Vector(id="v1", description="", payload_html="alert(1)", payload_context="js"),
+        Vector(id="v2", description="", payload_html="<b>ok</b>", payload_context="html"),
+    ]
+
+    sanitizer = Sanitizer(
+        name="htmlonly",
+        description="",
+        sanitize=lambda html: html,
+        supported_contexts={"html", "href", "html_head", "html_outer", "onerror_attr"},
+    )
+
+    summary = run_bench(vectors=vectors, sanitizers=[sanitizer], runner=lambda **_: type("VR", (), {"executed": False, "details": "no"})())
+
+    assert summary.total_cases == 2
+    outcomes = {r.vector_id: r.outcome for r in summary.results}
+    assert outcomes["v1"] == "skip"
+    assert outcomes["v2"] == "pass"
 
 
 def test_run_bench_wraps_onerror_attr_payload_before_sanitizing() -> None:

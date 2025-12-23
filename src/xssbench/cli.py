@@ -213,10 +213,11 @@ def _print_table(summary) -> None:
     per = {}
     for r in summary.results:
         key = (r.sanitizer, r.browser)
-        per.setdefault(key, {"total": 0, "executed": 0, "errors": 0})
+        per.setdefault(key, {"total": 0, "executed": 0, "errors": 0, "skipped": 0})
         per[key]["total"] += 1
         per[key]["executed"] += 1 if r.executed else 0
         per[key]["errors"] += 1 if r.outcome == "error" else 0
+        per[key]["skipped"] += 1 if r.outcome == "skip" else 0
 
     xss = [r for r in summary.results if r.outcome == "xss"]
     errors = [r for r in summary.results if r.outcome == "error"]
@@ -249,13 +250,13 @@ def _print_table(summary) -> None:
     if xss or errors:
         print("")
 
-    header = f"{'sanitizer':<22}  {'browser':<8}  {'xss':>6}  {'errors':>6}  {'total':>5}"
+    header = f"{'sanitizer':<22}  {'browser':<8}  {'xss':>6}  {'errors':>6}  {'skipped':>7}  {'total':>5}"
     print(header)
     print("-" * len(header))
     for (name, browser) in sorted(per.keys()):
         row = per[(name, browser)]
         print(
-            f"{name:<22}  {browser:<8}  {row['executed']:>6}  {row['errors']:>6}  {row['total']:>5}"
+            f"{name:<22}  {browser:<8}  {row['executed']:>6}  {row['errors']:>6}  {row['skipped']:>7}  {row['total']:>5}"
         )
 
 
