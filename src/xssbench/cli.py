@@ -53,19 +53,22 @@ def _worker_run(task: tuple[int, int, str, str, int | None, bool]) -> list[Bench
 
 
 def _default_vector_globs() -> list[str]:
-    root = Path(__file__).resolve().parents[2]
-    vectors_dir = root / "vectors"
-    if not vectors_dir.exists():
-        return []
-    return [str(p) for p in sorted(vectors_dir.glob("*.json"))]
+    # Prefer vectors relative to the current working directory.
+    # This makes `xssbench` usable when installed via pip (where `__file__`
+    # resolves inside site-packages and does not include the repo's `vectors/`).
+    for root in (Path.cwd(), Path(__file__).resolve().parents[2]):
+        vectors_dir = root / "vectors"
+        if vectors_dir.exists():
+            return [str(p) for p in sorted(vectors_dir.glob("*.json"))]
+    return []
 
 
 def _default_incoming_globs() -> list[str]:
-    root = Path(__file__).resolve().parents[2]
-    incoming_dir = root / "incoming"
-    if not incoming_dir.exists():
-        return []
-    return [str(p) for p in sorted(incoming_dir.glob("*.json"))]
+    for root in (Path.cwd(), Path(__file__).resolve().parents[2]):
+        incoming_dir = root / "incoming"
+        if incoming_dir.exists():
+            return [str(p) for p in sorted(incoming_dir.glob("*.json"))]
+    return []
 
 
 def _parse_run_args(argv: list[str]) -> argparse.Namespace:
@@ -268,7 +271,11 @@ def main(argv: list[str] | None = None) -> int:
 
         vector_paths = args.vectors if args.vectors is not None else _default_vector_globs()
         if not vector_paths:
-            print("No vector files found. Pass --vectors vectors/*.json", file=sys.stderr)
+            print(
+                "No vector files found. By default xssbench looks for ./vectors/*.json in the current directory. "
+                "Pass --vectors /path/to/vectors/*.json (or run from the repo root).",
+                file=sys.stderr,
+            )
             return 2
 
         stats = compile_vectors(
@@ -293,7 +300,11 @@ def main(argv: list[str] | None = None) -> int:
 
         against_paths = args.against if args.against is not None else _default_vector_globs()
         if not against_paths:
-            print("No vector files found. Pass --against vectors/*.json", file=sys.stderr)
+            print(
+                "No vector files found. By default xssbench looks for ./vectors/*.json in the current directory. "
+                "Pass --against /path/to/vectors/*.json (or run from the repo root).",
+                file=sys.stderr,
+            )
             return 2
 
         results = check_candidates(new_paths=new_paths, against_paths=against_paths)
@@ -323,13 +334,19 @@ def main(argv: list[str] | None = None) -> int:
 
     vector_paths = args.vectors if args.vectors is not None else _default_vector_globs()
     if not vector_paths:
-        print("No vector files found. Pass --vectors vectors/*.json", file=sys.stderr)
+        print(
+            "No vector files found. By default xssbench looks for ./vectors/*.json in the current directory. "
+            "Pass --vectors /path/to/vectors/*.json (or run from the repo root).",
+            file=sys.stderr,
+        )
         return 2
 
     # First-run convenience: fetch PortSwigger cheat sheet data and generate a
     # refs-only artifact under `.xssbench/` (git-ignored). Best-effort only.
     try:
-        repo_root = Path(__file__).resolve().parents[2]
+        # Write run artifacts under the current directory.
+        # When installed via pip, `__file__` may live in site-packages.
+        repo_root = Path.cwd()
         ensure_portswigger_refs_file(repo_root=repo_root, against_paths=vector_paths)
     except Exception as exc:
         print(f"warning: could not generate PortSwigger refs file: {exc}", file=sys.stderr)
