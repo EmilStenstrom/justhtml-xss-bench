@@ -12,6 +12,43 @@
     } catch { /* ignore */ }
 
   const elements = Array.from(scope.querySelectorAll('*'));
+
+        // Some historical corpora use IE-specific inline handler attributes (e.g. `onactivate`).
+        // Modern browsers typically treat these as inert attributes, not event listeners.
+        // To maximize coverage (especially for noop baselining), we optionally translate a
+        // small, targeted set of such attributes into real event listeners.
+        const legacyInlineHandlers = [
+            'onactivate',
+            'onbeforeactivate',
+            'onbeforedeactivate',
+            'ondeactivate',
+            'onpropertychange',
+            'ontimer',
+            'onqt_error',
+        ];
+
+        for (const el of elements) {
+            for (const attr of legacyInlineHandlers) {
+                try {
+                    if (!el.hasAttribute(attr)) continue;
+                    const code = String(el.getAttribute(attr) || '');
+                    if (!code) continue;
+                    const type = attr.slice(2);
+                    let fn;
+                    try {
+                        fn = new Function('event', code);
+                    } catch {
+                        continue;
+                    }
+                    try {
+                        el.addEventListener(type, function (event) {
+                            try { fn.call(el, event); } catch { /* ignore */ }
+                        });
+                    } catch { /* ignore */ }
+                } catch { /* ignore */ }
+            }
+        }
+
         const mouseEvents = [
             'mouseover',
             'mouseenter',
@@ -44,6 +81,16 @@
             'loadstart',
             'loadend',
             'readystatechange',
+            // Legacy/IE-ish handler names still present in some corpora.
+            // These don't generally fire in modern browsers on their own, but
+            // dispatching them helps quantify sanitizer risk against historical vectors.
+            'activate',
+            'beforeactivate',
+            'beforedeactivate',
+            'deactivate',
+            'propertychange',
+            'timer',
+            'qt_error',
             // Low-frequency legacy/lifecycle handler names seen in corpora.
             'begin',
             'start',
