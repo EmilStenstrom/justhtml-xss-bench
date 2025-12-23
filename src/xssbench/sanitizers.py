@@ -37,8 +37,8 @@ def _maybe_bleach() -> Sanitizer | None:
         name="bleach",
         description="bleach.clean(html) with default settings",
         sanitize=_sanitize,
-        # bleach is an HTML sanitizer; JS-string and JS-code contexts are out of scope.
-        supported_contexts={"html", "html_head", "html_outer", "href", "onerror_attr"},
+        # bleach is an HTML sanitizer; JS-string/JS-code and event-handler JS are out of scope.
+        supported_contexts={"html", "html_head", "html_outer", "href"},
     )
 
 
@@ -55,8 +55,8 @@ def _maybe_nh3() -> Sanitizer | None:
         name="nh3",
         description="nh3.clean(html) with default settings",
         sanitize=_sanitize,
-        # nh3 is an HTML sanitizer; JS-string and JS-code contexts are out of scope.
-        supported_contexts={"html", "html_head", "html_outer", "href", "onerror_attr"},
+        # nh3 is an HTML sanitizer; JS-string/JS-code and event-handler JS are out of scope.
+        supported_contexts={"html", "html_head", "html_outer", "href"},
     )
 
 
