@@ -4,9 +4,66 @@ from dataclasses import dataclass
 import importlib
 from typing import Any
 from typing import Literal
+from urllib.parse import urlsplit
 
 
 _MAX_PLAYWRIGHT_TIMEOUT_MS = 5000
+
+
+def render_html_document(*, sanitized_html: str, payload_context: "PayloadContext") -> str:
+    template = {
+        "html": _HTML_TEMPLATE,
+        "html_head": _HTML_HEAD_TEMPLATE,
+        "html_outer": _HTML_OUTER_TEMPLATE,
+        "href": _HREF_TEMPLATE,
+        "js": _JS_TEMPLATE,
+        "js_arg": _JS_ARG_TEMPLATE,
+        "js_string": _JS_STRING_TEMPLATE,
+        "js_string_double": _JS_STRING_DOUBLE_TEMPLATE,
+        "onerror_attr": _ONERROR_ATTR_TEMPLATE,
+    }.get(payload_context)
+    if template is None:
+        raise ValueError(f"Unknown payload_context: {payload_context!r}")
+
+    html = template.replace("__XSSBENCH_PAYLOAD__", sanitized_html)
+    html = html.replace("__XSSBENCH_PRELUDE__", _XSSBENCH_PRELUDE_HTML)
+    return html
+
+
+def _is_ignorable_navigation_url(url: str) -> bool:
+    # Chromium shows this for aborted/blocked navigations.
+    if url.startswith("chrome-error://"):
+        return True
+    # Can appear transiently during navigations.
+    if url == "about:blank":
+        return True
+    return False
+
+
+def _filter_navigation_urls_for_execution(
+    urls: list[str],
+    *,
+    base_url: str,
+    payload_context: "PayloadContext",
+    expected_href_click_url: str | None,
+) -> list[str]:
+    out: list[str] = []
+    for url in urls:
+        if not url:
+            continue
+        if _is_ignorable_navigation_url(url):
+            continue
+        # Ignore same-document hash navigations like `http://xssbench.local/#...`.
+        if url.startswith(base_url + "#"):
+            continue
+
+        if payload_context == "href" and expected_href_click_url:
+            # In href-context we intentionally click the link.
+            # A plain navigation to the link target is not XSS; it just means the URL was allowed.
+            if url == expected_href_click_url:
+                continue
+        out.append(url)
+    return out
 
 
 def _looks_like_navigation_context_destroyed(exc: Exception) -> bool:
@@ -190,6 +247,15 @@ _TRIGGER_EVENTS_JS = """
   const root = document.getElementById('root');
   const scope = root || document;
 
+    // Our synthetic event triggering should not cause the browser to actually navigate
+    // away from the synthetic document (e.g. clicking a normal <a href="https://...">).
+    // Preventing default keeps inline/DOM event handlers running, but avoids treating
+    // benign navigations as XSS.
+    try {
+        document.addEventListener('click', (e) => { try { e.preventDefault(); } catch {} }, true);
+        document.addEventListener('submit', (e) => { try { e.preventDefault(); } catch {} }, true);
+    } catch { /* ignore */ }
+
   const elements = Array.from(scope.querySelectorAll('*'));
     const mouseEvents = ['mouseover', 'mouseenter', 'click'];
     const focusEvents = ['focus', 'focusin'];
@@ -231,16 +297,28 @@ _DETECT_JAVASCRIPT_URLS_JS = """
     const attrs = ['href', 'src', 'action', 'formaction', 'data'];
     const hits = [];
 
-    const normalize = (value) => {
+    // Approximate what browsers do for scheme detection:
+    // - Trim leading/trailing ASCII whitespace and C0 control characters
+    // - Do NOT remove internal whitespace (e.g. `jav   ascript:` is not `javascript:`)
+    const normalizeForScheme = (value) => {
         if (value == null) return '';
-        const s = String(value).toLowerCase();
-        let out = '';
-        for (let i = 0; i < s.length; i++) {
-            // Remove ASCII whitespace/control chars (<= space) to normalize obfuscation.
-            if (s.charCodeAt(i) <= 0x20) continue;
-            out += s[i];
+        const s = String(value);
+        // Strip leading/trailing chars <= 0x20.
+        const stripped = s.replace(/^[\u0000-\u0020]+|[\u0000-\u0020]+$/g, '');
+        return stripped.toLowerCase();
+    };
+
+    const resolvedValue = (el, attr) => {
+        // Use DOM properties where available; these reflect browser URL parsing.
+        try {
+            if (attr === 'href' && typeof el.href === 'string') return el.href;
+            if (attr === 'src' && typeof el.src === 'string') return el.src;
+            if (attr === 'action' && typeof el.action === 'string') return el.action;
+            if (attr === 'formaction' && typeof el.formAction === 'string') return el.formAction;
+        } catch {
+            // ignore
         }
-        return out;
+        return '';
     };
 
     const elements = document.querySelectorAll('*');
@@ -249,7 +327,16 @@ _DETECT_JAVASCRIPT_URLS_JS = """
             try {
                 if (!el.hasAttribute(attr)) continue;
                 const raw = el.getAttribute(attr);
-                if (normalize(raw).startsWith('javascript:')) {
+                const schemeish = normalizeForScheme(raw);
+                // Primary check: raw attribute after trimming.
+                let isJavascript = schemeish.startsWith('javascript:');
+                // Secondary check: resolved property (more accurate for browser behavior).
+                if (!isJavascript) {
+                    const resolved = normalizeForScheme(resolvedValue(el, attr));
+                    isJavascript = resolved.startsWith('javascript:');
+                }
+
+                if (isJavascript) {
                     hits.push({ tag: (el.tagName || '').toLowerCase(), attr, value: raw });
                     if (hits.length >= 5) return hits;
                 }
@@ -371,6 +458,12 @@ class BrowserHarness:
             if not url:
                 return
 
+            # Ignore same-document hash navigations like `http://xssbench.local/#...`.
+            # These are often benign side-effects of anchor interactions and are
+            # not a reliable XSS execution signal.
+            if url.startswith(self._base_url + "#"):
+                return
+
             if url == self._base_url:
                 # Initial navigation to the synthetic document is expected.
                 # If we see subsequent navigations back to the same URL, that's
@@ -445,6 +538,16 @@ class BrowserHarness:
         if template is None:
             raise ValueError(f"Unknown payload_context: {payload_context!r}")
 
+        expected_href_click_url: str | None = None
+
+        def _execution_navigation_urls() -> list[str]:
+            return _filter_navigation_urls_for_execution(
+                self._navigation_requests,
+                base_url=self._base_url,
+                payload_context=payload_context,
+                expected_href_click_url=expected_href_click_url,
+            )
+
         html = template.replace("__XSSBENCH_PAYLOAD__", sanitized_html)
         html = html.replace("__XSSBENCH_PRELUDE__", _XSSBENCH_PRELUDE_HTML)
         self._current_html = html
@@ -463,8 +566,9 @@ class BrowserHarness:
         except Exception as exc:
             # If a payload immediately triggers navigation, consider that execution.
             if self._timeout_error is not None and isinstance(exc, self._timeout_error):
-                if self._navigation_requests:
-                    urls = ", ".join(self._navigation_requests[:3])
+                exec_nav = _execution_navigation_urls()
+                if exec_nav:
+                    urls = ", ".join(exec_nav[:3])
                     return VectorResult(
                         executed=True,
                         details=f"Executed: navigation:{urls}; payload={payload_html!r}",
@@ -536,8 +640,9 @@ class BrowserHarness:
                 details=f"Executed: {details}; payload={payload_html!r}",
             )
 
-        if self._navigation_requests:
-            urls = ", ".join(self._navigation_requests[:3])
+        exec_nav = _execution_navigation_urls()
+        if exec_nav:
+            urls = ", ".join(exec_nav[:3])
             return VectorResult(
                 executed=True,
                 details=f"Executed: navigation:{urls}; payload={payload_html!r}",
@@ -551,6 +656,18 @@ class BrowserHarness:
             )
 
         if payload_context == "href":
+            try:
+                # Use the resolved absolute link target so relative values match what the
+                # browser will navigate to.
+                expected_href_click_url = str(
+                    self._page.evaluate(
+                        "() => { const a = document.getElementById('xssbench-link'); return a ? String(a.href || '') : ''; }"
+                    )
+                    or ""
+                )
+            except Exception:
+                expected_href_click_url = None
+
             # `javascript:` URIs often require a real click gesture.
             try:
                 self._page.click("#xssbench-link", no_wait_after=True, timeout=timeout_ms)
@@ -567,8 +684,9 @@ class BrowserHarness:
             try:
                 self._page.evaluate(_TRIGGER_EVENTS_JS)
             except Exception as exc:
-                if self._navigation_requests:
-                    urls = ", ".join(self._navigation_requests[:3])
+                exec_nav = _execution_navigation_urls()
+                if exec_nav:
+                    urls = ", ".join(exec_nav[:3])
                     return VectorResult(
                         executed=True,
                         details=f"Executed: navigation:{urls}; payload={payload_html!r}",
@@ -592,8 +710,13 @@ class BrowserHarness:
                 anchors = self._page.query_selector_all("a[href], area[href]")
                 for h in anchors:
                     try:
-                        href = h.get_attribute("href") or ""
-                        normalized = "".join(ch for ch in href.lower() if ch not in " \t\r\n\f\v")
+                        # Use resolved `href` so we match what the browser will actually execute.
+                        resolved_href = ""
+                        try:
+                            resolved_href = str(self._page.evaluate("(el) => String(el.href || '')", h) or "")
+                        except Exception:
+                            resolved_href = h.get_attribute("href") or ""
+                        normalized = resolved_href.strip().lower()
                         if normalized.startswith("javascript:"):
                             h.click(timeout=timeout_ms, force=True)
                     except Exception:
@@ -603,8 +726,9 @@ class BrowserHarness:
 
         # Some payloads execute by causing a navigation rather than calling alert().
         # If we observed any document navigation attempt at any point, treat it as execution.
-        if self._navigation_requests:
-            urls = ", ".join(self._navigation_requests[:3])
+        exec_nav = _execution_navigation_urls()
+        if exec_nav:
+            urls = ", ".join(exec_nav[:3])
             return VectorResult(
                 executed=True,
                 details=f"Executed: navigation:{urls}; payload={payload_html!r}",
@@ -624,8 +748,9 @@ class BrowserHarness:
             except self._timeout_error:
                 pass
             except Exception as exc:
-                if self._navigation_requests:
-                    urls = ", ".join(self._navigation_requests[:3])
+                exec_nav = _execution_navigation_urls()
+                if exec_nav:
+                    urls = ", ".join(exec_nav[:3])
                     return VectorResult(
                         executed=True,
                         details=f"Executed: navigation:{urls}; payload={payload_html!r}",

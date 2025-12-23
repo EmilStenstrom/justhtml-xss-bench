@@ -115,3 +115,89 @@ def test_run_bench_fail_fast_stops_after_first_xss() -> None:
     assert summary.total_cases == 1
     assert summary.total_executed == 1
     assert calls == ["<img src=x onerror=1>"]
+
+
+def test_run_bench_wraps_href_payload_before_sanitizing() -> None:
+    from xssbench.bench import run_bench, Vector
+    from xssbench.sanitizers import Sanitizer
+
+    vectors = [
+        Vector(id="v1", description="", payload_html="javascript:alert(1)", payload_context="href"),
+    ]
+
+    seen_inputs: list[str] = []
+    seen_payload_contexts: list[str] = []
+
+    def sanitize(html: str) -> str:
+        seen_inputs.append(html)
+        # Simulate a sanitizer that strips javascript: to '#'
+        return '<a href="#">x</a>'
+
+    sanitizer = Sanitizer(name="s", description="", sanitize=sanitize)
+
+    def fake_runner(*, payload_html: str, sanitized_html: str, payload_context: str, timeout_ms: int, **_kwargs):
+        seen_payload_contexts.append(payload_context)
+        # No execution
+        return type("VR", (), {"executed": False, "details": "no"})()
+
+    summary = run_bench(vectors=vectors, sanitizers=[sanitizer], runner=fake_runner)
+
+    assert summary.total_cases == 1
+    assert seen_inputs == ['<a href="javascript:alert(1)">x</a>']
+    assert seen_payload_contexts == ["html"]
+
+
+def test_run_bench_wraps_js_payload_before_sanitizing() -> None:
+    from xssbench.bench import run_bench, Vector
+    from xssbench.sanitizers import Sanitizer
+
+    vectors = [
+        Vector(id="v1", description="", payload_html="alert(1)", payload_context="js"),
+    ]
+
+    seen_inputs: list[str] = []
+    seen_payload_contexts: list[str] = []
+
+    def sanitize(html: str) -> str:
+        seen_inputs.append(html)
+        return html
+
+    sanitizer = Sanitizer(name="s", description="", sanitize=sanitize)
+
+    def fake_runner(*, payload_html: str, sanitized_html: str, payload_context: str, timeout_ms: int, **_kwargs):
+        seen_payload_contexts.append(payload_context)
+        return type("VR", (), {"executed": False, "details": "no"})()
+
+    summary = run_bench(vectors=vectors, sanitizers=[sanitizer], runner=fake_runner)
+
+    assert summary.total_cases == 1
+    assert seen_inputs == ["<script>alert(1)</script>"]
+    assert seen_payload_contexts == ["html"]
+
+
+def test_run_bench_wraps_onerror_attr_payload_before_sanitizing() -> None:
+    from xssbench.bench import run_bench, Vector
+    from xssbench.sanitizers import Sanitizer
+
+    vectors = [
+        Vector(id="v1", description="", payload_html="alert(1)", payload_context="onerror_attr"),
+    ]
+
+    seen_inputs: list[str] = []
+    seen_payload_contexts: list[str] = []
+
+    def sanitize(html: str) -> str:
+        seen_inputs.append(html)
+        return html
+
+    sanitizer = Sanitizer(name="s", description="", sanitize=sanitize)
+
+    def fake_runner(*, payload_html: str, sanitized_html: str, payload_context: str, timeout_ms: int, **_kwargs):
+        seen_payload_contexts.append(payload_context)
+        return type("VR", (), {"executed": False, "details": "no"})()
+
+    summary = run_bench(vectors=vectors, sanitizers=[sanitizer], runner=fake_runner)
+
+    assert summary.total_cases == 1
+    assert seen_inputs == ['<img src="nonexistent://x" onerror="alert(1)">']
+    assert seen_payload_contexts == ["html"]

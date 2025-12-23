@@ -201,6 +201,13 @@ def _parse_check_args(argv: list[str]) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
+def _repr_truncated(value: str, *, limit: int = 400) -> str:
+    s = repr(value)
+    if len(s) <= limit:
+        return s
+    return s[: max(0, limit - 3)] + "..."
+
+
 def _print_table(summary) -> None:
     # Build per-sanitizer+browser counts.
     per = {}
@@ -221,6 +228,10 @@ def _print_table(summary) -> None:
             print(
                 f"- {r.sanitizer} / {r.browser} / {r.vector_id} ({r.payload_context}): {r.details}"
             )
+            if getattr(r, "sanitizer_input_html", ""):
+                print(f"  sanitizer_input_html={_repr_truncated(getattr(r, 'sanitizer_input_html'))}")
+            if r.sanitized_html:
+                print(f"  sanitized_html={_repr_truncated(r.sanitized_html)}")
 
     if errors:
         if xss:
@@ -230,6 +241,10 @@ def _print_table(summary) -> None:
             print(
                 f"- {r.sanitizer} / {r.browser} / {r.vector_id} ({r.payload_context}): {r.details}"
             )
+            if getattr(r, "sanitizer_input_html", ""):
+                print(f"  sanitizer_input_html={_repr_truncated(getattr(r, 'sanitizer_input_html'))}")
+            if r.sanitized_html:
+                print(f"  sanitized_html={_repr_truncated(r.sanitized_html)}")
 
     if xss or errors:
         print("")
@@ -417,6 +432,18 @@ def main(argv: list[str] | None = None) -> int:
                                 file=sys.stderr,
                                 flush=True,
                             )
+                            if hit.sanitized_html:
+                                print(
+                                    f"sanitized_html={_repr_truncated(hit.sanitized_html)}",
+                                    file=sys.stderr,
+                                    flush=True,
+                                )
+                            if getattr(hit, "sanitizer_input_html", ""):
+                                print(
+                                    f"sanitizer_input_html={_repr_truncated(getattr(hit, 'sanitizer_input_html'), limit=2000)}",
+                                    file=sys.stderr,
+                                    flush=True,
+                                )
                             pool.terminate()
                             return 1
 
@@ -471,6 +498,18 @@ def main(argv: list[str] | None = None) -> int:
                 file=sys.stderr,
                 flush=True,
             )
+            if hit.sanitized_html:
+                print(
+                    f"sanitized_html={_repr_truncated(hit.sanitized_html, limit=2000)}",
+                    file=sys.stderr,
+                    flush=True,
+                )
+            if getattr(hit, "sanitizer_input_html", ""):
+                print(
+                    f"sanitizer_input_html={_repr_truncated(getattr(hit, 'sanitizer_input_html'), limit=2000)}",
+                    file=sys.stderr,
+                    flush=True,
+                )
         return 1
 
     _print_table(summary)
@@ -491,10 +530,13 @@ def main(argv: list[str] | None = None) -> int:
                     "browser": r.browser,
                     "vector_id": r.vector_id,
                     "payload_context": r.payload_context,
+                    "run_payload_context": getattr(r, "run_payload_context", r.payload_context),
                     "outcome": r.outcome,
                     "executed": r.executed,
                     "details": r.details,
+                    "sanitizer_input_html": getattr(r, "sanitizer_input_html", ""),
                     "sanitized_html": r.sanitized_html,
+                    "rendered_html": getattr(r, "rendered_html", ""),
                 }
                 for r in summary.results
             ],

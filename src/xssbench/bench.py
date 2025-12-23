@@ -11,6 +11,7 @@ from .harness import (
     BrowserHarness,
     PayloadContext,
     VectorResult,
+    render_html_document,
     run_vector_in_browser,
 )
 from .sanitizers import Sanitizer
@@ -30,10 +31,13 @@ class BenchCaseResult:
     browser: str
     vector_id: str
     payload_context: PayloadContext
+    run_payload_context: PayloadContext
     outcome: str  # 'pass' | 'xss' | 'error'
     executed: bool
     details: str
+    sanitizer_input_html: str
     sanitized_html: str
+    rendered_html: str
 
 
 @dataclass(frozen=True, slots=True)
@@ -153,6 +157,47 @@ def run_bench(
     progress: Progress | None = None,
     fail_fast: bool = False,
 ) -> BenchSummary:
+    def _prepare_for_sanitizer(
+        *, vector: Vector, sanitizer: Sanitizer
+    ) -> tuple[str, str, PayloadContext]:
+        # Our vector files include contexts like `href` where the payload is not
+        # an HTML fragment by itself (it's an attribute value). HTML sanitizers
+        # such as nh3/bleach generally expect to see the attribute in context.
+        #
+        # For these, we wrap the payload in minimal HTML before sanitizing, and
+        # then run the sanitized HTML in normal `html` context.
+        if vector.payload_context == "href":
+            sanitizer_input_html = f'<a href="{vector.payload_html}">x</a>'
+            return sanitizer_input_html, sanitizer.sanitize(sanitizer_input_html), "html"
+
+        # JS-context vectors are not standalone HTML by themselves; they're meant
+        # to be inserted into a <script> block (or used within one). For HTML
+        # sanitizers, give that minimal script-tag context and then run the
+        # sanitized HTML as normal HTML.
+        if vector.payload_context == "js":
+            sanitizer_input_html = f"<script>{vector.payload_html}</script>"
+            return sanitizer_input_html, sanitizer.sanitize(sanitizer_input_html), "html"
+
+        if vector.payload_context == "js_arg":
+            sanitizer_input_html = f"<script>setTimeout(function(){{}}, {vector.payload_html});</script>"
+            return sanitizer_input_html, sanitizer.sanitize(sanitizer_input_html), "html"
+
+        if vector.payload_context == "js_string":
+            sanitizer_input_html = f"<script>var __xssbench = '{vector.payload_html}';</script>"
+            return sanitizer_input_html, sanitizer.sanitize(sanitizer_input_html), "html"
+
+        if vector.payload_context == "js_string_double":
+            sanitizer_input_html = f'<script>var __xssbench = "{vector.payload_html}";</script>'
+            return sanitizer_input_html, sanitizer.sanitize(sanitizer_input_html), "html"
+
+        if vector.payload_context == "onerror_attr":
+            sanitizer_input_html = (
+                f'<img src="nonexistent://x" onerror="{vector.payload_html}">'
+            )
+            return sanitizer_input_html, sanitizer.sanitize(sanitizer_input_html), "html"
+
+        sanitizer_input_html = vector.payload_html
+        return sanitizer_input_html, sanitizer.sanitize(sanitizer_input_html), vector.payload_context
     def _auto_timeout_ms(*, payload_html: str, sanitized_html: str) -> int:
         # Conservative-but-fast heuristics. Most vectors are synchronous; only a
         # handful need longer to execute.
@@ -204,17 +249,22 @@ def run_bench(
                 for sanitizer in sanitizers:
                     for vector in vectors:
                         try:
-                            sanitized_html = sanitizer.sanitize(vector.payload_html)
+                            sanitizer_input_html, sanitized_html, payload_context_to_run = _prepare_for_sanitizer(
+                                vector=vector, sanitizer=sanitizer
+                            )
                         except Exception as exc:
                             result = BenchCaseResult(
                                 sanitizer=sanitizer.name,
                                 browser=browser,
                                 vector_id=vector.id,
                                 payload_context=vector.payload_context,
+                                run_payload_context=vector.payload_context,
                                 outcome="error",
                                 executed=False,
                                 details=f"Sanitizer error: {exc!r}",
+                                sanitizer_input_html="",
                                 sanitized_html="",
+                                rendered_html="",
                             )
                             results.append(result)
                             case_index += 1
@@ -223,6 +273,10 @@ def run_bench(
                             continue
 
                         try:
+                            rendered_html = render_html_document(
+                                sanitized_html=sanitized_html,
+                                payload_context=payload_context_to_run,
+                            )
                             per_case_timeout_ms = _timeout_for_case(
                                 payload_html=vector.payload_html,
                                 sanitized_html=sanitized_html,
@@ -230,7 +284,7 @@ def run_bench(
                             vector_result = harness.run(
                                 payload_html=vector.payload_html,
                                 sanitized_html=sanitized_html,
-                                payload_context=vector.payload_context,
+                                payload_context=payload_context_to_run,
                                 timeout_ms=per_case_timeout_ms,
                             )
                         except Exception as exc:
@@ -239,10 +293,13 @@ def run_bench(
                                 browser=browser,
                                 vector_id=vector.id,
                                 payload_context=vector.payload_context,
+                                run_payload_context=payload_context_to_run,
                                 outcome="error",
                                 executed=False,
                                 details=f"Harness error: {exc}",
+                                sanitizer_input_html=sanitizer_input_html,
                                 sanitized_html=sanitized_html,
+                                rendered_html=rendered_html if "rendered_html" in locals() else "",
                             )
                             results.append(result)
                             case_index += 1
@@ -256,10 +313,13 @@ def run_bench(
                             browser=browser,
                             vector_id=vector.id,
                             payload_context=vector.payload_context,
+                            run_payload_context=payload_context_to_run,
                             outcome=outcome,
                             executed=vector_result.executed,
                             details=vector_result.details,
+                            sanitizer_input_html=sanitizer_input_html,
                             sanitized_html=sanitized_html,
+                            rendered_html=rendered_html,
                         )
                         results.append(result)
                         case_index += 1
@@ -291,17 +351,22 @@ def run_bench(
         for browser in browsers:
             for vector in vectors:
                 try:
-                    sanitized_html = sanitizer.sanitize(vector.payload_html)
+                    sanitizer_input_html, sanitized_html, payload_context_to_run = _prepare_for_sanitizer(
+                        vector=vector, sanitizer=sanitizer
+                    )
                 except Exception as exc:
                     result = BenchCaseResult(
                         sanitizer=sanitizer.name,
                         browser=browser,
                         vector_id=vector.id,
                         payload_context=vector.payload_context,
+                        run_payload_context=vector.payload_context,
                         outcome="error",
                         executed=False,
                         details=f"Sanitizer error: {exc!r}",
+                        sanitizer_input_html="",
                         sanitized_html="",
+                        rendered_html="",
                     )
                     results.append(result)
                     case_index += 1
@@ -310,6 +375,10 @@ def run_bench(
                     continue
 
                 try:
+                    rendered_html = render_html_document(
+                        sanitized_html=sanitized_html,
+                        payload_context=payload_context_to_run,
+                    )
                     per_case_timeout_ms = _timeout_for_case(
                         payload_html=vector.payload_html,
                         sanitized_html=sanitized_html,
@@ -317,7 +386,7 @@ def run_bench(
                     vector_result = runner(
                         payload_html=vector.payload_html,
                         sanitized_html=sanitized_html,
-                        payload_context=vector.payload_context,
+                        payload_context=payload_context_to_run,
                         browser=browser,
                         timeout_ms=per_case_timeout_ms,
                     )
@@ -327,10 +396,13 @@ def run_bench(
                         browser=browser,
                         vector_id=vector.id,
                         payload_context=vector.payload_context,
+                        run_payload_context=payload_context_to_run,
                         outcome="error",
                         executed=False,
                         details=f"Harness error: {exc}",
+                        sanitizer_input_html=sanitizer_input_html,
                         sanitized_html=sanitized_html,
+                        rendered_html=rendered_html if "rendered_html" in locals() else "",
                     )
                     results.append(result)
                     case_index += 1
@@ -345,10 +417,13 @@ def run_bench(
                     browser=browser,
                     vector_id=vector.id,
                     payload_context=vector.payload_context,
+                    run_payload_context=payload_context_to_run,
                     outcome=outcome,
                     executed=vector_result.executed,
                     details=vector_result.details,
+                    sanitizer_input_html=sanitizer_input_html,
                     sanitized_html=sanitized_html,
+                    rendered_html=rendered_html,
                 )
                 results.append(result)
                 case_index += 1
