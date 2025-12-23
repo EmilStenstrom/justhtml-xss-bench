@@ -15,6 +15,7 @@
     "description": "Inline CSS containing potentially executable constructs",
     "payload_html": "<p style=\"color: red; position: fixed; background-color: url(http://x); font-weight: bold; font-style: expression(alert(1)); color: @import; text-decoration: javascript:alert(1); font-size: 12px\\6; border-radius: 4px; : x; color: ; broken\">Hi</p>",
     "payload_context": "html",
+    "expected_tags": ["p"],
     "source_url": "https://pypi.org/project/bleach/"
   },
   {
@@ -22,6 +23,7 @@
     "description": "HTML with event handler attribute (onclick)",
     "payload_html": "<p onclick=alert(1)>Hi</p><img src=x onerror=alert(1)>",
     "payload_context": "html",
+    "expected_tags": ["p", "img"],
     "source_url": "https://pypi.org/project/bleach/"
   },
   {
@@ -29,6 +31,7 @@
     "description": "iframe with srcdoc HTML payload",
     "payload_html": "<iframe srcdoc=\"<p onclick=alert(1)>X</p>\"></iframe>",
     "payload_context": "html",
+    "expected_tags": [],
     "source_url": "https://pypi.org/project/bleach/"
   },
   {
@@ -36,6 +39,7 @@
     "description": "HTML-escaped tag text containing an event handler",
     "payload_html": "&lt;img src=x onerror=alert(1)&gt;",
     "payload_context": "html",
+    "expected_tags": [],
     "source_url": "https://pypi.org/project/bleach/"
   },
   {
@@ -43,6 +47,7 @@
     "description": "HTML with event handler attribute (onclick)",
     "payload_html": "<!--x--><p onclick='alert(1)'>Hi</p>",
     "payload_context": "html",
+    "expected_tags": ["p"],
     "source_url": "https://pypi.org/project/bleach/"
   },
   {
@@ -50,6 +55,7 @@
     "description": "Script tag payload",
     "payload_html": "<script>alert(1)</script>",
     "payload_context": "html",
+    "expected_tags": [],
     "source_url": "https://pypi.org/project/bleach/"
   },
   {
@@ -57,6 +63,7 @@
     "description": "Script tag payload",
     "payload_html": "<script>alert(1)</script><p>Ok</p>",
     "payload_context": "html",
+    "expected_tags": ["p"],
     "source_url": "https://pypi.org/project/bleach/"
   },
   {
@@ -64,6 +71,7 @@
     "description": "Script tag payload",
     "payload_html": ">\"><script>alert(\"XSS\")</script>&",
     "payload_context": "html",
+    "expected_tags": [],
     "source_url": "https://pypi.org/project/bleach/"
   },
   {
@@ -71,6 +79,7 @@
     "description": "STYLE tag payload containing @import/javascript: URL",
     "payload_html": "\"><STYLE>@import\"javascript:alert('XSS')\";</STYLE>",
     "payload_context": "html",
+    "expected_tags": [],
     "source_url": "https://pypi.org/project/bleach/"
   },
   {
@@ -78,6 +87,7 @@
     "description": "Malformed nested script-tag injection",
     "payload_html": "<scr<script></script>ipt type=\"text/javascript\">alert(\"foo\");</<script></script>script<del></del>>",
     "payload_context": "html",
+    "expected_tags": [],
     "source_url": "https://pypi.org/project/bleach/"
   },
   {
@@ -85,6 +95,7 @@
     "description": "IMG with data:text/html URL containing a script tag",
     "payload_html": "<img src=\"data:text/html,<script>alert(1)</script>\">",
     "payload_context": "html",
+    "expected_tags": ["img"],
     "source_url": "https://pypi.org/project/bleach/"
   },
   {
@@ -92,6 +103,7 @@
     "description": "Link with javascript: URL in href",
     "payload_html": "<a href=\"javascript:alert(1)\">x</a>",
     "payload_context": "html",
+    "expected_tags": ["a"],
     "source_url": "https://pypi.org/project/bleach/"
   },
   {
@@ -99,6 +111,7 @@
     "description": "Obfuscated Link with javascript: URL in href (tab)",
     "payload_html": "<a href=\"javas&#x09;cript:alert(1)\">hi</a>",
     "payload_context": "html",
+    "expected_tags": ["a"],
     "source_url": "https://pypi.org/project/bleach/"
   },
   {
@@ -106,6 +119,7 @@
     "description": "IMG with javascript: URL in src",
     "payload_html": "<IMG SRC=\"javascript:alert('XSS');\">",
     "payload_context": "html",
+    "expected_tags": ["img"],
     "source_url": "https://pypi.org/project/bleach/"
   },
   {
@@ -113,6 +127,7 @@
     "description": "Obfuscated IMG with javascript: URL in src (newline)",
     "payload_html": "<IMG SRC=\"jav&#x0A;ascript:alert(<WBR>'XSS');\">",
     "payload_context": "html",
+    "expected_tags": ["img"],
     "source_url": "https://pypi.org/project/bleach/"
   },
   {
@@ -120,6 +135,7 @@
     "description": "IMG with javascript: URL in src",
     "payload_html": "<IMG SRC=JaVaScRiPt:alert('XSS')>",
     "payload_context": "html",
+    "expected_tags": ["img"],
     "source_url": "https://pypi.org/project/bleach/"
   },
   {
@@ -127,6 +143,7 @@
     "description": "IMG with javascript: URL in src",
     "payload_html": "<IMG SRC=javascript:alert('XSS')>",
     "payload_context": "html",
+    "expected_tags": ["img"],
     "source_url": "https://pypi.org/project/bleach/"
   },
   {
@@ -134,6 +151,7 @@
     "description": "Obfuscated Link with javascript: URL in href (carriage return)",
     "payload_html": "<a href=\"java&#x0d;script:alert(1)\">x</a>",
     "payload_context": "html",
+    "expected_tags": ["a"],
     "source_url": "https://pypi.org/project/bleach/"
   }
 ]

@@ -21,6 +21,7 @@ test = [
 sanitizers = [
   "bleach>=6.1",
   "nh3>=0.2.20",
+  "lxml-html-clean>=0.4.0",
 ]
 
 [project.scripts]

@@ -31,6 +31,7 @@ def test_run_bench_uses_runner_and_counts_executed() -> None:
     assert summary.total_cases == 2
     assert summary.total_executed == 1
     assert summary.total_errors == 0
+    assert summary.total_lossy == 0
     assert [r.vector_id for r in summary.results if r.executed] == ["v1"]
 
 
@@ -57,6 +58,7 @@ def test_run_bench_external_script_request_counts_as_xss() -> None:
 
     assert summary.total_cases == 3
     assert summary.total_errors == 0
+    assert summary.total_lossy == 0
     assert summary.total_executed == 1
     assert [r.vector_id for r in summary.results if r.outcome == "xss"] == ["v2"]
 
@@ -93,6 +95,39 @@ def test_load_vectors_accepts_meta_wrapper() -> None:
     assert [v.id for v in vectors] == ["v1"]
 
 
+def test_load_vectors_ignores_expected_tags_infer_meta_flag() -> None:
+    from xssbench.bench import load_vectors
+
+    payload = {
+        "schema": "xssbench.vectorfile.v1",
+        "meta": {
+            "tool": "xssbench",
+            "source_url": "https://example.invalid/",
+            "expected_tags_infer": True,
+            "license": {
+                "spdx": "MIT",
+                "url": "https://spdx.org/licenses/MIT.html",
+                "file": "vectors/example-LICENSE.txt",
+            },
+        },
+        "vectors": [
+            {
+                "id": "v1",
+                "description": "d",
+                "payload_html": "<b>ok</b><img src=x onerror=alert(1)>",
+                "payload_context": "html",
+            }
+        ],
+    }
+
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "vectors.json"
+        p.write_text(json.dumps(payload), encoding="utf-8")
+        vectors = load_vectors([p])
+
+    assert vectors[0].expected_tags is None
+
+
 def test_run_bench_fail_fast_stops_after_first_xss() -> None:
     from xssbench.bench import run_bench, Vector
     from xssbench.sanitizers import Sanitizer
@@ -114,6 +149,7 @@ def test_run_bench_fail_fast_stops_after_first_xss() -> None:
 
     assert summary.total_cases == 1
     assert summary.total_executed == 1
+    assert summary.total_lossy == 0
     assert calls == ["<img src=x onerror=1>"]
 
 
@@ -143,6 +179,7 @@ def test_run_bench_wraps_href_payload_before_sanitizing() -> None:
     summary = run_bench(vectors=vectors, sanitizers=[sanitizer], runner=fake_runner)
 
     assert summary.total_cases == 1
+    assert summary.total_lossy == 0
     assert seen_inputs == ['<a href="javascript:alert(1)">x</a>']
     assert seen_payload_contexts == ["html"]
 
@@ -171,6 +208,7 @@ def test_run_bench_does_not_wrap_js_payload_before_sanitizing() -> None:
     summary = run_bench(vectors=vectors, sanitizers=[sanitizer], runner=fake_runner)
 
     assert summary.total_cases == 1
+    assert summary.total_lossy == 0
     assert seen_inputs == ["alert(1)"]
     assert seen_payload_contexts == ["js"]
 
@@ -194,6 +232,7 @@ def test_run_bench_skips_unsupported_contexts() -> None:
     summary = run_bench(vectors=vectors, sanitizers=[sanitizer], runner=lambda **_: type("VR", (), {"executed": False, "details": "no"})())
 
     assert summary.total_cases == 2
+    assert summary.total_lossy == 0
     outcomes = {r.vector_id: r.outcome for r in summary.results}
     assert outcomes["v1"] == "skip"
     assert outcomes["v2"] == "pass"
@@ -223,5 +262,62 @@ def test_run_bench_wraps_onerror_attr_payload_before_sanitizing() -> None:
     summary = run_bench(vectors=vectors, sanitizers=[sanitizer], runner=fake_runner)
 
     assert summary.total_cases == 1
+    assert summary.total_lossy == 0
     assert seen_inputs == ['<img src="nonexistent://x" onerror="alert(1)">']
     assert seen_payload_contexts == ["html"]
+
+
+def test_run_bench_marks_missing_expected_tags_as_lossy_and_skips_runner() -> None:
+    vectors = [
+        Vector(
+            id="v1",
+            description="",
+            payload_html="<b>keep</b>",
+            payload_context="html",
+            expected_tags=("b",),
+        ),
+    ]
+
+    sanitizer = Sanitizer(name="s", description="", sanitize=lambda _html: "keep")
+
+    called = {"n": 0}
+
+    def fake_runner(**_kwargs):
+        called["n"] += 1
+        return type("VR", (), {"executed": False, "details": "no"})()
+
+    summary = run_bench(vectors=vectors, sanitizers=[sanitizer], runner=fake_runner)
+
+    assert summary.total_cases == 1
+    assert summary.total_executed == 0
+    assert summary.total_errors == 0
+    assert summary.total_lossy == 1
+    assert called["n"] == 0
+    assert summary.results[0].outcome == "lossy"
+
+
+def test_run_bench_empty_expected_tags_means_no_tags_allowed() -> None:
+    vectors = [
+        Vector(
+            id="v1",
+            description="",
+            payload_html="<b>keep</b>",
+            payload_context="html",
+            expected_tags=(),
+        ),
+    ]
+
+    sanitizer = Sanitizer(name="s", description="", sanitize=lambda _html: "<b>still here</b>")
+
+    called = {"n": 0}
+
+    def fake_runner(**_kwargs):
+        called["n"] += 1
+        return type("VR", (), {"executed": False, "details": "no"})()
+
+    summary = run_bench(vectors=vectors, sanitizers=[sanitizer], runner=fake_runner)
+
+    assert summary.total_cases == 1
+    assert summary.total_lossy == 1
+    assert called["n"] == 0
+    assert summary.results[0].outcome == "lossy"

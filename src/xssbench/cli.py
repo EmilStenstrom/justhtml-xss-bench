@@ -12,7 +12,7 @@ from .check import check_candidates
 from .compile import compile_vectors
 from .harness import BrowserName
 from .portswigger import ensure_portswigger_refs_file
-from .sanitizers import available_sanitizers, get_sanitizer
+from .sanitizers import available_sanitizers, default_sanitizers, get_sanitizer
 
 
 _WORKER_VECTOR_PATHS: tuple[str, ...] | None = None
@@ -88,7 +88,7 @@ def _parse_run_args(argv: list[str]) -> argparse.Namespace:
         "--sanitizers",
         nargs="+",
         default=None,
-        help="One or more sanitizer names (default: all available)",
+        help="One or more sanitizer names (default: rich HTML sanitizers)",
     )
 
     parser.add_argument(
@@ -216,14 +216,16 @@ def _print_table(summary) -> None:
     per = {}
     for r in summary.results:
         key = (r.sanitizer, r.browser)
-        per.setdefault(key, {"total": 0, "executed": 0, "errors": 0, "skipped": 0})
+        per.setdefault(key, {"total": 0, "executed": 0, "errors": 0, "lossy": 0, "skipped": 0})
         per[key]["total"] += 1
         per[key]["executed"] += 1 if r.executed else 0
         per[key]["errors"] += 1 if r.outcome == "error" else 0
+        per[key]["lossy"] += 1 if r.outcome == "lossy" else 0
         per[key]["skipped"] += 1 if r.outcome == "skip" else 0
 
     xss = [r for r in summary.results if r.outcome == "xss"]
     errors = [r for r in summary.results if r.outcome == "error"]
+    lossy = [r for r in summary.results if r.outcome == "lossy"]
 
     # Put detailed output first; print the summary table last.
     if xss:
@@ -250,16 +252,30 @@ def _print_table(summary) -> None:
             if r.sanitized_html:
                 print(f"  sanitized_html={_repr_truncated(r.sanitized_html)}")
 
-    if xss or errors:
+    if lossy:
+        if xss or errors:
+            print("")
+        print("Lossy (expected tags stripped):")
+        for r in lossy:
+            print(
+                f"- {r.sanitizer} / {r.browser} / {r.vector_id} ({r.payload_context}): {r.details}"
+            )
+            if getattr(r, "sanitizer_input_html", ""):
+                print(f"  sanitizer_input_html={_repr_truncated(getattr(r, 'sanitizer_input_html'))}")
+            # Always print sanitized_html for lossy cases, even if it's empty.
+            # An empty string is often the most important signal when debugging.
+            print(f"  sanitized_html={_repr_truncated(getattr(r, 'sanitized_html', ''))}")
+
+    if xss or errors or lossy:
         print("")
 
-    header = f"{'sanitizer':<22}  {'browser':<8}  {'xss':>6}  {'errors':>6}  {'skipped':>7}  {'total':>5}"
+    header = f"{'sanitizer':<22}  {'browser':<8}  {'xss':>6}  {'lossy':>6}  {'errors':>6}  {'skipped':>7}  {'total':>5}"
     print(header)
     print("-" * len(header))
     for (name, browser) in sorted(per.keys()):
         row = per[(name, browser)]
         print(
-            f"{name:<22}  {browser:<8}  {row['executed']:>6}  {row['errors']:>6}  {row['skipped']:>7}  {row['total']:>5}"
+            f"{name:<22}  {browser:<8}  {row['executed']:>6}  {row['lossy']:>6}  {row['errors']:>6}  {row['skipped']:>7}  {row['total']:>5}"
         )
 
 
@@ -354,7 +370,7 @@ def main(argv: list[str] | None = None) -> int:
     vectors = load_vectors(vector_paths)
 
     if args.sanitizers is None:
-        sanitizers = list(available_sanitizers().values())
+        sanitizers = list(default_sanitizers().values())
     else:
         sanitizers = [get_sanitizer(n) for n in args.sanitizers]
 
@@ -383,6 +399,8 @@ def main(argv: list[str] | None = None) -> int:
             if args.progress_every == 1:
                 if result.outcome == "error":
                     ch = "E"
+                elif result.outcome == "lossy":
+                    ch = "L"
                 elif result.executed:
                     ch = "X"
                 else:
@@ -492,6 +510,7 @@ def main(argv: list[str] | None = None) -> int:
                 "total_cases": len(results),
                 "total_executed": sum(1 for r in results if r.executed),
                 "total_errors": sum(1 for r in results if r.outcome == "error"),
+                "total_lossy": sum(1 for r in results if r.outcome == "lossy"),
                 "results": results,
             })()
         else:
@@ -542,6 +561,7 @@ def main(argv: list[str] | None = None) -> int:
             "total_cases": summary.total_cases,
             "total_executed": summary.total_executed,
             "total_errors": summary.total_errors,
+            "total_lossy": getattr(summary, "total_lossy", 0),
             "results": [
                 {
                     "sanitizer": r.sanitizer,
@@ -562,7 +582,7 @@ def main(argv: list[str] | None = None) -> int:
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
-    if summary.total_errors > 0:
+    if summary.total_errors > 0 or getattr(summary, "total_lossy", 0) > 0:
         return 2
     return 1 if summary.total_executed > 0 else 0
 

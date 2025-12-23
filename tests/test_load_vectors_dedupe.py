@@ -8,7 +8,7 @@ import pytest
 from xssbench.compile import compile_vectors
 
 
-def _read_compiled(path: Path) -> list[dict[str, str]]:
+def _read_compiled(path: Path) -> list[dict[str, object]]:
     data = json.loads(path.read_text(encoding="utf-8"))
     assert isinstance(data, list)
     assert all(isinstance(x, dict) for x in data)

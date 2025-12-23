@@ -43,7 +43,7 @@ def compile_vectors(
         "onerror_attr",
     }
 
-    out: list[dict[str, str]] = []
+    out: list[dict[str, object]] = []
     expanded = 0
     skipped = 0
 
@@ -90,6 +90,14 @@ def compile_vectors(
             vector_id = str(item["id"])
             payload_html = str(item["payload_html"])
             description = str(item["description"])
+            expected_tags = item.get("expected_tags")
+            if expected_tags is not None:
+                if not isinstance(expected_tags, list) or not all(
+                    isinstance(x, str) for x in expected_tags
+                ):
+                    raise ValueError(
+                        f"expected_tags must be a list of strings when present: {path}"
+                    )
 
             for payload_context in contexts:
                 payload_context = str(payload_context)
@@ -124,6 +132,7 @@ def compile_vectors(
                         "description": description,
                         "payload_html": payload_html,
                         "payload_context": payload_context,
+                        **({"expected_tags": expected_tags} if expected_tags is not None else {}),
                     }
                 )
 

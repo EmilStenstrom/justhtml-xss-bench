@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import re
 import json
 from pathlib import Path
-import re
+import string
 from typing import Callable, Iterable
 
 from .harness import (
@@ -23,6 +24,11 @@ class Vector:
     description: str
     payload_html: str
     payload_context: PayloadContext = "html"
+    # Tags we expect to survive sanitization.
+    # - None: no preservation expectation (backwards-compatible for old vector packs)
+    # - (): explicitly expect NO tags to remain after sanitization
+    # - ("a", "p", ...): expect these tags to remain after sanitization
+    expected_tags: tuple[str, ...] | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -32,7 +38,7 @@ class BenchCaseResult:
     vector_id: str
     payload_context: PayloadContext
     run_payload_context: PayloadContext
-    outcome: str  # 'pass' | 'xss' | 'error'
+    outcome: str  # 'pass' | 'xss' | 'lossy' | 'skip' | 'error'
     executed: bool
     details: str
     sanitizer_input_html: str
@@ -45,7 +51,68 @@ class BenchSummary:
     total_cases: int
     total_executed: int
     total_errors: int
+    total_lossy: int
     results: list[BenchCaseResult]
+
+
+class _TagCollector:
+    def __init__(self) -> None:
+        from html.parser import HTMLParser
+
+        class _P(HTMLParser):
+            def __init__(self, outer: "_TagCollector") -> None:
+                super().__init__(convert_charrefs=True)
+                self._outer = outer
+
+            def handle_starttag(self, tag: str, attrs) -> None:  # type: ignore[override]
+                self._outer.tags.add(tag.lower())
+
+            def handle_startendtag(self, tag: str, attrs) -> None:  # type: ignore[override]
+                self._outer.tags.add(tag.lower())
+
+        self.tags: set[str] = set()
+        self._parser = _P(self)
+
+    def feed(self, html: str) -> set[str]:
+        try:
+            self._parser.feed(html)
+            self._parser.close()
+        except Exception:
+            # Best-effort: if parsing fails, return what we saw.
+            pass
+        return self.tags
+
+
+def _missing_expected_tags(*, expected_tags: Iterable[str], sanitized_html: str) -> list[str]:
+    expected = {str(t).lower() for t in expected_tags if str(t).strip()}
+    if not expected:
+        return []
+
+    tags = _TagCollector().feed(sanitized_html)
+    missing = sorted(expected - tags)
+    return missing
+
+
+def _unexpected_tags_when_none_expected(*, sanitized_html: str) -> list[str]:
+    tags = sorted(_TagCollector().feed(sanitized_html))
+    return tags
+
+
+def _normalize_expected_tag(tag: str) -> str:
+    t = str(tag).strip().lower()
+    if not t:
+        raise ValueError("expected_tags entries must be non-empty")
+    # Keep this intentionally permissive (HTML + SVG + MathML + custom elements).
+    # Reject obvious garbage that would make the check meaningless.
+    if any(ch.isspace() for ch in t) or "<" in t or ">" in t:
+        raise ValueError(f"Invalid tag name in expected_tags: {tag!r}")
+    # Quick sanity: must start with a letter, and contain only reasonable name chars.
+    if t[0] not in string.ascii_lowercase:
+        raise ValueError(f"Invalid tag name in expected_tags: {tag!r}")
+    for ch in t:
+        if ch not in (string.ascii_lowercase + string.digits + "-:"):
+            raise ValueError(f"Invalid tag name in expected_tags: {tag!r}")
+    return t
 
 
 def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
@@ -83,6 +150,7 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
                 raise ValueError(
                     f"Vector file object must contain a 'vectors' key: {path}"
                 )
+
             data = data["vectors"]
 
         if not isinstance(data, list):
@@ -98,6 +166,8 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
                 raise ValueError(f"Vector missing keys {sorted(missing)}: {path}")
 
             raw_context = item.get("payload_context")
+            expected_tags_key_present = "expected_tags" in item
+            raw_expected_tags = item.get("expected_tags")
             if raw_context is None:
                 contexts: list[str] = ["html"]
             elif isinstance(raw_context, str):
@@ -129,12 +199,35 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
 
                 payload_html = str(item["payload_html"])
 
+                expected_tags: tuple[str, ...] | None
+                if not expected_tags_key_present:
+                    expected_tags = None
+                elif raw_expected_tags is None:
+                    raise ValueError(f"expected_tags must be a list of strings (got null): {path}")
+                elif isinstance(raw_expected_tags, list):
+                    if not all(isinstance(x, str) for x in raw_expected_tags):
+                        raise ValueError(f"expected_tags must contain only strings: {path}")
+                    normalized = [_normalize_expected_tag(x) for x in raw_expected_tags]
+                    # preserve order but de-dup
+                    seen: set[str] = set()
+                    deduped: list[str] = []
+                    for t in normalized:
+                        if t not in seen:
+                            seen.add(t)
+                            deduped.append(t)
+                    expected_tags = tuple(deduped)
+                else:
+                    raise ValueError(
+                        f"expected_tags must be a list of strings (got {type(raw_expected_tags)!r}): {path}"
+                    )
+
                 vectors.append(
                     Vector(
                         id=vector_id,
                         description=str(item["description"]),
                         payload_html=payload_html,
                         payload_context=payload_context,  # type: ignore[arg-type]
+                        expected_tags=expected_tags,
                     )
                 )
 
@@ -276,6 +369,61 @@ def run_bench(
                                 progress(case_index, total_planned, result)
                             continue
 
+                        if vector.expected_tags is not None:
+                            if len(vector.expected_tags) == 0:
+                                unexpected = _unexpected_tags_when_none_expected(
+                                    sanitized_html=sanitized_html
+                                )
+                                if unexpected:
+                                    result = BenchCaseResult(
+                                        sanitizer=sanitizer.name,
+                                        browser=browser,
+                                        vector_id=vector.id,
+                                        payload_context=vector.payload_context,
+                                        run_payload_context=payload_context_to_run,
+                                        outcome="lossy",
+                                        executed=False,
+                                        details=(
+                                            "Expected no tags after sanitization, but found: "
+                                            + ", ".join(unexpected[:20])
+                                        ),
+                                        sanitizer_input_html=sanitizer_input_html,
+                                        sanitized_html=sanitized_html,
+                                        rendered_html="",
+                                    )
+                                    results.append(result)
+                                    case_index += 1
+                                    if progress is not None:
+                                        progress(case_index, total_planned, result)
+                                    continue
+                            else:
+                                missing_tags = _missing_expected_tags(
+                                    expected_tags=vector.expected_tags,
+                                    sanitized_html=sanitized_html,
+                                )
+                                if missing_tags:
+                                    result = BenchCaseResult(
+                                        sanitizer=sanitizer.name,
+                                        browser=browser,
+                                        vector_id=vector.id,
+                                        payload_context=vector.payload_context,
+                                        run_payload_context=payload_context_to_run,
+                                        outcome="lossy",
+                                        executed=False,
+                                        details=(
+                                            "Missing expected tags after sanitization: "
+                                            + ", ".join(missing_tags)
+                                        ),
+                                        sanitizer_input_html=sanitizer_input_html,
+                                        sanitized_html=sanitized_html,
+                                        rendered_html="",
+                                    )
+                                    results.append(result)
+                                    case_index += 1
+                                    if progress is not None:
+                                        progress(case_index, total_planned, result)
+                                    continue
+
                         try:
                             rendered_html = render_html_document(
                                 sanitized_html=sanitized_html,
@@ -333,21 +481,25 @@ def run_bench(
                             total_cases = len(results)
                             total_executed = sum(1 for r in results if r.executed)
                             total_errors = sum(1 for r in results if r.outcome == "error")
+                            total_lossy = sum(1 for r in results if r.outcome == "lossy")
                             return BenchSummary(
                                 total_cases=total_cases,
                                 total_executed=total_executed,
                                 total_errors=total_errors,
+                                total_lossy=total_lossy,
                                 results=results,
                             )
 
         total_cases = len(results)
         total_executed = sum(1 for r in results if r.executed)
         total_errors = sum(1 for r in results if r.outcome == "error")
+        total_lossy = sum(1 for r in results if r.outcome == "lossy")
 
         return BenchSummary(
             total_cases=total_cases,
             total_executed=total_executed,
             total_errors=total_errors,
+            total_lossy=total_lossy,
             results=results,
         )
 
@@ -401,6 +553,61 @@ def run_bench(
                     if progress is not None:
                         progress(case_index, total_planned, result)
                     continue
+
+                if vector.expected_tags is not None:
+                    if len(vector.expected_tags) == 0:
+                        unexpected = _unexpected_tags_when_none_expected(
+                            sanitized_html=sanitized_html
+                        )
+                        if unexpected:
+                            result = BenchCaseResult(
+                                sanitizer=sanitizer.name,
+                                browser=browser,
+                                vector_id=vector.id,
+                                payload_context=vector.payload_context,
+                                run_payload_context=payload_context_to_run,
+                                outcome="lossy",
+                                executed=False,
+                                details=(
+                                    "Expected no tags after sanitization, but found: "
+                                    + ", ".join(unexpected[:20])
+                                ),
+                                sanitizer_input_html=sanitizer_input_html,
+                                sanitized_html=sanitized_html,
+                                rendered_html="",
+                            )
+                            results.append(result)
+                            case_index += 1
+                            if progress is not None:
+                                progress(case_index, total_planned, result)
+                            continue
+                    else:
+                        missing_tags = _missing_expected_tags(
+                            expected_tags=vector.expected_tags,
+                            sanitized_html=sanitized_html,
+                        )
+                        if missing_tags:
+                            result = BenchCaseResult(
+                                sanitizer=sanitizer.name,
+                                browser=browser,
+                                vector_id=vector.id,
+                                payload_context=vector.payload_context,
+                                run_payload_context=payload_context_to_run,
+                                outcome="lossy",
+                                executed=False,
+                                details=(
+                                    "Missing expected tags after sanitization: "
+                                    + ", ".join(missing_tags)
+                                ),
+                                sanitizer_input_html=sanitizer_input_html,
+                                sanitized_html=sanitized_html,
+                                rendered_html="",
+                            )
+                            results.append(result)
+                            case_index += 1
+                            if progress is not None:
+                                progress(case_index, total_planned, result)
+                            continue
 
                 try:
                     rendered_html = render_html_document(
@@ -461,20 +668,24 @@ def run_bench(
                     total_cases = len(results)
                     total_executed = sum(1 for r in results if r.executed)
                     total_errors = sum(1 for r in results if r.outcome == "error")
+                    total_lossy = sum(1 for r in results if r.outcome == "lossy")
                     return BenchSummary(
                         total_cases=total_cases,
                         total_executed=total_executed,
                         total_errors=total_errors,
+                        total_lossy=total_lossy,
                         results=results,
                     )
 
     total_cases = len(results)
     total_executed = sum(1 for r in results if r.executed)
     total_errors = sum(1 for r in results if r.outcome == "error")
+    total_lossy = sum(1 for r in results if r.outcome == "lossy")
 
     return BenchSummary(
         total_cases=total_cases,
         total_executed=total_executed,
         total_errors=total_errors,
+        total_lossy=total_lossy,
         results=results,
     )

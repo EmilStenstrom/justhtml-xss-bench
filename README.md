@@ -16,7 +16,7 @@ pytest
 This repo also ships a small CLI that runs **many vectors** across **many sanitizers** and reports which combinations executed JavaScript in a real browser.
 
 ```bash
-# Run all vector files in ./vectors against all available sanitizers
+# Run all vector files in ./vectors against the default (rich) sanitizer set
 xssbench
 
 # By default it runs across all browser engines (Chromium, Firefox, WebKit)
@@ -102,6 +102,9 @@ Each vector object has (at minimum):
 - `description`: where the vector came from
 - `payload_html`: the payload string
 - `payload_context`: where `payload_html` should be injected (string enum, or a list of enums)
+- `expected_tags`: list of tag names that are expected to still be present after sanitization.
+	If any of these tags are missing from the sanitized output, the benchmark marks the case as `lossy`.
+	If the list is empty (`[]`), the benchmark expects the sanitized output to contain no tags at all.
 
 `payload_context` is an enum:
 
