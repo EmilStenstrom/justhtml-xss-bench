@@ -257,9 +257,14 @@ _TRIGGER_EVENTS_JS = """
     } catch { /* ignore */ }
 
   const elements = Array.from(scope.querySelectorAll('*'));
-    const mouseEvents = ['mouseover', 'mouseenter', 'click'];
-    const focusEvents = ['focus', 'focusin'];
-    const directEvents = ['load', 'error'];
+        const mouseEvents = ['mouseover', 'mouseenter', 'click'];
+        const focusEvents = ['focus', 'focusin'];
+        const directEvents = ['load', 'error'];
+        const keyboardEvents = ['keydown', 'keypress', 'keyup'];
+        const clipboardEvents = ['copy', 'cut', 'paste'];
+        const otherEvents = ['contextmenu', 'toggle', 'scroll', 'wheel', 'input', 'change', 'beforeinput'];
+        const animationEvents = ['animationstart', 'animationiteration', 'animationend'];
+        const transitionEvents = ['transitionrun', 'transitionstart', 'transitionend', 'transitioncancel'];
 
   for (const el of elements) {
         for (const type of mouseEvents) {
@@ -276,6 +281,41 @@ _TRIGGER_EVENTS_JS = """
             } catch {
                 try { el.dispatchEvent(new Event(type, { bubbles: true, cancelable: true })); } catch { /* ignore */ }
             }
+        }
+
+        for (const type of keyboardEvents) {
+            try {
+                el.dispatchEvent(new KeyboardEvent(type, { bubbles: true, cancelable: true, key: 'A', code: 'KeyA' }));
+            } catch {
+                try { el.dispatchEvent(new Event(type, { bubbles: true, cancelable: true })); } catch { /* ignore */ }
+            }
+        }
+
+        for (const type of clipboardEvents) {
+            try {
+                // ClipboardEvent may be restricted in some engines; fall back to a plain Event.
+                el.dispatchEvent(new ClipboardEvent(type, { bubbles: true, cancelable: true }));
+            } catch {
+                try { el.dispatchEvent(new Event(type, { bubbles: true, cancelable: true })); } catch { /* ignore */ }
+            }
+        }
+
+        for (const type of otherEvents) {
+            try {
+                el.dispatchEvent(new Event(type, { bubbles: true, cancelable: true }));
+            } catch { /* ignore */ }
+        }
+
+        for (const type of animationEvents) {
+            try {
+                el.dispatchEvent(new Event(type, { bubbles: true, cancelable: true }));
+            } catch { /* ignore */ }
+        }
+
+        for (const type of transitionEvents) {
+            try {
+                el.dispatchEvent(new Event(type, { bubbles: true, cancelable: true }));
+            } catch { /* ignore */ }
         }
 
     for (const type of directEvents) {
