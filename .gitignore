@@ -8,3 +8,6 @@ build/
 
 # Local benchmark artifacts (avoid /tmp)
 .xssbench/
+
+# Auto-generated third-party packs (local-only)
+vectors/portswigger-xss-cheatsheet-data.json

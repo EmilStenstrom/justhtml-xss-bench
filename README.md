@@ -39,34 +39,6 @@ xssbench --json-out .xssbench
 xssbench --timeout-ms 800
 ```
 
-## Compiling vectors (dedupe at build time)
-
-If you're importing large vector dumps and want to avoid bringing in unuseful
-exact duplicates, compile them once into a single expanded JSON list:
-
-```bash
-# Compile vectors/*.json into one file and skip unuseful duplicates
-xssbench compile --out .xssbench/compiled-vectors.json
-
-# Then run the benchmark from the compiled file
-xssbench --vectors .xssbench/compiled-vectors.json
-
-# If you want to preserve *all* duplicates during compile
-xssbench compile --out .xssbench/compiled-vectors.json --no-dedupe
-```
-
-## Checking new patterns
-
-To quickly see if new candidate patterns are already covered by the existing
-vector packs, drop JSON files into `incoming/` and run:
-
-```bash
-xssbench check
-
-# Show where matches were found
-xssbench check --show-matches
-```
-
 ### Optional: benchmark third-party sanitizers
 
 If you install the optional extras, the CLI will automatically include them (when importable):
@@ -87,10 +59,7 @@ python -m playwright install webkit
 
 ## Vector schema
 
-Each vector file is either:
-
-- a JSON list of vector objects (legacy format), or
-- a JSON object wrapper (v1) with header metadata:
+Each vector file is a JSON object wrapper (v1) with header metadata:
 
 	- `schema`: must be `"xssbench.vectorfile.v1"`
 	- `meta`: file-level metadata (including a `license.file` pointing at a `xssbench-*-LICENSE.txt` file)

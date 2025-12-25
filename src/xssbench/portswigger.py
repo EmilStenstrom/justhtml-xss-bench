@@ -1,26 +1,20 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 import hashlib
 import json
 from pathlib import Path
 import subprocess
 from typing import Iterable
 
-from .check import iter_occurrences
+from .bench import load_vectors
 from .normalize import normalize_payload
 
 
 _PORTSWIGGER_REPO_URL = "https://github.com/PortSwigger/xss-cheatsheet-data"
 
 
-@dataclass(frozen=True, slots=True)
-class PortSwiggerRefsStats:
-    candidates_total: int
-    candidates_unique_normalized: int
-    matched_existing_html: int
-    new_not_in_existing_html: int
-    source_commit: str
+def _vectors_out_path(*, repo_root: Path) -> Path:
+    return repo_root / "vectors" / "portswigger-xss-cheatsheet-data.json"
 
 
 def _run_git(args: list[str], *, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
@@ -76,11 +70,11 @@ def _get_commit(repo_dir: Path) -> str:
     return cp.stdout.strip()
 
 
-def _build_new_refs(*, repo_dir: Path, against_paths: Iterable[str | Path]) -> tuple[PortSwiggerRefsStats, list[dict]]:
+def _build_new_vectors(*, repo_dir: Path, against_paths: Iterable[str | Path]) -> tuple[str, dict[str, int], list[dict]]:
     # Existing tested vectors in this repo.
     existing: set[tuple[str, str]] = set()
-    for occ in iter_occurrences(against_paths):
-        existing.add((occ.payload_context, normalize_payload(occ.payload_html)))
+    for v in load_vectors(against_paths):
+        existing.add((v.payload_context, normalize_payload(v.payload_html)))
 
     # Extract candidates from PortSwigger's json/*.json
     json_dir = repo_dir / "json"
@@ -90,7 +84,7 @@ def _build_new_refs(*, repo_dir: Path, against_paths: Iterable[str | Path]) -> t
     seen_norm: set[tuple[str, str]] = set()
     matched = 0
     new = 0
-    refs: list[dict] = []
+    vectors: list[dict] = []
 
     for path in paths:
         data = json.loads(path.read_text(encoding="utf-8", errors="replace"))
@@ -129,78 +123,69 @@ def _build_new_refs(*, repo_dir: Path, against_paths: Iterable[str | Path]) -> t
 
                 new += 1
                 sha = hashlib.sha256(norm.encode("utf-8")).hexdigest()
-
-                refs.append(
+                vectors.append(
                     {
-                        "source_path": f"json/{path.name}",
-                        "source_key": str(top_key),
-                        "tag_index": tag_index,
-                        "tag": tag_entry.get("tag"),
-                        "browsers": tag_entry.get("browsers"),
-                        "interaction": tag_entry.get("interaction"),
+                        "id": f"portswigger-{sha[:12]}",
+                        "description": (
+                            f"PortSwigger xss-cheatsheet-data {path.name}#{top_key} "
+                            f"tag_index={tag_index} tag={tag_entry.get('tag')!s}"
+                        ),
+                        "payload_html": code,
                         "payload_context": payload_context,
-                        "normalized_sha256": sha,
                     }
                 )
 
     source_commit = _get_commit(repo_dir)
+    counts = {
+        "candidates_total": candidates_total,
+        "candidates_unique_normalized": len(seen_norm),
+        "matched_existing_html": matched,
+        "new_not_in_existing_html": new,
+    }
 
-    stats = PortSwiggerRefsStats(
-        candidates_total=candidates_total,
-        candidates_unique_normalized=len(seen_norm),
-        matched_existing_html=matched,
-        new_not_in_existing_html=new,
-        source_commit=source_commit,
-    )
-
-    return stats, refs
+    return source_commit, counts, vectors
 
 
-def ensure_portswigger_refs_file(
+def ensure_portswigger_vectors_file(
     *,
     repo_root: Path,
     against_paths: Iterable[str | Path],
 ) -> Path:
-    """Ensure `.xssbench/portswigger-xss-cheatsheet-data-refs.json` exists.
+    """Ensure a PortSwigger-derived vector pack exists under `vectors/`.
 
     This is a first-run convenience that clones PortSwigger's repo locally and
-    generates a refs-only artifact (no payload contents) for the patterns that
-    are not already covered by this repo's vector packs.
+    writes a normal `xssbench.vectorfile.v1` file containing *new* candidates
+    (not already covered by `against_paths`).
 
-    The output is stored under `.xssbench/` (git-ignored).
+    The output is intended to be git-ignored because upstream does not provide
+    a license for redistributing payload contents.
     """
 
-    out_dir = repo_root / ".xssbench"
-    out_path = out_dir / "portswigger-xss-cheatsheet-data-refs.json"
+    out_path = _vectors_out_path(repo_root=repo_root)
     if out_path.exists():
         return out_path
 
-    vendor_dir = out_dir / "vendor"
+    vendor_dir = repo_root / ".xssbench" / "vendor"
     repo_dir = _ensure_repo_clone(vendor_dir=vendor_dir)
 
-    stats, refs = _build_new_refs(repo_dir=repo_dir, against_paths=against_paths)
+    source_commit, counts, vectors = _build_new_vectors(repo_dir=repo_dir, against_paths=against_paths)
 
-    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
 
     payload = {
-        "schema": "xssbench.vectorfile.refs.v1",
+        "schema": "xssbench.vectorfile.v1",
         "meta": {
             "tool": "xssbench",
             "source_url": _PORTSWIGGER_REPO_URL,
-            "source_commit": stats.source_commit,
+            "source_commit": source_commit,
             "license_note": "Upstream repo states no license is provided; do not redistribute payload contents.",
-            "counts": {
-                "candidates_total": stats.candidates_total,
-                "candidates_unique_normalized": stats.candidates_unique_normalized,
-                "matched_existing_html": stats.matched_existing_html,
-                "new_not_in_existing_html": stats.new_not_in_existing_html,
-            },
+            "counts": counts,
         },
-        "refs": refs,
+        "vectors": vectors,
     }
 
     out_path.write_text(
-        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        json.dumps(payload, indent=2, ensure_ascii=True, sort_keys=True) + "\n",
         encoding="utf-8",
     )
 

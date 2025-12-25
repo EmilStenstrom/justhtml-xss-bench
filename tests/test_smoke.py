@@ -1,0 +1,57 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import pytest
+
+from xssbench.harness import run_vector
+from xssbench.sanitizers import noop
+
+
+VECTORS_PATH = Path(__file__).resolve().parents[1] / "vectors" / "smoke.json"
+
+
+def _load_vectors() -> list[dict[str, str]]:
+    data = json.loads(VECTORS_PATH.read_text(encoding="utf-8"))
+    assert isinstance(data, dict)
+    assert data.get("schema") == "xssbench.vectorfile.v1"
+    vectors = data.get("vectors")
+    assert isinstance(vectors, list)
+    return vectors  # type: ignore[return-value]
+
+
+@pytest.mark.parametrize("vector", _load_vectors(), ids=lambda v: v["id"])
+def test_smoke_no_execution(vector: dict[str, str]) -> None:
+    payload_html = vector["payload_html"]
+    payload_context = vector.get("payload_context", "html")
+    sanitized_html = noop(payload_html)
+
+    try:
+        result = run_vector(
+            payload_html=payload_html,
+            sanitized_html=sanitized_html,
+            payload_context=payload_context,  # type: ignore[arg-type]
+            timeout_ms=1500,
+        )
+    except RuntimeError as exc:
+        pytest.skip(str(exc))
+
+    assert result.executed is True, result.details
+
+
+def test_external_script_fetch_counts_as_executed() -> None:
+    payload_html = '<script src="https://example.com/x.js"></script>'
+    sanitized_html = noop(payload_html)
+
+    try:
+        result = run_vector(
+            payload_html=payload_html,
+            sanitized_html=sanitized_html,
+            timeout_ms=1500,
+        )
+    except RuntimeError as exc:
+        # Playwright missing / browser engine not installed / missing OS deps.
+        pytest.skip(str(exc))
+
+    assert result.executed is True

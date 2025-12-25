@@ -133,30 +133,33 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
     # Duplicate handling:
     # - Always error on duplicate (id, context).
     #
-    # Note: payload deduplication is intentionally NOT done here. Do it once at
-    # vector-pack compilation time (see `xssbench.compile`) so runtime loads are
-    # transparent.
+    # Note: payload deduplication is intentionally NOT done here.
     seen_id_ctx: set[tuple[str, str]] = set()
 
     for raw_path in paths:
         path = Path(raw_path)
         data = json.loads(path.read_text(encoding="utf-8"))
 
-        # Backwards-compatible schema:
-        # - legacy: JSON list of vectors
-        # - v1: JSON object with header metadata: {"schema": "xssbench.vectorfile.v1", "meta": {...}, "vectors": [...]}
-        if isinstance(data, dict):
-            if "vectors" not in data:
-                raise ValueError(
-                    f"Vector file object must contain a 'vectors' key: {path}"
-                )
+        # Vector file schema (strict):
+        # {"schema": "xssbench.vectorfile.v1", "meta": {...}, "vectors": [...]}
+        if not isinstance(data, dict):
+            raise ValueError(
+                f"Vector file must be a v1 object with schema 'xssbench.vectorfile.v1' (got {type(data)!r}): {path}"
+            )
 
-            data = data["vectors"]
+        schema = data.get("schema")
+        if schema != "xssbench.vectorfile.v1":
+            raise ValueError(
+                f"Vector file schema must be 'xssbench.vectorfile.v1' (got {schema!r}): {path}"
+            )
+
+        if "vectors" not in data:
+            raise ValueError(f"Vector file object must contain a 'vectors' key: {path}")
+
+        data = data["vectors"]
 
         if not isinstance(data, list):
-            raise ValueError(
-                f"Vector file must contain a JSON list, or an object with 'vectors': {path}"
-            )
+            raise ValueError(f"Vector file 'vectors' must be a JSON list: {path}")
 
         for item in data:
             if not isinstance(item, dict):

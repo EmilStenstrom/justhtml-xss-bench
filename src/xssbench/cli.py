@@ -8,10 +8,8 @@ import sys
 import time
 
 from .bench import BenchCaseResult, load_vectors, run_bench
-from .check import check_candidates
-from .compile import compile_vectors
 from .harness import BrowserName
-from .portswigger import ensure_portswigger_refs_file
+from .portswigger import ensure_portswigger_vectors_file
 from .sanitizers import available_sanitizers, default_sanitizers, get_sanitizer
 
 
@@ -60,14 +58,6 @@ def _default_vector_globs() -> list[str]:
         vectors_dir = root / "vectors"
         if vectors_dir.exists():
             return [str(p) for p in sorted(vectors_dir.glob("*.json"))]
-    return []
-
-
-def _default_incoming_globs() -> list[str]:
-    for root in (Path.cwd(), Path(__file__).resolve().parents[2]):
-        incoming_dir = root / "incoming"
-        if incoming_dir.exists():
-            return [str(p) for p in sorted(incoming_dir.glob("*.json"))]
     return []
 
 
@@ -142,63 +132,6 @@ def _parse_run_args(argv: list[str]) -> argparse.Namespace:
         "--list-sanitizers",
         action="store_true",
         help="List available sanitizers and exit",
-    )
-
-    return parser.parse_args(argv)
-
-
-def _parse_compile_args(argv: list[str]) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        prog="xssbench compile",
-        description="Compile multiple vector files into a single expanded JSON list, optionally de-duping unuseful exact duplicates.",
-    )
-
-    parser.add_argument(
-        "--vectors",
-        nargs="+",
-        default=None,
-        help="One or more vector JSON files (default: vectors/*.json)",
-    )
-
-    parser.add_argument(
-        "--out",
-        required=True,
-        help="Output JSON file path (compiled vector list)",
-    )
-
-    parser.add_argument(
-        "--no-dedupe",
-        action="store_true",
-        help="Disable compile-time skipping of unuseful duplicate payloads",
-    )
-
-    return parser.parse_args(argv)
-
-
-def _parse_check_args(argv: list[str]) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        prog="xssbench check",
-        description="Check whether candidate XSS patterns are already covered by the current vector packs.",
-    )
-
-    parser.add_argument(
-        "--new",
-        nargs="+",
-        default=None,
-        help="One or more candidate JSON files (default: incoming/*.json)",
-    )
-
-    parser.add_argument(
-        "--against",
-        nargs="+",
-        default=None,
-        help="One or more existing vector JSON files to check against (default: vectors/*.json)",
-    )
-
-    parser.add_argument(
-        "--show-matches",
-        action="store_true",
-        help="Show where matches were found (file + vector id)",
     )
 
     return parser.parse_args(argv)
@@ -282,65 +215,6 @@ def _print_table(summary) -> None:
 def main(argv: list[str] | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
 
-    if argv and argv[0] == "compile":
-        args = _parse_compile_args(argv[1:])
-
-        vector_paths = args.vectors if args.vectors is not None else _default_vector_globs()
-        if not vector_paths:
-            print(
-                "No vector files found. By default xssbench looks for ./vectors/*.json in the current directory. "
-                "Pass --vectors /path/to/vectors/*.json (or run from the repo root).",
-                file=sys.stderr,
-            )
-            return 2
-
-        stats = compile_vectors(
-            paths=vector_paths,
-            out_path=args.out,
-            dedupe_unuseful=not args.no_dedupe,
-        )
-        print(
-            f"Wrote {stats.written_vectors} vectors to {args.out} "
-            f"(expanded={stats.expanded_vectors}, skipped_unuseful_duplicates={stats.skipped_unuseful_duplicates})",
-            file=sys.stderr,
-        )
-        return 0
-
-    if argv and argv[0] == "check":
-        args = _parse_check_args(argv[1:])
-
-        new_paths = args.new if args.new is not None else _default_incoming_globs()
-        if not new_paths:
-            print("No candidate files found. Put JSON files in incoming/ or pass --new incoming/*.json", file=sys.stderr)
-            return 2
-
-        against_paths = args.against if args.against is not None else _default_vector_globs()
-        if not against_paths:
-            print(
-                "No vector files found. By default xssbench looks for ./vectors/*.json in the current directory. "
-                "Pass --against /path/to/vectors/*.json (or run from the repo root).",
-                file=sys.stderr,
-            )
-            return 2
-
-        results = check_candidates(new_paths=new_paths, against_paths=against_paths)
-        already = [r for r in results if r.already_tested]
-        new = [r for r in results if not r.already_tested]
-
-        for r in new:
-            print(f"NEW: {Path(r.file).name}#{r.index} ({r.payload_context})")
-
-        for r in already:
-            print(f"TESTED: {Path(r.file).name}#{r.index} ({r.payload_context})")
-            if args.show_matches:
-                for m in r.matched[:5]:
-                    print(f"  - {Path(m.file).name}:{m.vector_id}")
-                if len(r.matched) > 5:
-                    print(f"  - (+{len(r.matched) - 5} more)")
-
-        print(f"summary: candidates={len(results)} tested={len(already)} new={len(new)}", file=sys.stderr)
-        return 0 if not new else 1
-
     args = _parse_run_args(argv)
 
     if args.list_sanitizers:
@@ -363,9 +237,9 @@ def main(argv: list[str] | None = None) -> int:
         # Write run artifacts under the current directory.
         # When installed via pip, `__file__` may live in site-packages.
         repo_root = Path.cwd()
-        ensure_portswigger_refs_file(repo_root=repo_root, against_paths=vector_paths)
+        ensure_portswigger_vectors_file(repo_root=repo_root, against_paths=vector_paths)
     except Exception as exc:
-        print(f"warning: could not generate PortSwigger refs file: {exc}", file=sys.stderr)
+        print(f"warning: could not generate PortSwigger vectors file: {exc}", file=sys.stderr)
 
     vectors = load_vectors(vector_paths)
 

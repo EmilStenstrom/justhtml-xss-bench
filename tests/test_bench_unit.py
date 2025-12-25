@@ -95,7 +95,7 @@ def test_load_vectors_accepts_meta_wrapper() -> None:
     assert [v.id for v in vectors] == ["v1"]
 
 
-def test_load_vectors_ignores_expected_tags_infer_meta_flag() -> None:
+def test_load_vectors_ignores_unknown_meta_keys() -> None:
     from xssbench.bench import load_vectors
 
     payload = {
@@ -103,7 +103,7 @@ def test_load_vectors_ignores_expected_tags_infer_meta_flag() -> None:
         "meta": {
             "tool": "xssbench",
             "source_url": "https://example.invalid/",
-            "expected_tags_infer": True,
+            "some_unknown_flag": True,
             "license": {
                 "spdx": "MIT",
                 "url": "https://spdx.org/licenses/MIT.html",
