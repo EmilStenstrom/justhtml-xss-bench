@@ -673,6 +673,411 @@ class BrowserHarness:
         return VectorResult(executed=False, details="No execution detected")
 
 
+class AsyncBrowserHarness:
+    def __init__(self, *, browser: BrowserName, headless: bool = True):
+        self._browser_name = browser
+        self._headless = headless
+        self._pw_cm: Any | None = None
+        self._pw: Any | None = None
+        self._browser_instance: Any | None = None
+        self._page: Any | None = None
+        self._timeout_error: type[Exception] | None = None
+        self._external_script_requests: list[str] = []
+        self._navigation_requests: list[str] = []
+        self._dialog_events: list[str] = []
+        self._base_navigation_count: int = 0
+        self._current_html: str = ""
+        self._base_url: str = "http://xssbench.local/"
+
+    async def __aenter__(self) -> "AsyncBrowserHarness":
+        try:
+            async_api = importlib.import_module("playwright.async_api")
+            async_playwright = async_api.async_playwright
+            self._timeout_error = async_api.TimeoutError
+        except Exception as exc:  # pragma: no cover
+            raise RuntimeError(
+                "Playwright is not installed. Install with: pip install -e '.[test]'"
+            ) from exc
+
+        self._pw_cm = async_playwright()
+        self._pw = await self._pw_cm.__aenter__()
+
+        browser_type = {
+            "chromium": self._pw.chromium,
+            "firefox": self._pw.firefox,
+            "webkit": self._pw.webkit,
+        }[self._browser_name]
+
+        try:
+            launch_kwargs: dict[str, Any] = {"headless": self._headless}
+            if self._browser_name == "chromium":
+                launch_kwargs["args"] = [
+                    "--disable-gpu",
+                    "--disable-dev-shm-usage",
+                    "--disable-extensions",
+                    "--mute-audio",
+                ]
+            self._browser_instance = await browser_type.launch(**launch_kwargs)
+        except Exception as exc:  # pragma: no cover
+            message = str(exc)
+            hint = (
+                f"Failed to launch Playwright {self._browser_name}. "
+                f"If the engine is installed, your host may be missing OS dependencies. "
+                f"Try: playwright install-deps {self._browser_name} (or: playwright install-deps)."
+            )
+            raise RuntimeError(
+                f"{hint}\nOriginal error: {message}\n"
+                f"If the engine isn't installed yet, run: playwright install {self._browser_name}"
+            ) from exc
+
+        self._page = await self._browser_instance.new_page()
+
+        try:
+            self._page.set_default_timeout(_MAX_PLAYWRIGHT_TIMEOUT_MS)
+        except Exception:
+            pass
+        try:
+            self._page.set_default_navigation_timeout(_MAX_PLAYWRIGHT_TIMEOUT_MS)
+        except Exception:
+            pass
+
+        import asyncio
+
+        def _on_dialog(dialog) -> None:
+            try:
+                dialog_type = getattr(dialog, "type", "")
+                dialog_message = getattr(dialog, "message", "")
+                details = f"dialog:{dialog_type}:{dialog_message}"
+            except Exception:
+                details = "dialog"
+
+            self._dialog_events.append(details)
+
+            async def _handle() -> None:
+                try:
+                    if dialog_type == "prompt":
+                        default_value = ""
+                        try:
+                            default_value = str(getattr(dialog, "default_value", "") or "")
+                        except Exception:
+                            default_value = ""
+                        await dialog.accept(default_value)
+                    else:
+                        await dialog.accept()
+                except Exception:
+                    try:
+                        await dialog.dismiss()
+                    except Exception:
+                        pass
+
+            try:
+                asyncio.get_running_loop().create_task(_handle())
+            except Exception:
+                # If we can't schedule it, best effort: do nothing.
+                pass
+
+        self._page.on("dialog", _on_dialog)
+
+        def _on_frame_navigated(frame) -> None:
+            try:
+                url = frame.url
+            except Exception:
+                return
+            if not url:
+                return
+
+            if url.startswith(self._base_url + "#"):
+                return
+
+            if url == self._base_url:
+                self._base_navigation_count += 1
+                if self._base_navigation_count > 1:
+                    self._navigation_requests.append(url)
+                return
+
+            self._navigation_requests.append(url)
+
+        self._page.on("framenavigated", _on_frame_navigated)
+
+        async def _route(route) -> None:
+            req = route.request
+            if req.resource_type == "document" and req.url == self._base_url:
+                await route.fulfill(status=200, content_type="text/html", body=self._current_html)
+                return
+
+            if req.resource_type == "document":
+                self._navigation_requests.append(req.url)
+
+            if req.resource_type == "script" and req.url.startswith(("http://", "https://")):
+                self._external_script_requests.append(req.url)
+
+            await route.abort()
+
+        await self._page.route("**/*", _route)
+
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb) -> None:
+        try:
+            if self._browser_instance is not None:
+                await self._browser_instance.close()
+        finally:
+            if self._pw_cm is not None:
+                await self._pw_cm.__aexit__(exc_type, exc, tb)
+
+    async def run(
+        self,
+        *,
+        payload_html: str,
+        sanitized_html: str,
+        payload_context: PayloadContext = "html",
+        timeout_ms: int = 1500,
+    ) -> VectorResult:
+        if self._page is None or self._timeout_error is None:
+            raise RuntimeError("Harness not initialized")
+
+        self._external_script_requests.clear()
+        self._navigation_requests.clear()
+        self._dialog_events.clear()
+        self._base_navigation_count = 0
+
+        template = {
+            "html": _HTML_TEMPLATE,
+            "html_head": _HTML_HEAD_TEMPLATE,
+            "html_outer": _HTML_OUTER_TEMPLATE,
+            "href": _HREF_TEMPLATE,
+            "js": _JS_TEMPLATE,
+            "js_arg": _JS_ARG_TEMPLATE,
+            "js_string": _JS_STRING_TEMPLATE,
+            "js_string_double": _JS_STRING_DOUBLE_TEMPLATE,
+            "onerror_attr": _ONERROR_ATTR_TEMPLATE,
+        }.get(payload_context)
+        if template is None:
+            raise ValueError(f"Unknown payload_context: {payload_context!r}")
+
+        expected_href_click_url: str | None = None
+
+        def _execution_navigation_urls() -> list[str]:
+            return _filter_navigation_urls_for_execution(
+                self._navigation_requests,
+                base_url=self._base_url,
+                payload_context=payload_context,
+                expected_href_click_url=expected_href_click_url,
+            )
+
+        html = template.replace("__XSSBENCH_PAYLOAD__", sanitized_html)
+        html = html.replace("__XSSBENCH_PRELUDE__", _XSSBENCH_PRELUDE_HTML)
+        self._current_html = html
+
+        try:
+            await self._page.goto(
+                self._base_url,
+                wait_until="domcontentloaded",
+                timeout=_MAX_PLAYWRIGHT_TIMEOUT_MS,
+            )
+        except Exception as exc:
+            if self._timeout_error is not None and isinstance(exc, self._timeout_error):
+                exec_nav = _execution_navigation_urls()
+                if exec_nav:
+                    urls = ", ".join(exec_nav[:3])
+                    return VectorResult(
+                        executed=True,
+                        details=f"Executed: navigation:{urls}; payload={payload_html!r}",
+                    )
+                if self._external_script_requests:
+                    urls = ", ".join(self._external_script_requests[:3])
+                    return VectorResult(
+                        executed=True,
+                        details=f"Executed: external-script:{urls}; payload={payload_html!r}",
+                    )
+                if self._dialog_events:
+                    details = self._dialog_events[0]
+                    return VectorResult(
+                        executed=True,
+                        details=f"Executed: {details}; payload={payload_html!r}",
+                    )
+                return VectorResult(
+                    executed=True,
+                    details=f"Executed: navigation:goto-timeout; payload={payload_html!r}",
+                )
+
+            if _looks_like_navigation_context_destroyed(exc):
+                return VectorResult(
+                    executed=True,
+                    details=f"Executed: navigation:context-destroyed; payload={payload_html!r}",
+                )
+            raise
+
+        async def _hook_details() -> str:
+            try:
+                return str(
+                    (await self._page.evaluate(
+                        "() => (window.__xssbench && window.__xssbench.executed) ? String(window.__xssbench.details || '') : ''"
+                    ))
+                    or ""
+                )
+            except Exception:
+                return ""
+
+        try:
+            js_urls = await self._page.evaluate(_DETECT_JAVASCRIPT_URLS_JS)
+        except Exception:
+            js_urls = []
+
+        if js_urls:
+            first = js_urls[0]
+            return VectorResult(
+                executed=True,
+                details=(
+                    "Executed: javascript-url:"
+                    f"{first.get('tag')}[{first.get('attr')}]={first.get('value')}; payload={payload_html!r}"
+                ),
+            )
+
+        hook = await _hook_details()
+        if hook:
+            return VectorResult(
+                executed=True,
+                details=f"Executed: hook:{hook}; payload={payload_html!r}",
+            )
+
+        if self._dialog_events:
+            details = self._dialog_events[0]
+            return VectorResult(
+                executed=True,
+                details=f"Executed: {details}; payload={payload_html!r}",
+            )
+
+        exec_nav = _execution_navigation_urls()
+        if exec_nav:
+            urls = ", ".join(exec_nav[:3])
+            return VectorResult(
+                executed=True,
+                details=f"Executed: navigation:{urls}; payload={payload_html!r}",
+            )
+
+        if self._external_script_requests:
+            urls = ", ".join(self._external_script_requests[:3])
+            return VectorResult(
+                executed=True,
+                details=f"Executed: external-script:{urls}; payload={payload_html!r}",
+            )
+
+        if payload_context == "href":
+            try:
+                expected_href_click_url = str(
+                    (await self._page.evaluate(
+                        "() => { const a = document.getElementById('xssbench-link'); return a ? String(a.href || '') : ''; }"
+                    ))
+                    or ""
+                )
+            except Exception:
+                expected_href_click_url = None
+
+            try:
+                await self._page.click("#xssbench-link", no_wait_after=True, timeout=timeout_ms)
+            except Exception:
+                pass
+
+            hook = await _hook_details()
+            if hook:
+                return VectorResult(
+                    executed=True,
+                    details=f"Executed: hook:{hook}; payload={payload_html!r}",
+                )
+        else:
+            try:
+                await self._page.evaluate(_TRIGGER_EVENTS_JS)
+            except Exception as exc:
+                exec_nav = _execution_navigation_urls()
+                if exec_nav:
+                    urls = ", ".join(exec_nav[:3])
+                    return VectorResult(
+                        executed=True,
+                        details=f"Executed: navigation:{urls}; payload={payload_html!r}",
+                    )
+                if _looks_like_navigation_context_destroyed(exc):
+                    return VectorResult(
+                        executed=True,
+                        details=f"Executed: navigation:context-destroyed; payload={payload_html!r}",
+                    )
+                raise exc
+
+            hook = await _hook_details()
+            if hook:
+                return VectorResult(
+                    executed=True,
+                    details=f"Executed: hook:{hook}; payload={payload_html!r}",
+                )
+
+            try:
+                anchors = await self._page.query_selector_all("a[href], area[href]")
+                for h in anchors:
+                    try:
+                        resolved_href = ""
+                        try:
+                            resolved_href = str(
+                                (await self._page.evaluate("(el) => String(el.href || '')", h))
+                                or ""
+                            )
+                        except Exception:
+                            resolved_href = (await h.get_attribute("href")) or ""
+                        normalized = resolved_href.strip().lower()
+                        if normalized.startswith("javascript:"):
+                            await h.click(timeout=timeout_ms, force=True)
+                    except Exception:
+                        continue
+            except Exception:
+                pass
+
+        exec_nav = _execution_navigation_urls()
+        if exec_nav:
+            urls = ", ".join(exec_nav[:3])
+            return VectorResult(
+                executed=True,
+                details=f"Executed: navigation:{urls}; payload={payload_html!r}",
+            )
+
+        if timeout_ms > 0:
+            try:
+                await self._page.wait_for_function(
+                    "() => (window.__xssbench && window.__xssbench.executed) === true",
+                    timeout=timeout_ms,
+                )
+            except self._timeout_error:
+                pass
+            except Exception as exc:
+                exec_nav = _execution_navigation_urls()
+                if exec_nav:
+                    urls = ", ".join(exec_nav[:3])
+                    return VectorResult(
+                        executed=True,
+                        details=f"Executed: navigation:{urls}; payload={payload_html!r}",
+                    )
+                if _looks_like_navigation_context_destroyed(exc):
+                    return VectorResult(
+                        executed=True,
+                        details=f"Executed: navigation:context-destroyed; payload={payload_html!r}",
+                    )
+                raise exc
+
+        hook = await _hook_details()
+        if hook:
+            return VectorResult(
+                executed=True,
+                details=f"Executed: hook:{hook}; payload={payload_html!r}",
+            )
+
+        if self._dialog_events:
+            details = self._dialog_events[0]
+            return VectorResult(
+                executed=True,
+                details=f"Executed: {details}; payload={payload_html!r}",
+            )
+
+        return VectorResult(executed=False, details="No execution detected")
+
+
 def run_vector(
     *,
     payload_html: str,

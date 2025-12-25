@@ -1,11 +1,16 @@
 from __future__ import annotations
 
 import argparse
+from contextlib import ExitStack
 import json
+import math
 import multiprocessing
 from pathlib import Path
 import sys
+import threading
 import time
+import re
+import queue
 
 from .bench import BenchCaseResult, load_vectors, run_bench
 from .harness import BrowserName
@@ -48,6 +53,318 @@ def _worker_run(task: tuple[int, int, str, str, int | None, bool]) -> list[Bench
         fail_fast=bool(fail_fast),
     )
     return summary.results
+
+
+def _queue_worker_main(
+    *,
+    vector_paths: list[str],
+    sanitizer_names: list[str],
+    browsers: list[BrowserName],
+    timeout_ms: int | None,
+    fail_fast: bool,
+    task_queue,
+    result_queue,
+    stop_event,
+) -> None:
+    # Use Playwright's Async API in parallel workers.
+    #
+    # On Python 3.15, the Sync API can incorrectly trip its "Sync API inside the
+    # asyncio loop" guard even when no loop is running in the calling thread.
+    # Using the Async API avoids that check entirely.
+
+    def _prepare_for_sanitizer(*, vector, sanitizer):
+        if vector.payload_context == "href":
+            sanitizer_input_html = f'<a href="{vector.payload_html}">x</a>'
+            return sanitizer_input_html, sanitizer.sanitize(sanitizer_input_html), "html"
+
+        if vector.payload_context == "onerror_attr":
+            sanitizer_input_html = (
+                f'<img src="nonexistent://x" onerror="{vector.payload_html}">'
+            )
+            return sanitizer_input_html, sanitizer.sanitize(sanitizer_input_html), "html"
+
+        sanitizer_input_html = vector.payload_html
+        return (
+            sanitizer_input_html,
+            sanitizer.sanitize(sanitizer_input_html),
+            vector.payload_context,
+        )
+
+    def _auto_timeout_ms(*, payload_html: str, sanitized_html: str) -> int:
+        blob = (payload_html + "\n" + sanitized_html).lower()
+
+        if any(
+            token in blob
+            for token in (
+                "settimeout",
+                "setinterval",
+                "requestanimationframe",
+                "promiseresolve",
+                "new promise",
+                "async ",
+                "await ",
+            )
+        ):
+            return 250
+
+        if "http-equiv" in blob and "refresh" in blob:
+            return 400
+
+        if re.search(r"\bon(load|error)\s*=", blob):
+            return 25
+
+        return 0
+
+    def _timeout_for_case(*, payload_html: str, sanitized_html: str) -> int:
+        return int(timeout_ms) if timeout_ms is not None else _auto_timeout_ms(
+            payload_html=payload_html, sanitized_html=sanitized_html
+        )
+
+    async def _async_main() -> None:
+        vectors = load_vectors(vector_paths)
+        sanitizers = [get_sanitizer(str(n)) for n in sanitizer_names]
+
+        # Keep browsers open for the lifetime of the worker so small tasks don't
+        # pay browser startup overhead.
+        from contextlib import AsyncExitStack
+
+        from .harness import AsyncBrowserHarness, render_html_document
+        from .bench import _missing_expected_tags, _unexpected_tags_when_none_expected
+
+        try:
+            async with AsyncExitStack() as stack:
+                harnesses = {
+                    b: await stack.enter_async_context(
+                        AsyncBrowserHarness(browser=b, headless=True)
+                    )
+                    for b in browsers
+                }
+
+                while True:
+                    try:
+                        item = task_queue.get(timeout=0.5)
+                    except Exception:
+                        if stop_event.is_set():
+                            break
+                        continue
+
+                    if item is None:
+                        try:
+                            task_queue.task_done()
+                        except Exception:
+                            pass
+                        break
+
+                    task_id, start_i, end_i = item
+
+                    if stop_event.is_set():
+                        try:
+                            task_queue.task_done()
+                        except Exception:
+                            pass
+                        continue
+
+                    part: list[BenchCaseResult] = []
+                    hit_xss = False
+
+                    for browser in browsers:
+                        harness = harnesses[browser]
+                        for sanitizer in sanitizers:
+                            for vector in vectors[start_i:end_i]:
+                                if stop_event.is_set():
+                                    break
+
+                                if (
+                                    sanitizer.supported_contexts is not None
+                                    and vector.payload_context not in sanitizer.supported_contexts
+                                ):
+                                    part.append(
+                                        BenchCaseResult(
+                                            sanitizer=sanitizer.name,
+                                            browser=browser,
+                                            vector_id=vector.id,
+                                            payload_context=vector.payload_context,
+                                            run_payload_context=vector.payload_context,
+                                            outcome="skip",
+                                            executed=False,
+                                            details=(
+                                                f"Skipped: {sanitizer.name} does not support context {vector.payload_context}"
+                                            ),
+                                            sanitizer_input_html="",
+                                            sanitized_html="",
+                                            rendered_html="",
+                                        )
+                                    )
+                                    continue
+
+                                try:
+                                    sanitizer_input_html, sanitized_html, payload_context_to_run = _prepare_for_sanitizer(
+                                        vector=vector, sanitizer=sanitizer
+                                    )
+                                except Exception as exc:
+                                    part.append(
+                                        BenchCaseResult(
+                                            sanitizer=sanitizer.name,
+                                            browser=browser,
+                                            vector_id=vector.id,
+                                            payload_context=vector.payload_context,
+                                            run_payload_context=vector.payload_context,
+                                            outcome="error",
+                                            executed=False,
+                                            details=f"Sanitizer error: {exc!r}",
+                                            sanitizer_input_html="",
+                                            sanitized_html="",
+                                            rendered_html="",
+                                        )
+                                    )
+                                    continue
+
+                                if len(vector.expected_tags) == 0:
+                                    unexpected = _unexpected_tags_when_none_expected(
+                                        sanitized_html=sanitized_html
+                                    )
+                                    if unexpected:
+                                        part.append(
+                                            BenchCaseResult(
+                                                sanitizer=sanitizer.name,
+                                                browser=browser,
+                                                vector_id=vector.id,
+                                                payload_context=vector.payload_context,
+                                                run_payload_context=payload_context_to_run,
+                                                outcome="lossy",
+                                                executed=False,
+                                                details=(
+                                                    "Expected no tags after sanitization, but found: "
+                                                    + ", ".join(unexpected[:20])
+                                                ),
+                                                sanitizer_input_html=sanitizer_input_html,
+                                                sanitized_html=sanitized_html,
+                                                rendered_html="",
+                                            )
+                                        )
+                                        continue
+                                else:
+                                    missing_tags = _missing_expected_tags(
+                                        expected_tags=vector.expected_tags,
+                                        sanitized_html=sanitized_html,
+                                    )
+                                    if missing_tags:
+                                        part.append(
+                                            BenchCaseResult(
+                                                sanitizer=sanitizer.name,
+                                                browser=browser,
+                                                vector_id=vector.id,
+                                                payload_context=vector.payload_context,
+                                                run_payload_context=payload_context_to_run,
+                                                outcome="lossy",
+                                                executed=False,
+                                                details=(
+                                                    "Missing expected tags after sanitization: "
+                                                    + ", ".join(missing_tags)
+                                                ),
+                                                sanitizer_input_html=sanitizer_input_html,
+                                                sanitized_html=sanitized_html,
+                                                rendered_html="",
+                                            )
+                                        )
+                                        continue
+
+                                try:
+                                    rendered_html = render_html_document(
+                                        sanitized_html=sanitized_html,
+                                        payload_context=payload_context_to_run,
+                                    )
+                                    per_case_timeout_ms = _timeout_for_case(
+                                        payload_html=vector.payload_html,
+                                        sanitized_html=sanitized_html,
+                                    )
+                                    vector_result = await harness.run(
+                                        payload_html=vector.payload_html,
+                                        sanitized_html=sanitized_html,
+                                        payload_context=payload_context_to_run,
+                                        timeout_ms=per_case_timeout_ms,
+                                    )
+                                except Exception as exc:
+                                    part.append(
+                                        BenchCaseResult(
+                                            sanitizer=sanitizer.name,
+                                            browser=browser,
+                                            vector_id=vector.id,
+                                            payload_context=vector.payload_context,
+                                            run_payload_context=payload_context_to_run,
+                                            outcome="error",
+                                            executed=False,
+                                            details=f"Harness error: {exc}",
+                                            sanitizer_input_html=sanitizer_input_html,
+                                            sanitized_html=sanitized_html,
+                                            rendered_html=rendered_html if "rendered_html" in locals() else "",
+                                        )
+                                    )
+                                    continue
+
+                                outcome = "xss" if vector_result.executed else "pass"
+                                part.append(
+                                    BenchCaseResult(
+                                        sanitizer=sanitizer.name,
+                                        browser=browser,
+                                        vector_id=vector.id,
+                                        payload_context=vector.payload_context,
+                                        run_payload_context=payload_context_to_run,
+                                        outcome=outcome,
+                                        executed=vector_result.executed,
+                                        details=vector_result.details,
+                                        sanitizer_input_html=sanitizer_input_html,
+                                        sanitized_html=sanitized_html,
+                                        rendered_html=rendered_html,
+                                    )
+                                )
+
+                                if fail_fast and outcome == "xss":
+                                    hit_xss = True
+                                    stop_event.set()
+                                    break
+
+                            if stop_event.is_set():
+                                break
+                        if stop_event.is_set():
+                            break
+
+                    if stop_event.is_set():
+                        break
+
+                    result_queue.put((task_id, part, hit_xss))
+                    try:
+                        task_queue.task_done()
+                    except Exception:
+                        pass
+        except Exception as exc:
+            # If Playwright blows up in some environments, include enough context
+            # to debug without spamming successful runs.
+            try:
+                import asyncio
+
+                try:
+                    asyncio.get_running_loop()
+                    loop_running = True
+                except RuntimeError:
+                    loop_running = False
+            except Exception:
+                loop_running = None
+
+            print(
+                f"worker error: process={multiprocessing.current_process().name} "
+                f"thread={threading.current_thread().name} loop_running={loop_running}: {exc}",
+                file=sys.stderr,
+                flush=True,
+            )
+            raise
+
+    try:
+        import asyncio
+
+        asyncio.run(_async_main())
+    except Exception:
+        raise
 
 
 def _default_vector_globs() -> list[str]:
@@ -114,6 +431,16 @@ def _parse_run_args(argv: list[str]) -> argparse.Namespace:
         type=int,
         default=1,
         help="Run in parallel using N worker processes (default: 1)",
+    )
+
+    parser.add_argument(
+        "--worker-task-timeout-s",
+        type=int,
+        default=3600,
+        help=(
+            "In parallel mode, kill and restart the worker pool if a single chunk runs longer than this many seconds. "
+            "Timed-out chunks are recorded as errors so the run can finish (default: 3600, set 0 to disable)."
+        ),
     )
 
     parser.add_argument(
@@ -309,76 +636,232 @@ def main(argv: list[str] | None = None) -> int:
             errors_so_far = 0
             last_bucket = -1
 
-            # Split vectors evenly across workers. Each worker runs *all* selected
-            # sanitizers and browsers for its slice, which avoids launching a new
-            # browser per chunk.
+            # Global queue: each worker pulls the next vector batch when ready.
+            # This keeps progress flowing and avoids waiting for one huge slice.
             actual_workers = min(workers, n) if n > 0 else 1
-            base = n // actual_workers
-            rem = n % actual_workers
-            starts = []
-            cur = 0
-            for i in range(actual_workers):
-                size = base + (1 if i < rem else 0)
-                starts.append((cur, cur + size))
-                cur += size
 
-            sanitizer_names_json = json.dumps([s.name for s in sanitizers])
-            browsers_json = json.dumps(list(browsers))
+            cases_per_vector = max(1, len(sanitizers) * len(browsers))
+            vectors_per_task = 1
+            if args.progress_every and args.progress_every > 0:
+                vectors_per_task = max(1, math.ceil(int(args.progress_every) / cases_per_vector))
 
-            tasks: list[tuple[int, int, str, str, int | None, bool]] = [
-                (start, end, sanitizer_names_json, browsers_json, args.timeout_ms, bool(args.fail_fast))
-                for (start, end) in starts
-            ]
+            if not args.no_progress and args.progress_every > 0:
+                print(
+                    f"[0/{total_planned}] starting {actual_workers} workers (vectors_per_task={vectors_per_task}, cases_per_vector={cases_per_vector})",
+                    file=sys.stderr,
+                    flush=True,
+                )
 
             ctx = multiprocessing.get_context("spawn")
+            task_queue = ctx.JoinableQueue(maxsize=max(1, actual_workers * 4))
+            result_queue = ctx.Queue()
+            stop_event = ctx.Event()
+
+            sanitizer_names = [s.name for s in sanitizers]
             results: list[BenchCaseResult] = []
-            with ctx.Pool(processes=actual_workers, initializer=_worker_init, initargs=(vector_paths,)) as pool:
-                for part in pool.imap_unordered(_worker_run, tasks, chunksize=1):
-                    if args.fail_fast:
-                        hit = next((r for r in part if r.outcome == "xss"), None)
-                        if hit is not None:
+
+            procs: list[multiprocessing.Process] = []
+            for _ in range(actual_workers):
+                p = ctx.Process(
+                    target=_queue_worker_main,
+                    kwargs={
+                        "vector_paths": list(vector_paths),
+                        "sanitizer_names": sanitizer_names,
+                        "browsers": list(browsers),
+                        "timeout_ms": args.timeout_ms,
+                        "fail_fast": bool(args.fail_fast),
+                        "task_queue": task_queue,
+                        "result_queue": result_queue,
+                        "stop_event": stop_event,
+                    },
+                )
+                p.start()
+                procs.append(p)
+
+            task_id = 0
+            pending: dict[int, tuple[int, int]] = {}
+            deferred: list[tuple[int, int, int]] = []
+
+            def _task_iter():
+                nonlocal task_id
+                for start_i in range(0, n, vectors_per_task):
+                    end_i = min(n, start_i + vectors_per_task)
+                    yield (task_id, start_i, end_i)
+                    task_id += 1
+
+            task_iter = _task_iter()
+
+            def _feed_tasks() -> None:
+                # Don't block the parent while workers are still starting.
+                # Fill the queue opportunistically, and enqueue more as results arrive.
+                while not stop_event.is_set():
+                    if deferred:
+                        tid, start_i, end_i = deferred.pop(0)
+                    else:
+                        try:
+                            tid, start_i, end_i = next(task_iter)
+                        except StopIteration:
+                            return
+                    try:
+                        task_queue.put_nowait((tid, start_i, end_i))
+                    except queue.Full:
+                        deferred.insert(0, (tid, start_i, end_i))
+                        return
+                    pending[tid] = (start_i, end_i)
+
+            _feed_tasks()
+
+            completed_tasks = 0
+            last_result_time = time.monotonic()
+            watchdog_s = int(getattr(args, "worker_task_timeout_s", 0) or 0)
+            last_heartbeat_time = time.monotonic()
+
+            while pending and not stop_event.is_set():
+                # If a worker has crashed, stop instead of deadlocking on a full queue.
+                dead = next((p for p in procs if p.exitcode not in (None, 0)), None)
+                if dead is not None:
+                    stop_event.set()
+                    if not args.no_progress:
+                        print(
+                            f"error: worker exited with code {dead.exitcode}; marking remaining work as errors",
+                            file=sys.stderr,
+                            flush=True,
+                        )
+                    for (_tid, (start_i, end_i)) in list(pending.items()):
+                        for v in vectors[start_i:end_i]:
+                            for s in sanitizers:
+                                for b in browsers:
+                                    results.append(
+                                        BenchCaseResult(
+                                            sanitizer=s.name,
+                                            browser=b,
+                                            vector_id=v.id,
+                                            payload_context=v.payload_context,
+                                            run_payload_context=v.payload_context,
+                                            outcome="error",
+                                            executed=False,
+                                            details=f"Worker crashed (exitcode={dead.exitcode})",
+                                            sanitizer_input_html="",
+                                            sanitized_html="",
+                                            rendered_html="",
+                                        )
+                                    )
+                                    done_cases += 1
+                    pending.clear()
+                    break
+
+                try:
+                    got_task_id, part, hit_xss = result_queue.get(timeout=0.5)
+                except Exception:
+                    if not args.no_progress and args.progress_every > 0:
+                        now = time.monotonic()
+                        # If workers are still starting/loading vectors, we might have
+                        # no completed tasks for a while. Print a lightweight heartbeat.
+                        if (now - last_heartbeat_time) > 10 and done_cases == 0:
+                            last_heartbeat_time = now
+                            elapsed_s = now - started
+                            alive = sum(1 for p in procs if p.is_alive())
                             print(
-                                f"FAIL-FAST: {hit.sanitizer} / {hit.browser} / {hit.vector_id} ({hit.payload_context}): {hit.details}",
+                                f"[0/{total_planned}] {elapsed_s:0.1f}s  starting...  workers_alive={alive}",
                                 file=sys.stderr,
                                 flush=True,
                             )
-                            if hit.sanitized_html:
-                                print(
-                                    f"sanitized_html={_repr_truncated(hit.sanitized_html)}",
-                                    file=sys.stderr,
-                                    flush=True,
-                                )
-                            if getattr(hit, "sanitizer_input_html", ""):
-                                print(
-                                    f"sanitizer_input_html={_repr_truncated(getattr(hit, 'sanitizer_input_html'), limit=2000)}",
-                                    file=sys.stderr,
-                                    flush=True,
-                                )
-                            pool.terminate()
-                            return 1
-
-                    results.extend(part)
-
-                    # Aggregated progress output.
-                    if not args.no_progress and args.progress_every > 0 and part:
-                        done_cases += len(part)
-                        errors_so_far += sum(1 for r in part if r.outcome == "error")
-                        xss_so_far += sum(1 for r in part if r.executed and r.outcome != "error")
-
-                        # Dot-style output is too noisy in parallel mode; treat
-                        # it as a request for frequent updates.
-                        every = 1 if args.progress_every == 1 else args.progress_every
-                        bucket = done_cases // every
-                        if bucket != last_bucket or done_cases == total_planned:
-                            last_bucket = bucket
-                            elapsed_s = time.monotonic() - started
-                            last = part[-1]
+                    if watchdog_s > 0 and (time.monotonic() - last_result_time) > watchdog_s:
+                        # No completed tasks for too long: assume a stall and mark remaining work as errors.
+                        if not args.no_progress:
                             print(
-                                f"[{done_cases}/{total_planned}] {elapsed_s:0.1f}s  xss={xss_so_far}  errors={errors_so_far}  "
-                                f"{last.sanitizer} / {last.browser} / {last.vector_id} ({last.payload_context})",
+                                f"warning: no completed chunks for {watchdog_s}s; marking remaining work as errors",
                                 file=sys.stderr,
                                 flush=True,
                             )
+                        for (_tid, (start_i, end_i)) in list(pending.items()):
+                            for v in vectors[start_i:end_i]:
+                                for s in sanitizers:
+                                    for b in browsers:
+                                        results.append(
+                                            BenchCaseResult(
+                                                sanitizer=s.name,
+                                                browser=b,
+                                                vector_id=v.id,
+                                                payload_context=v.payload_context,
+                                                run_payload_context=v.payload_context,
+                                                outcome="error",
+                                                executed=False,
+                                                details=f"Parallel run stalled (no completed chunks for {watchdog_s}s)",
+                                                sanitizer_input_html="",
+                                                sanitized_html="",
+                                                rendered_html="",
+                                            )
+                                        )
+                                        done_cases += 1
+                        pending.clear()
+                        stop_event.set()
+                        break
+                    continue
+
+                last_result_time = time.monotonic()
+                pending.pop(int(got_task_id), None)
+                completed_tasks += 1
+
+                # As workers finish, feed more work into the queue.
+                _feed_tasks()
+
+                if args.fail_fast and hit_xss:
+                    hit = next((r for r in part if r.outcome == "xss"), None)
+                    if hit is not None:
+                        print(
+                            f"FAIL-FAST: {hit.sanitizer} / {hit.browser} / {hit.vector_id} ({hit.payload_context}): {hit.details}",
+                            file=sys.stderr,
+                            flush=True,
+                        )
+                        if hit.sanitized_html:
+                            print(
+                                f"sanitized_html={_repr_truncated(hit.sanitized_html)}",
+                                file=sys.stderr,
+                                flush=True,
+                            )
+                        if getattr(hit, "sanitizer_input_html", ""):
+                            print(
+                                f"sanitizer_input_html={_repr_truncated(getattr(hit, 'sanitizer_input_html'), limit=2000)}",
+                                file=sys.stderr,
+                                flush=True,
+                            )
+                    stop_event.set()
+                    break
+
+                results.extend(part)
+
+                if not args.no_progress and args.progress_every > 0 and part:
+                    done_cases += len(part)
+                    errors_so_far += sum(1 for r in part if r.outcome == "error")
+                    xss_so_far += sum(1 for r in part if r.executed and r.outcome != "error")
+
+                    every = 1 if args.progress_every == 1 else args.progress_every
+                    bucket = done_cases // every
+                    if bucket != last_bucket or done_cases == total_planned:
+                        last_bucket = bucket
+                        elapsed_s = time.monotonic() - started
+                        last = part[-1]
+                        print(
+                            f"[{done_cases}/{total_planned}] {elapsed_s:0.1f}s  xss={xss_so_far}  errors={errors_so_far}  "
+                            f"{last.sanitizer} / {last.browser} / {last.vector_id} ({last.payload_context})",
+                            file=sys.stderr,
+                            flush=True,
+                        )
+
+            # Tell workers to exit.
+            for _ in range(actual_workers):
+                task_queue.put(None)
+            try:
+                task_queue.join()
+            except Exception:
+                pass
+
+            for p in procs:
+                p.join(timeout=5)
+                if p.is_alive():
+                    p.terminate()
+                    p.join(timeout=2)
 
             summary = type("Summary", (), {
                 "total_cases": len(results),
