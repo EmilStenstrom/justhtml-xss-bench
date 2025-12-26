@@ -16,6 +16,13 @@ from .harness import (
     run_vector_in_browser,
 )
 from .sanitizers import Sanitizer
+from .sanitizers import allowed_attributes_for_tag
+
+
+@dataclass(frozen=True, slots=True)
+class ExpectedTag:
+    tag: str
+    attrs: frozenset[str] = frozenset()
 
 
 @dataclass(frozen=True, slots=True)
@@ -24,10 +31,10 @@ class Vector:
     description: str
     payload_html: str
     payload_context: PayloadContext = "html"
-    # Tags we expect to survive sanitization.
+    # Tags/attributes we expect to survive sanitization.
     # - (): explicitly expect NO tags to remain after sanitization
-    # - ("a", "p", ...): expect these tags to remain after sanitization
-    expected_tags: tuple[str, ...] = ()
+    # - (ExpectedTag("a", {"href"}), ...): expect tag+attrs to remain
+    expected_tags: tuple[ExpectedTag, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -64,12 +71,27 @@ class _TagCollector:
                 self._outer = outer
 
             def handle_starttag(self, tag: str, attrs) -> None:  # type: ignore[override]
-                self._outer.tags.add(tag.lower())
+                t = tag.lower()
+                self._outer.tags.add(t)
+                if attrs is not None:
+                    s = set()
+                    for name, _value in attrs:
+                        if name:
+                            s.add(str(name).lower())
+                    self._outer.attr_sets_by_tag.setdefault(t, []).append(s)
 
             def handle_startendtag(self, tag: str, attrs) -> None:  # type: ignore[override]
-                self._outer.tags.add(tag.lower())
+                t = tag.lower()
+                self._outer.tags.add(t)
+                if attrs is not None:
+                    s = set()
+                    for name, _value in attrs:
+                        if name:
+                            s.add(str(name).lower())
+                    self._outer.attr_sets_by_tag.setdefault(t, []).append(s)
 
         self.tags: set[str] = set()
+        self.attr_sets_by_tag: dict[str, list[set[str]]] = {}
         self._parser = _P(self)
 
     def feed(self, html: str) -> set[str]:
@@ -82,6 +104,70 @@ class _TagCollector:
         return self.tags
 
 
+_EXPECTED_TAG_WITH_ATTRS_RE = re.compile(r"^\s*([A-Za-z][A-Za-z0-9:-]*)\[(.*)\]\s*$")
+_EXPECTED_TAG_ONLY_RE = re.compile(r"^\s*([A-Za-z][A-Za-z0-9:-]*)\s*$")
+
+
+def _normalize_expected_tag_name(tag: str) -> str:
+    t = str(tag).strip().lower()
+    if not t:
+        raise ValueError("expected_tags entries must have a tag name")
+    if any(ch.isspace() for ch in t) or "<" in t or ">" in t:
+        raise ValueError(f"Invalid tag name in expected_tags: {tag!r}")
+    if t[0] not in string.ascii_lowercase:
+        raise ValueError(f"Invalid tag name in expected_tags: {tag!r}")
+    for ch in t:
+        if ch not in (string.ascii_lowercase + string.digits + "-:"):
+            raise ValueError(f"Invalid tag name in expected_tags: {tag!r}")
+    return t
+
+
+def _normalize_expected_attr_name(attr: str) -> str:
+    a = str(attr).strip().lower()
+    if not a:
+        raise ValueError("expected_tags attribute names must be non-empty")
+    if any(ch.isspace() for ch in a) or "<" in a or ">" in a:
+        raise ValueError(f"Invalid attribute name in expected_tags: {attr!r}")
+    if a[0] not in string.ascii_lowercase:
+        raise ValueError(f"Invalid attribute name in expected_tags: {attr!r}")
+    for ch in a:
+        if ch not in (string.ascii_lowercase + string.digits + "-_:"):
+            raise ValueError(f"Invalid attribute name in expected_tags: {attr!r}")
+    return a
+
+
+def _parse_expected_tag_spec(spec: str) -> ExpectedTag:
+    raw = str(spec)
+    m = _EXPECTED_TAG_WITH_ATTRS_RE.match(raw)
+    if m:
+        tag_name = _normalize_expected_tag_name(m.group(1))
+        attrs_raw = m.group(2).strip()
+        if attrs_raw == "":
+            raise ValueError(f"expected_tags entry {spec!r} must not use empty brackets; use {tag_name!r} instead")
+    else:
+        m2 = _EXPECTED_TAG_ONLY_RE.match(raw)
+        if not m2:
+            raise ValueError(
+                "expected_tags entries must use the form tag or tag[attrs], e.g. 'p', 'p[class]' or 'a[href, style]'"
+            )
+        tag_name = _normalize_expected_tag_name(m2.group(1))
+        attrs_raw = ""
+
+    if not attrs_raw:
+        return ExpectedTag(tag=tag_name, attrs=frozenset())
+
+    parts = [p.strip() for p in attrs_raw.split(",")]
+    if any(p == "" for p in parts):
+        raise ValueError(f"Invalid expected_tags attribute list: {spec!r}")
+    attrs = {_normalize_expected_attr_name(p) for p in parts}
+
+    allowed = allowed_attributes_for_tag(tag_name)
+    illegal = sorted(a for a in attrs if a not in allowed)
+    if illegal:
+        raise ValueError(f"Attributes not allowed by the shared sanitization policy for <{tag_name}>: {illegal}")
+    return ExpectedTag(tag=tag_name, attrs=frozenset(attrs))
+
+
 def _expected_tags_allowed_for_context(payload_context: PayloadContext) -> bool:
     # expected_tags is a notion for HTML-fragment sanitization.
     # It is explicitly forbidden for href and all js* contexts.
@@ -92,13 +178,36 @@ def _expected_tags_allowed_for_context(payload_context: PayloadContext) -> bool:
     return True
 
 
-def _missing_expected_tags(*, expected_tags: Iterable[str], sanitized_html: str) -> list[str]:
-    expected = {str(t).lower() for t in expected_tags if str(t).strip()}
-    if not expected:
+def _missing_expected_tags(*, expected_tags: Iterable[ExpectedTag], sanitized_html: str) -> list[str]:
+    expected_list = list(expected_tags)
+    if not expected_list:
         return []
 
-    tags = _TagCollector().feed(sanitized_html)
-    missing = sorted(expected - tags)
+    collector = _TagCollector()
+    tags = collector.feed(sanitized_html)
+    attr_sets_by_tag = collector.attr_sets_by_tag
+
+    missing: list[str] = []
+    for exp in expected_list:
+        if exp.tag not in tags:
+            if exp.attrs:
+                missing.append(f"{exp.tag}[{', '.join(sorted(exp.attrs))}]")
+            else:
+                missing.append(exp.tag)
+            continue
+        per_el = attr_sets_by_tag.get(exp.tag, [])
+        # If we somehow saw a tag but didn't capture attrs, treat as empty attrs.
+        if not per_el:
+            per_el = [set()]
+        if exp.attrs:
+            ok = any(all(a in s for a in exp.attrs) for s in per_el)
+            if not ok:
+                missing.append(f"{exp.tag}[{', '.join(sorted(exp.attrs))}]")
+        else:
+            # Bare tag means: the tag must survive *without any attributes*.
+            ok = any(len(s) == 0 for s in per_el)
+            if not ok:
+                missing.append(exp.tag)
     return missing
 
 
@@ -108,20 +217,12 @@ def _unexpected_tags_when_none_expected(*, sanitized_html: str) -> list[str]:
 
 
 def _normalize_expected_tag(tag: str) -> str:
-    t = str(tag).strip().lower()
-    if not t:
-        raise ValueError("expected_tags entries must be non-empty")
-    # Keep this intentionally permissive (HTML + SVG + MathML + custom elements).
-    # Reject obvious garbage that would make the check meaningless.
-    if any(ch.isspace() for ch in t) or "<" in t or ">" in t:
-        raise ValueError(f"Invalid tag name in expected_tags: {tag!r}")
-    # Quick sanity: must start with a letter, and contain only reasonable name chars.
-    if t[0] not in string.ascii_lowercase:
-        raise ValueError(f"Invalid tag name in expected_tags: {tag!r}")
-    for ch in t:
-        if ch not in (string.ascii_lowercase + string.digits + "-:"):
-            raise ValueError(f"Invalid tag name in expected_tags: {tag!r}")
-    return t
+    # Backwards-compatible helper name kept for internal imports/tests, but now
+    # it validates tag / tag[attrs] syntax and returns a normalized string.
+    parsed = _parse_expected_tag_spec(tag)
+    if not parsed.attrs:
+        return parsed.tag
+    return f"{parsed.tag}[{', '.join(sorted(parsed.attrs))}]"
 
 
 def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
@@ -207,7 +308,7 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
 
                 payload_html = str(item["payload_html"])
 
-                expected_tags: tuple[str, ...] = ()
+                expected_tags: tuple[ExpectedTag, ...] = ()
                 if _expected_tags_allowed_for_context(payload_context):
                     if raw_expected_tags is None:
                         raise ValueError(f"expected_tags is required for payload_context {payload_context!r}: {path}")
@@ -217,15 +318,11 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
                         )
                     if not all(isinstance(x, str) for x in raw_expected_tags):
                         raise ValueError(f"expected_tags must contain only strings: {path}")
-                    normalized = [_normalize_expected_tag(x) for x in raw_expected_tags]
-                    # preserve order but de-dup
-                    seen: set[str] = set()
-                    deduped: list[str] = []
-                    for t in normalized:
-                        if t not in seen:
-                            seen.add(t)
-                            deduped.append(t)
-                    expected_tags = tuple(deduped)
+
+                    if len(raw_expected_tags) == 0:
+                        expected_tags = ()
+                    else:
+                        expected_tags = tuple(_parse_expected_tag_spec(x) for x in raw_expected_tags)
                 else:
                     if "expected_tags" in item:
                         raise ValueError(

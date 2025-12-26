@@ -139,7 +139,11 @@ def _queue_worker_main(
         from contextlib import AsyncExitStack
 
         from .harness import AsyncBrowserHarness, render_html_document
-        from .bench import _missing_expected_tags, _unexpected_tags_when_none_expected
+        from .bench import (
+            _expected_tags_allowed_for_context,
+            _missing_expected_tags,
+            _unexpected_tags_when_none_expected,
+        )
 
         try:
             async with AsyncExitStack() as stack:
@@ -228,53 +232,54 @@ def _queue_worker_main(
                                     )
                                     continue
 
-                                if len(vector.expected_tags) == 0:
-                                    unexpected = _unexpected_tags_when_none_expected(sanitized_html=sanitized_html)
-                                    if unexpected:
-                                        part.append(
-                                            BenchCaseResult(
-                                                sanitizer=sanitizer.name,
-                                                browser=browser,
-                                                vector_id=vector.id,
-                                                payload_context=vector.payload_context,
-                                                run_payload_context=payload_context_to_run,
-                                                outcome="lossy",
-                                                executed=False,
-                                                details=(
-                                                    "Expected no tags after sanitization, but found: "
-                                                    + ", ".join(unexpected[:20])
-                                                ),
-                                                sanitizer_input_html=sanitizer_input_html,
-                                                sanitized_html=sanitized_html,
-                                                rendered_html="",
+                                if _expected_tags_allowed_for_context(vector.payload_context):
+                                    if len(vector.expected_tags) == 0:
+                                        unexpected = _unexpected_tags_when_none_expected(sanitized_html=sanitized_html)
+                                        if unexpected:
+                                            part.append(
+                                                BenchCaseResult(
+                                                    sanitizer=sanitizer.name,
+                                                    browser=browser,
+                                                    vector_id=vector.id,
+                                                    payload_context=vector.payload_context,
+                                                    run_payload_context=payload_context_to_run,
+                                                    outcome="lossy",
+                                                    executed=False,
+                                                    details=(
+                                                        "Expected no tags after sanitization, but found: "
+                                                        + ", ".join(unexpected[:20])
+                                                    ),
+                                                    sanitizer_input_html=sanitizer_input_html,
+                                                    sanitized_html=sanitized_html,
+                                                    rendered_html="",
+                                                )
                                             )
+                                            continue
+                                    else:
+                                        missing_tags = _missing_expected_tags(
+                                            expected_tags=vector.expected_tags,
+                                            sanitized_html=sanitized_html,
                                         )
-                                        continue
-                                else:
-                                    missing_tags = _missing_expected_tags(
-                                        expected_tags=vector.expected_tags,
-                                        sanitized_html=sanitized_html,
-                                    )
-                                    if missing_tags:
-                                        part.append(
-                                            BenchCaseResult(
-                                                sanitizer=sanitizer.name,
-                                                browser=browser,
-                                                vector_id=vector.id,
-                                                payload_context=vector.payload_context,
-                                                run_payload_context=payload_context_to_run,
-                                                outcome="lossy",
-                                                executed=False,
-                                                details=(
-                                                    "Missing expected tags after sanitization: "
-                                                    + ", ".join(missing_tags)
-                                                ),
-                                                sanitizer_input_html=sanitizer_input_html,
-                                                sanitized_html=sanitized_html,
-                                                rendered_html="",
+                                        if missing_tags:
+                                            part.append(
+                                                BenchCaseResult(
+                                                    sanitizer=sanitizer.name,
+                                                    browser=browser,
+                                                    vector_id=vector.id,
+                                                    payload_context=vector.payload_context,
+                                                    run_payload_context=payload_context_to_run,
+                                                    outcome="lossy",
+                                                    executed=False,
+                                                    details=(
+                                                        "Missing expected tags after sanitization: "
+                                                        + ", ".join(missing_tags)
+                                                    ),
+                                                    sanitizer_input_html=sanitizer_input_html,
+                                                    sanitized_html=sanitized_html,
+                                                    rendered_html="",
+                                                )
                                             )
-                                        )
-                                        continue
+                                            continue
 
                                 try:
                                     rendered_html = render_html_document(

@@ -75,14 +75,14 @@
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / Default SRC Tag to Get Past Filters that Check SRC Domain",
 			"payload_html": "<IMG SRC=# onmouseover=\"alert('xxs')\">",
 			"payload_context": "html",
-			"expected_tags": ["img"]
+			"expected_tags": ["img[src]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-default-src-tag-by-leaving-it-empty-cfe04e6677",
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / Default SRC Tag by Leaving it Empty",
 			"payload_html": "<IMG SRC= onmouseover=\"alert('xxs')\">",
 			"payload_context": "html",
-			"expected_tags": ["img"]
+			"expected_tags": ["img[src]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-default-src-tag-by-leaving-it-out-entirely-3d8dd05505",
@@ -96,14 +96,14 @@
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / On Error Alert",
 			"payload_html": "<IMG SRC=/ onerror=\"alert(String.fromCharCode(88,83,83))\"></img>",
 			"payload_context": "html",
-			"expected_tags": ["img"]
+			"expected_tags": ["img[src]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-img-onerror-and-javascript-alert-encode-081e5d7d37",
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / IMG onerror and JavaScript Alert Encode",
 			"payload_html": "<img src=x onerror=\"&#0000106&#0000097&#0000118&#0000097&#0000115&#0000099&#0000114&#0000105&#0000112&#0000116&#0000058&#0000097&#0000108&#0000101&#0000114&#0000116&#0000040&#0000039&#0000088&#0000083&#0000083&#0000039&#0000041\">",
 			"payload_context": "html",
-			"expected_tags": ["img"]
+			"expected_tags": ["img[src]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-decimal-html-character-references-e55c713995",
@@ -159,7 +159,7 @@
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / Embedded Newline to Break Up XSS / Example 2: Break Up JavaScript Directive with Null",
 			"payload_html": "perl -e 'print \"<IMG SRC=java\\0script:alert(\\\"XSS\\\")>\";' > out",
 			"payload_context": "html",
-			"expected_tags": ["img"]
+			"expected_tags": ["img[src]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-embedded-newline-to-break-up-xss-example-3--a6c621abc6",
@@ -353,21 +353,21 @@
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / STYLE Attribute that Breaks Up an Expression",
 			"payload_html": "<IMG STYLE=\"xss:expr/*XSS*/ession(alert('XSS'))\">",
 			"payload_context": "html",
-			"expected_tags": ["img"]
+			"expected_tags": ["img[style]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-img-style-with-expressions-91ca3f04b1",
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / IMG STYLE with Expressions",
 			"payload_html": "exp/*<A STYLE='no\\xss:noxss(\"*//*\");\nxss:ex/*XSS*//*/*/pression(alert(\"XSS\"))'>",
 			"payload_context": "html",
-			"expected_tags": ["a"]
+			"expected_tags": ["a[style]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-style-tag-using-background-image-e968c83781",
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / STYLE Tag using Background-image",
 			"payload_html": "<STYLE>.XSS{background-image:url(\"javascript:alert('XSS')\");}</STYLE><A CLASS=XSS></A>",
 			"payload_context": "html",
-			"expected_tags": ["a"]
+			"expected_tags": ["a[class]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-style-tag-using-background-7699908cbe",
@@ -457,28 +457,28 @@
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / DIV / DIV Background-image",
 			"payload_html": "<DIV STYLE=\"background-image: url(javascript:alert('XSS'))\">",
 			"payload_context": "html",
-			"expected_tags": ["div"]
+			"expected_tags": ["div[style]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-div-div-background-image-with-unicode-xss-e-93cad23907",
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / DIV / DIV Background-image with Unicode XSS Exploit",
 			"payload_html": "<DIV STYLE=\"background-image:\\0075\\0072\\006C\\0028'\\006a\\0061\\0076\\0061\\0073\\0063\\0072\\0069\\0070\\0074\\003a\\0061\\006c\\0065\\0072\\0074\\0028.1027\\0058.1053\\0053\\0027\\0029'\\0029\">",
 			"payload_context": "html",
-			"expected_tags": ["div"]
+			"expected_tags": ["div[style]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-div-div-background-image-plus-extra-charact-b290ae3d13",
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / DIV / DIV Background-image Plus Extra Characters",
 			"payload_html": "<DIV STYLE=\"background-image: url(\u0001javascript:alert('XSS'))\">",
 			"payload_context": "html",
-			"expected_tags": ["div"]
+			"expected_tags": ["div[style]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-div-div-expression-4425078a59",
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / DIV / DIV Expression",
 			"payload_html": "<DIV STYLE=\"width: expression(alert('XSS'));\">",
 			"payload_context": "html",
-			"expected_tags": ["div"]
+			"expected_tags": ["div[style]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-downlevel-hidden-block-b0ae63c1b8",
@@ -513,7 +513,7 @@
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / XML Data Island with CDATA Obfuscation",
 			"payload_html": "<XML ID=\"xss\"><I><B><IMG SRC=\"javas<!-- -->cript:alert('XSS')\"></B></I></XML>\n<SPAN DATASRC=\"#xss\" DATAFLD=\"B\" DATAFORMATAS=\"HTML\"></SPAN>",
 			"payload_context": "html",
-			"expected_tags": ["i", "b", "img", "span"]
+			"expected_tags": ["i", "b", "img[src]", "span"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-locally-hosted-xml-with-embedded-javascript-43a1b85afb",
@@ -555,7 +555,7 @@
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / IMG Embedded Commands",
 			"payload_html": "<IMG SRC=\"http://www.thesiteyouareon.com/somecommand.php?somevariables=maliciouscode\">",
 			"payload_context": "html",
-			"expected_tags": ["img"]
+			"expected_tags": ["img[src]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-img-embedded-commands-img-embedded-commands-f5cc304dc3",
@@ -624,35 +624,35 @@
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / IP Versus Hostname",
 			"payload_html": "<A HREF=\"http://66.102.7.147/\">XSS</A>",
 			"payload_context": "html",
-			"expected_tags": ["a"]
+			"expected_tags": ["a[href]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-url-string-evasion-url-encoding-d33763bf7c",
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / URL Encoding",
 			"payload_html": "<A HREF=\"http://%77%77%77%2E%67%6F%6F%67%6C%65%2E%63%6F%6D\">XSS</A>",
 			"payload_context": "html",
-			"expected_tags": ["a"]
+			"expected_tags": ["a[href]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-url-string-evasion-dword-encoding-6c1a71f321",
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / DWORD Encoding",
 			"payload_html": "<A HREF=\"http://1113982867/\">XSS</A>",
 			"payload_context": "html",
-			"expected_tags": ["a"]
+			"expected_tags": ["a[href]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-url-string-evasion-hex-encoding-3fb04d90c4",
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / Hex Encoding",
 			"payload_html": "<A HREF=\"http://0x42.0x0000066.0x7.0x93/\">XSS</A>",
 			"payload_context": "html",
-			"expected_tags": ["a"]
+			"expected_tags": ["a[href]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-url-string-evasion-octal-encoding-2e3d682ea9",
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / Octal Encoding",
 			"payload_html": "<A HREF=\"http://0102.0146.0007.00000223/\">XSS</A>",
 			"payload_context": "html",
-			"expected_tags": ["a"]
+			"expected_tags": ["a[href]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-url-string-evasion-base64-encoding-cd99030b22",
@@ -666,28 +666,28 @@
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / Mixed Encoding",
 			"payload_html": "<A HREF=\"h\ntt  p://6   6.000146.0x7.147/\">XSS</A>",
 			"payload_context": "html",
-			"expected_tags": ["a"]
+			"expected_tags": ["a[href]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-url-string-evasion-protocol-resolution-bypa-a4fbe879b4",
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / Protocol Resolution Bypass",
 			"payload_html": "<A HREF=\"//www.google.com/\">XSS</A>",
 			"payload_context": "html",
-			"expected_tags": ["a"]
+			"expected_tags": ["a[href]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-url-string-evasion-removing-cnames-eeaa749db8",
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / Removing CNAMEs",
 			"payload_html": "<A HREF=\"http://google.com/\">XSS</A>",
 			"payload_context": "html",
-			"expected_tags": ["a"]
+			"expected_tags": ["a[href]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-url-string-evasion-removing-cnames-69c041ec1e",
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / Removing CNAMEs",
 			"payload_html": "<A HREF=\"http://www.google.com./\">XSS</A>",
 			"payload_context": "html",
-			"expected_tags": ["a"]
+			"expected_tags": ["a[href]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-url-string-evasion-javascript-link-location-6e08c6293f",
@@ -701,7 +701,7 @@
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / URL String Evasion / Content Replace as Attack Vector",
 			"payload_html": "<A HREF=\"http://www.google.com/ogle.com/\">XSS</A>",
 			"payload_context": "html",
-			"expected_tags": ["a"]
+			"expected_tags": ["a[href]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-assisting-xss-with-http-parameter-pollution-dd4d730e19",
@@ -722,7 +722,7 @@
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / Assisting XSS with HTTP Parameter Pollution / Content Page Output",
 			"payload_html": "<a href=\"/share?content_type=1&title=This is a regular title&amp;content_type=1;alert(1)\">Share</a>",
 			"payload_context": "html",
-			"expected_tags": ["a"]
+			"expected_tags": ["a[href]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-assisting-xss-with-http-parameter-pollution-17487aea0c",
@@ -788,7 +788,7 @@
 			"description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
 			"payload_html": "<Img src = x onerror = \"javascript: window.onerror = alert; throw XSS\">",
 			"payload_context": "html",
-			"expected_tags": ["img"]
+			"expected_tags": ["img[src]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-e5cee64be2",
@@ -858,7 +858,7 @@
 			"description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
 			"payload_html": "<img src=x:alert(alt) onerror=eval(src) alt=0>",
 			"payload_context": "html",
-			"expected_tags": ["img"]
+			"expected_tags": ["img[alt]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-26ed772d67",
@@ -928,7 +928,7 @@
 			"description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
 			"payload_html": "<img src=\"/\" =_=\" title=\"onerror='prompt(1)'\">",
 			"payload_context": "html",
-			"expected_tags": ["img"]
+			"expected_tags": ["img[src]"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-e4efcfc631",

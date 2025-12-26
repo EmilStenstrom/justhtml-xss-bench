@@ -92,6 +92,17 @@ Each vector object has (at minimum):
 	If any of these tags are missing from the sanitized output, the benchmark marks the case as `lossy`.
 	If the list is empty (`[]`), the benchmark expects the sanitized output to contain no tags at all.
 
+	Each entry may either be a bare tag name (tag must exist with no attributes)
+	or a tag with an attribute list:
+	- `"p"` (tag must exist; at least one surviving `<p>` must have no attributes)
+	- `"p[class]"` (tag must exist and have a `class` attribute)
+	- `"a[href, style]"` (tag must exist and have both `href` and `style` attributes)
+
+	Each entry is checked as: there must be at least one surviving element of that tag
+	that has all listed attributes.
+
+	Allowed attribute names must come from the shared sanitizer allowlist policy.
+
 	`expected_tags` is required for HTML-fragment contexts (`html`, `html_head`, `html_outer`, `onerror_attr`).
 	It is forbidden for `href` and all `js*` contexts.
 

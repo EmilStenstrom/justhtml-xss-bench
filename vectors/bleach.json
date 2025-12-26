@@ -15,14 +15,14 @@
 			"description": "Inline CSS containing potentially executable constructs",
 			"payload_html": "<p style=\"color: red; position: fixed; background-color: url(http://x); font-weight: bold; font-style: expression(alert(1)); color: @import; text-decoration: javascript:alert(1); font-size: 12px\\6; border-radius: 4px; : x; color: ; broken\">Hi</p>",
 			"payload_context": "html",
-			"expected_tags": ["p"]
+			"expected_tags": ["p[style]"]
 		},
 		{
 			"id": "bleach-security_attributes-event-handler-attributes-are-always-removed-dee64f8eac",
 			"description": "HTML with event handler attribute (onclick)",
 			"payload_html": "<p onclick=alert(1)>Hi</p><img src=x onerror=alert(1)>",
 			"payload_context": "html",
-			"expected_tags": ["p", "img"]
+			"expected_tags": ["p", "img[src]"]
 		},
 		{
 			"id": "bleach-security_attributes-srcdoc-is-always-removed-even-if-allowed-by-policy-85bda63d61",

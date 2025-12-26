@@ -75,7 +75,7 @@
       "payload_html": "<img/src/onerror=prompt(8)>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[src]"
       ]
     },
     {
@@ -84,7 +84,7 @@
       "payload_html": "<image src/onerror=prompt(8)>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[src]"
       ]
     },
     {
@@ -93,7 +93,7 @@
       "payload_html": "<img src/onerror=prompt(8)>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[src]"
       ]
     },
     {
@@ -102,7 +102,7 @@
       "payload_html": "<image src =q onerror=prompt(8)>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[src]"
       ]
     },
     {
@@ -111,7 +111,7 @@
       "payload_html": "<img src =q onerror=prompt(8)>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[src]"
       ]
     },
     {
@@ -120,7 +120,7 @@
       "payload_html": "</scrip</script>t><img src =q onerror=prompt(8)>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[src]"
       ]
     },
     {
@@ -677,7 +677,7 @@
       "payload_html": "\"><img src=1 onerror=alert(1)>.gif",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[src]"
       ]
     },
     {
@@ -777,7 +777,7 @@
       "payload_html": "<body onhashchange=alert(1)><a href=#x>click this!#x",
       "payload_context": "html",
       "expected_tags": [
-        "a"
+        "a[href]"
       ]
     },
     {
@@ -1047,7 +1047,7 @@
       "payload_html": "<a id=x tabindex=1 onactivate=alert(1)></a>",
       "payload_context": "html",
       "expected_tags": [
-        "a"
+        "a[id]"
       ]
     },
     {
@@ -1056,7 +1056,7 @@
       "payload_html": "<a id=x tabindex=1 onbeforeactivate=alert(1)></a>",
       "payload_context": "html",
       "expected_tags": [
-        "a"
+        "a[id]"
       ]
     },
     {
@@ -1065,7 +1065,7 @@
       "payload_html": "<a id=x tabindex=1 onbeforedeactivate=alert(1)></a><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "a"
+        "a[id]"
       ]
     },
     {
@@ -1074,7 +1074,7 @@
       "payload_html": "<a id=x tabindex=1 ondeactivate=alert(1)></a><input id=y autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "a"
+        "a[id]"
       ]
     },
     {
@@ -1083,7 +1083,7 @@
       "payload_html": "<a id=x tabindex=1 onfocus=alert(1)></a>",
       "payload_context": "html",
       "expected_tags": [
-        "a"
+        "a[id]"
       ]
     },
     {
@@ -1092,7 +1092,7 @@
       "payload_html": "<a id=x tabindex=1 onfocusin=alert(1)></a>",
       "payload_context": "html",
       "expected_tags": [
-        "a"
+        "a[id]"
       ]
     },
     {
@@ -1128,7 +1128,7 @@
       "payload_html": "<a onblur=alert(1) tabindex=1 id=x></a><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "a"
+        "a[id]"
       ]
     },
     {
@@ -1182,7 +1182,7 @@
       "payload_html": "<a onfocusout=alert(1) tabindex=1 id=x></a><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "a"
+        "a[id]"
       ]
     },
     {
@@ -3204,7 +3204,7 @@
       "payload_html": "<b id=x tabindex=1 onactivate=alert(1)></b>",
       "payload_context": "html",
       "expected_tags": [
-        "b"
+        "b[id]"
       ]
     },
     {
@@ -3213,7 +3213,7 @@
       "payload_html": "<b id=x tabindex=1 onbeforeactivate=alert(1)></b>",
       "payload_context": "html",
       "expected_tags": [
-        "b"
+        "b[id]"
       ]
     },
     {
@@ -3222,7 +3222,7 @@
       "payload_html": "<b id=x tabindex=1 onbeforedeactivate=alert(1)></b><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "b"
+        "b[id]"
       ]
     },
     {
@@ -3231,7 +3231,7 @@
       "payload_html": "<b id=x tabindex=1 ondeactivate=alert(1)></b><input id=y autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "b"
+        "b[id]"
       ]
     },
     {
@@ -3240,7 +3240,7 @@
       "payload_html": "<b id=x tabindex=1 onfocus=alert(1)></b>",
       "payload_context": "html",
       "expected_tags": [
-        "b"
+        "b[id]"
       ]
     },
     {
@@ -3249,7 +3249,7 @@
       "payload_html": "<b id=x tabindex=1 onfocusin=alert(1)></b>",
       "payload_context": "html",
       "expected_tags": [
-        "b"
+        "b[id]"
       ]
     },
     {
@@ -3285,7 +3285,7 @@
       "payload_html": "<b onblur=alert(1) tabindex=1 id=x></b><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "b"
+        "b[id]"
       ]
     },
     {
@@ -3339,7 +3339,7 @@
       "payload_html": "<b onfocusout=alert(1) tabindex=1 id=x></b><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "b"
+        "b[id]"
       ]
     },
     {
@@ -5060,7 +5060,7 @@
       "payload_html": "<blockquote id=x tabindex=1 onactivate=alert(1)></blockquote>",
       "payload_context": "html",
       "expected_tags": [
-        "blockquote"
+        "blockquote[id]"
       ]
     },
     {
@@ -5069,7 +5069,7 @@
       "payload_html": "<blockquote id=x tabindex=1 onbeforeactivate=alert(1)></blockquote>",
       "payload_context": "html",
       "expected_tags": [
-        "blockquote"
+        "blockquote[id]"
       ]
     },
     {
@@ -5078,7 +5078,7 @@
       "payload_html": "<blockquote id=x tabindex=1 onbeforedeactivate=alert(1)></blockquote><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "blockquote"
+        "blockquote[id]"
       ]
     },
     {
@@ -5087,7 +5087,7 @@
       "payload_html": "<blockquote id=x tabindex=1 ondeactivate=alert(1)></blockquote><input id=y autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "blockquote"
+        "blockquote[id]"
       ]
     },
     {
@@ -5096,7 +5096,7 @@
       "payload_html": "<blockquote id=x tabindex=1 onfocus=alert(1)></blockquote>",
       "payload_context": "html",
       "expected_tags": [
-        "blockquote"
+        "blockquote[id]"
       ]
     },
     {
@@ -5105,7 +5105,7 @@
       "payload_html": "<blockquote id=x tabindex=1 onfocusin=alert(1)></blockquote>",
       "payload_context": "html",
       "expected_tags": [
-        "blockquote"
+        "blockquote[id]"
       ]
     },
     {
@@ -5141,7 +5141,7 @@
       "payload_html": "<blockquote onblur=alert(1) tabindex=1 id=x></blockquote><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "blockquote"
+        "blockquote[id]"
       ]
     },
     {
@@ -5195,7 +5195,7 @@
       "payload_html": "<blockquote onfocusout=alert(1) tabindex=1 id=x></blockquote><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "blockquote"
+        "blockquote[id]"
       ]
     },
     {
@@ -5651,7 +5651,7 @@
       "payload_html": "<br id=x tabindex=1 onactivate=alert(1)></br>",
       "payload_context": "html",
       "expected_tags": [
-        "br"
+        "br[id]"
       ]
     },
     {
@@ -5660,7 +5660,7 @@
       "payload_html": "<br id=x tabindex=1 onbeforeactivate=alert(1)></br>",
       "payload_context": "html",
       "expected_tags": [
-        "br"
+        "br[id]"
       ]
     },
     {
@@ -5669,6 +5669,7 @@
       "payload_html": "<br id=x tabindex=1 onbeforedeactivate=alert(1)></br><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
+        "br[id]",
         "br"
       ]
     },
@@ -5678,7 +5679,7 @@
       "payload_html": "<br id=x tabindex=1 ondeactivate=alert(1)></br><input id=y autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "br"
+        "br[id]"
       ]
     },
     {
@@ -5687,7 +5688,7 @@
       "payload_html": "<br id=x tabindex=1 onfocus=alert(1)></br>",
       "payload_context": "html",
       "expected_tags": [
-        "br"
+        "br[id]"
       ]
     },
     {
@@ -5696,7 +5697,7 @@
       "payload_html": "<br id=x tabindex=1 onfocusin=alert(1)></br>",
       "payload_context": "html",
       "expected_tags": [
-        "br"
+        "br[id]"
       ]
     },
     {
@@ -5732,7 +5733,7 @@
       "payload_html": "<br onblur=alert(1) tabindex=1 id=x></br><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "br"
+        "br[id]"
       ]
     },
     {
@@ -5786,7 +5787,7 @@
       "payload_html": "<br onfocusout=alert(1) tabindex=1 id=x></br><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "br"
+        "br[id]"
       ]
     },
     {
@@ -7059,7 +7060,7 @@
       "payload_html": "<code id=x tabindex=1 onactivate=alert(1)></code>",
       "payload_context": "html",
       "expected_tags": [
-        "code"
+        "code[id]"
       ]
     },
     {
@@ -7068,7 +7069,7 @@
       "payload_html": "<code id=x tabindex=1 onbeforeactivate=alert(1)></code>",
       "payload_context": "html",
       "expected_tags": [
-        "code"
+        "code[id]"
       ]
     },
     {
@@ -7077,7 +7078,7 @@
       "payload_html": "<code id=x tabindex=1 onbeforedeactivate=alert(1)></code><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "code"
+        "code[id]"
       ]
     },
     {
@@ -7086,7 +7087,7 @@
       "payload_html": "<code id=x tabindex=1 ondeactivate=alert(1)></code><input id=y autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "code"
+        "code[id]"
       ]
     },
     {
@@ -7095,7 +7096,7 @@
       "payload_html": "<code id=x tabindex=1 onfocus=alert(1)></code>",
       "payload_context": "html",
       "expected_tags": [
-        "code"
+        "code[id]"
       ]
     },
     {
@@ -7104,7 +7105,7 @@
       "payload_html": "<code id=x tabindex=1 onfocusin=alert(1)></code>",
       "payload_context": "html",
       "expected_tags": [
-        "code"
+        "code[id]"
       ]
     },
     {
@@ -7140,7 +7141,7 @@
       "payload_html": "<code onblur=alert(1) tabindex=1 id=x></code><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "code"
+        "code[id]"
       ]
     },
     {
@@ -7194,7 +7195,7 @@
       "payload_html": "<code onfocusout=alert(1) tabindex=1 id=x></code><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "code"
+        "code[id]"
       ]
     },
     {
@@ -12624,7 +12625,7 @@
       "payload_html": "<div id=x tabindex=1 onactivate=alert(1)></div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -12633,7 +12634,7 @@
       "payload_html": "<div id=x tabindex=1 onbeforeactivate=alert(1)></div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -12642,7 +12643,7 @@
       "payload_html": "<div id=x tabindex=1 onbeforedeactivate=alert(1)></div><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -12651,7 +12652,7 @@
       "payload_html": "<div id=x tabindex=1 ondeactivate=alert(1)></div><input id=y autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -12660,7 +12661,7 @@
       "payload_html": "<div id=x tabindex=1 onfocus=alert(1)></div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -12669,7 +12670,7 @@
       "payload_html": "<div id=x tabindex=1 onfocusin=alert(1)></div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -12705,7 +12706,7 @@
       "payload_html": "<div onblur=alert(1) tabindex=1 id=x></div><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -12759,7 +12760,7 @@
       "payload_html": "<div onfocusout=alert(1) tabindex=1 id=x></div><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -13584,7 +13585,7 @@
       "payload_html": "<em id=x tabindex=1 onactivate=alert(1)></em>",
       "payload_context": "html",
       "expected_tags": [
-        "em"
+        "em[id]"
       ]
     },
     {
@@ -13593,7 +13594,7 @@
       "payload_html": "<em id=x tabindex=1 onbeforeactivate=alert(1)></em>",
       "payload_context": "html",
       "expected_tags": [
-        "em"
+        "em[id]"
       ]
     },
     {
@@ -13602,7 +13603,7 @@
       "payload_html": "<em id=x tabindex=1 onbeforedeactivate=alert(1)></em><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "em"
+        "em[id]"
       ]
     },
     {
@@ -13611,7 +13612,7 @@
       "payload_html": "<em id=x tabindex=1 ondeactivate=alert(1)></em><input id=y autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "em"
+        "em[id]"
       ]
     },
     {
@@ -13620,7 +13621,7 @@
       "payload_html": "<em id=x tabindex=1 onfocus=alert(1)></em>",
       "payload_context": "html",
       "expected_tags": [
-        "em"
+        "em[id]"
       ]
     },
     {
@@ -13629,7 +13630,7 @@
       "payload_html": "<em id=x tabindex=1 onfocusin=alert(1)></em>",
       "payload_context": "html",
       "expected_tags": [
-        "em"
+        "em[id]"
       ]
     },
     {
@@ -13665,7 +13666,7 @@
       "payload_html": "<em onblur=alert(1) tabindex=1 id=x></em><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "em"
+        "em[id]"
       ]
     },
     {
@@ -13719,7 +13720,7 @@
       "payload_html": "<em onfocusout=alert(1) tabindex=1 id=x></em><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "em"
+        "em[id]"
       ]
     },
     {
@@ -15944,7 +15945,7 @@
       "payload_html": "<h1 id=x tabindex=1 onactivate=alert(1)></h1>",
       "payload_context": "html",
       "expected_tags": [
-        "h1"
+        "h1[id]"
       ]
     },
     {
@@ -15953,7 +15954,7 @@
       "payload_html": "<h1 id=x tabindex=1 onbeforeactivate=alert(1)></h1>",
       "payload_context": "html",
       "expected_tags": [
-        "h1"
+        "h1[id]"
       ]
     },
     {
@@ -15962,7 +15963,7 @@
       "payload_html": "<h1 id=x tabindex=1 onbeforedeactivate=alert(1)></h1><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "h1"
+        "h1[id]"
       ]
     },
     {
@@ -15971,7 +15972,7 @@
       "payload_html": "<h1 id=x tabindex=1 ondeactivate=alert(1)></h1><input id=y autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "h1"
+        "h1[id]"
       ]
     },
     {
@@ -15980,7 +15981,7 @@
       "payload_html": "<h1 id=x tabindex=1 onfocus=alert(1)></h1>",
       "payload_context": "html",
       "expected_tags": [
-        "h1"
+        "h1[id]"
       ]
     },
     {
@@ -15989,7 +15990,7 @@
       "payload_html": "<h1 id=x tabindex=1 onfocusin=alert(1)></h1>",
       "payload_context": "html",
       "expected_tags": [
-        "h1"
+        "h1[id]"
       ]
     },
     {
@@ -16025,7 +16026,7 @@
       "payload_html": "<h1 onblur=alert(1) tabindex=1 id=x></h1><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "h1"
+        "h1[id]"
       ]
     },
     {
@@ -16079,7 +16080,7 @@
       "payload_html": "<h1 onfocusout=alert(1) tabindex=1 id=x></h1><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "h1"
+        "h1[id]"
       ]
     },
     {
@@ -16904,7 +16905,7 @@
       "payload_html": "<hr id=x tabindex=1 onactivate=alert(1)></hr>",
       "payload_context": "html",
       "expected_tags": [
-        "hr"
+        "hr[id]"
       ]
     },
     {
@@ -16913,7 +16914,7 @@
       "payload_html": "<hr id=x tabindex=1 onbeforeactivate=alert(1)></hr>",
       "payload_context": "html",
       "expected_tags": [
-        "hr"
+        "hr[id]"
       ]
     },
     {
@@ -16922,7 +16923,7 @@
       "payload_html": "<hr id=x tabindex=1 onbeforedeactivate=alert(1)></hr><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "hr"
+        "hr[id]"
       ]
     },
     {
@@ -16931,7 +16932,7 @@
       "payload_html": "<hr id=x tabindex=1 ondeactivate=alert(1)></hr><input id=y autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "hr"
+        "hr[id]"
       ]
     },
     {
@@ -16940,7 +16941,7 @@
       "payload_html": "<hr id=x tabindex=1 onfocus=alert(1)></hr>",
       "payload_context": "html",
       "expected_tags": [
-        "hr"
+        "hr[id]"
       ]
     },
     {
@@ -16949,7 +16950,7 @@
       "payload_html": "<hr id=x tabindex=1 onfocusin=alert(1)></hr>",
       "payload_context": "html",
       "expected_tags": [
-        "hr"
+        "hr[id]"
       ]
     },
     {
@@ -16985,7 +16986,7 @@
       "payload_html": "<hr onblur=alert(1) tabindex=1 id=x></hr><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "hr"
+        "hr[id]"
       ]
     },
     {
@@ -17039,7 +17040,7 @@
       "payload_html": "<hr onfocusout=alert(1) tabindex=1 id=x></hr><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "hr"
+        "hr[id]"
       ]
     },
     {
@@ -17416,7 +17417,7 @@
       "payload_html": "<i id=x tabindex=1 onactivate=alert(1)></i>",
       "payload_context": "html",
       "expected_tags": [
-        "i"
+        "i[id]"
       ]
     },
     {
@@ -17425,7 +17426,7 @@
       "payload_html": "<i id=x tabindex=1 onbeforeactivate=alert(1)></i>",
       "payload_context": "html",
       "expected_tags": [
-        "i"
+        "i[id]"
       ]
     },
     {
@@ -17434,7 +17435,7 @@
       "payload_html": "<i id=x tabindex=1 onbeforedeactivate=alert(1)></i><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "i"
+        "i[id]"
       ]
     },
     {
@@ -17443,7 +17444,7 @@
       "payload_html": "<i id=x tabindex=1 ondeactivate=alert(1)></i><input id=y autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "i"
+        "i[id]"
       ]
     },
     {
@@ -17452,7 +17453,7 @@
       "payload_html": "<i id=x tabindex=1 onfocus=alert(1)></i>",
       "payload_context": "html",
       "expected_tags": [
-        "i"
+        "i[id]"
       ]
     },
     {
@@ -17461,7 +17462,7 @@
       "payload_html": "<i id=x tabindex=1 onfocusin=alert(1)></i>",
       "payload_context": "html",
       "expected_tags": [
-        "i"
+        "i[id]"
       ]
     },
     {
@@ -17497,7 +17498,7 @@
       "payload_html": "<i onblur=alert(1) tabindex=1 id=x></i><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "i"
+        "i[id]"
       ]
     },
     {
@@ -17551,7 +17552,7 @@
       "payload_html": "<i onfocusout=alert(1) tabindex=1 id=x></i><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "i"
+        "i[id]"
       ]
     },
     {
@@ -17942,7 +17943,7 @@
       "payload_html": "<image id=x tabindex=1 onactivate=alert(1)></image>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[id]"
       ]
     },
     {
@@ -17951,7 +17952,7 @@
       "payload_html": "<image id=x tabindex=1 onbeforeactivate=alert(1)></image>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[id]"
       ]
     },
     {
@@ -17960,7 +17961,7 @@
       "payload_html": "<image id=x tabindex=1 onbeforedeactivate=alert(1)></image><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[id]"
       ]
     },
     {
@@ -17969,7 +17970,7 @@
       "payload_html": "<image id=x tabindex=1 ondeactivate=alert(1)></image><input id=y autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[id]"
       ]
     },
     {
@@ -17978,7 +17979,7 @@
       "payload_html": "<image id=x tabindex=1 onfocus=alert(1)></image>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[id]"
       ]
     },
     {
@@ -17987,7 +17988,7 @@
       "payload_html": "<image id=x tabindex=1 onfocusin=alert(1)></image>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[id]"
       ]
     },
     {
@@ -18023,7 +18024,7 @@
       "payload_html": "<image onblur=alert(1) tabindex=1 id=x></image><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[id]"
       ]
     },
     {
@@ -18077,7 +18078,7 @@
       "payload_html": "<image onfocusout=alert(1) tabindex=1 id=x></image><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[id]"
       ]
     },
     {
@@ -18185,7 +18186,7 @@
       "payload_html": "<image src/onerror=alert(1)>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[src]"
       ]
     },
     {
@@ -18194,7 +18195,7 @@
       "payload_html": "<image src=validimage.png onload=alert(1)>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[src]"
       ]
     },
     {
@@ -18203,7 +18204,7 @@
       "payload_html": "<image src=validimage.png onloadend=alert(1)>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[src]"
       ]
     },
     {
@@ -18212,7 +18213,7 @@
       "payload_html": "<image src=validimage.png onloadstart=alert(1)>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[src]"
       ]
     },
     {
@@ -18275,7 +18276,7 @@
       "payload_html": "<img id=x tabindex=1 onactivate=alert(1)></img>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[id]"
       ]
     },
     {
@@ -18284,7 +18285,7 @@
       "payload_html": "<img id=x tabindex=1 onbeforeactivate=alert(1)></img>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[id]"
       ]
     },
     {
@@ -18293,7 +18294,7 @@
       "payload_html": "<img id=x tabindex=1 onbeforedeactivate=alert(1)></img><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[id]"
       ]
     },
     {
@@ -18302,7 +18303,7 @@
       "payload_html": "<img id=x tabindex=1 ondeactivate=alert(1)></img><input id=y autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[id]"
       ]
     },
     {
@@ -18311,7 +18312,7 @@
       "payload_html": "<img id=x tabindex=1 onfocus=alert(1)></img>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[id]"
       ]
     },
     {
@@ -18320,7 +18321,7 @@
       "payload_html": "<img id=x tabindex=1 onfocusin=alert(1)></img>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[id]"
       ]
     },
     {
@@ -18356,7 +18357,7 @@
       "payload_html": "<img onblur=alert(1) tabindex=1 id=x></img><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[id]"
       ]
     },
     {
@@ -18410,7 +18411,7 @@
       "payload_html": "<img onfocusout=alert(1) tabindex=1 id=x></img><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[id]"
       ]
     },
     {
@@ -18518,7 +18519,7 @@
       "payload_html": "<img src/onerror=alert(1)>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[src]"
       ]
     },
     {
@@ -18527,7 +18528,7 @@
       "payload_html": "<img src=validimage.png onload=alert(1)>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[src]"
       ]
     },
     {
@@ -18536,7 +18537,7 @@
       "payload_html": "<img src=validimage.png onloadend=alert(1)>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[src]"
       ]
     },
     {
@@ -18545,7 +18546,7 @@
       "payload_html": "<img src=validimage.png onloadstart=alert(1)>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[src]"
       ]
     },
     {
@@ -20322,7 +20323,7 @@
       "payload_html": "<li id=x tabindex=1 onactivate=alert(1)></li>",
       "payload_context": "html",
       "expected_tags": [
-        "li"
+        "li[id]"
       ]
     },
     {
@@ -20331,7 +20332,7 @@
       "payload_html": "<li id=x tabindex=1 onbeforeactivate=alert(1)></li>",
       "payload_context": "html",
       "expected_tags": [
-        "li"
+        "li[id]"
       ]
     },
     {
@@ -20340,7 +20341,7 @@
       "payload_html": "<li id=x tabindex=1 onbeforedeactivate=alert(1)></li><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "li"
+        "li[id]"
       ]
     },
     {
@@ -20349,7 +20350,7 @@
       "payload_html": "<li id=x tabindex=1 ondeactivate=alert(1)></li><input id=y autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "li"
+        "li[id]"
       ]
     },
     {
@@ -20358,7 +20359,7 @@
       "payload_html": "<li id=x tabindex=1 onfocus=alert(1)></li>",
       "payload_context": "html",
       "expected_tags": [
-        "li"
+        "li[id]"
       ]
     },
     {
@@ -20367,7 +20368,7 @@
       "payload_html": "<li id=x tabindex=1 onfocusin=alert(1)></li>",
       "payload_context": "html",
       "expected_tags": [
-        "li"
+        "li[id]"
       ]
     },
     {
@@ -20403,7 +20404,7 @@
       "payload_html": "<li onblur=alert(1) tabindex=1 id=x></li><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "li"
+        "li[id]"
       ]
     },
     {
@@ -20457,7 +20458,7 @@
       "payload_html": "<li onfocusout=alert(1) tabindex=1 id=x></li><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "li"
+        "li[id]"
       ]
     },
     {
@@ -24705,7 +24706,7 @@
       "payload_html": "<ol id=x tabindex=1 onactivate=alert(1)></ol>",
       "payload_context": "html",
       "expected_tags": [
-        "ol"
+        "ol[id]"
       ]
     },
     {
@@ -24714,7 +24715,7 @@
       "payload_html": "<ol id=x tabindex=1 onbeforeactivate=alert(1)></ol>",
       "payload_context": "html",
       "expected_tags": [
-        "ol"
+        "ol[id]"
       ]
     },
     {
@@ -24723,7 +24724,7 @@
       "payload_html": "<ol id=x tabindex=1 onbeforedeactivate=alert(1)></ol><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "ol"
+        "ol[id]"
       ]
     },
     {
@@ -24732,7 +24733,7 @@
       "payload_html": "<ol id=x tabindex=1 ondeactivate=alert(1)></ol><input id=y autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "ol"
+        "ol[id]"
       ]
     },
     {
@@ -24741,7 +24742,7 @@
       "payload_html": "<ol id=x tabindex=1 onfocus=alert(1)></ol>",
       "payload_context": "html",
       "expected_tags": [
-        "ol"
+        "ol[id]"
       ]
     },
     {
@@ -24750,7 +24751,7 @@
       "payload_html": "<ol id=x tabindex=1 onfocusin=alert(1)></ol>",
       "payload_context": "html",
       "expected_tags": [
-        "ol"
+        "ol[id]"
       ]
     },
     {
@@ -24786,7 +24787,7 @@
       "payload_html": "<ol onblur=alert(1) tabindex=1 id=x></ol><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "ol"
+        "ol[id]"
       ]
     },
     {
@@ -24840,7 +24841,7 @@
       "payload_html": "<ol onfocusout=alert(1) tabindex=1 id=x></ol><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "ol"
+        "ol[id]"
       ]
     },
     {
@@ -25665,7 +25666,7 @@
       "payload_html": "<p id=x tabindex=1 onactivate=alert(1)></p>",
       "payload_context": "html",
       "expected_tags": [
-        "p"
+        "p[id]"
       ]
     },
     {
@@ -25674,7 +25675,7 @@
       "payload_html": "<p id=x tabindex=1 onbeforeactivate=alert(1)></p>",
       "payload_context": "html",
       "expected_tags": [
-        "p"
+        "p[id]"
       ]
     },
     {
@@ -25683,7 +25684,7 @@
       "payload_html": "<p id=x tabindex=1 onbeforedeactivate=alert(1)></p><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "p"
+        "p[id]"
       ]
     },
     {
@@ -25692,7 +25693,7 @@
       "payload_html": "<p id=x tabindex=1 ondeactivate=alert(1)></p><input id=y autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "p"
+        "p[id]"
       ]
     },
     {
@@ -25701,7 +25702,7 @@
       "payload_html": "<p id=x tabindex=1 onfocus=alert(1)></p>",
       "payload_context": "html",
       "expected_tags": [
-        "p"
+        "p[id]"
       ]
     },
     {
@@ -25710,7 +25711,7 @@
       "payload_html": "<p id=x tabindex=1 onfocusin=alert(1)></p>",
       "payload_context": "html",
       "expected_tags": [
-        "p"
+        "p[id]"
       ]
     },
     {
@@ -25746,7 +25747,7 @@
       "payload_html": "<p onblur=alert(1) tabindex=1 id=x></p><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "p"
+        "p[id]"
       ]
     },
     {
@@ -25800,7 +25801,7 @@
       "payload_html": "<p onfocusout=alert(1) tabindex=1 id=x></p><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "p"
+        "p[id]"
       ]
     },
     {
@@ -26679,7 +26680,7 @@
       "payload_html": "<pre id=x tabindex=1 onactivate=alert(1)></pre>",
       "payload_context": "html",
       "expected_tags": [
-        "pre"
+        "pre[id]"
       ]
     },
     {
@@ -26688,7 +26689,7 @@
       "payload_html": "<pre id=x tabindex=1 onbeforeactivate=alert(1)></pre>",
       "payload_context": "html",
       "expected_tags": [
-        "pre"
+        "pre[id]"
       ]
     },
     {
@@ -26697,7 +26698,7 @@
       "payload_html": "<pre id=x tabindex=1 onbeforedeactivate=alert(1)></pre><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "pre"
+        "pre[id]"
       ]
     },
     {
@@ -26706,7 +26707,7 @@
       "payload_html": "<pre id=x tabindex=1 ondeactivate=alert(1)></pre><input id=y autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "pre"
+        "pre[id]"
       ]
     },
     {
@@ -26715,7 +26716,7 @@
       "payload_html": "<pre id=x tabindex=1 onfocus=alert(1)></pre>",
       "payload_context": "html",
       "expected_tags": [
-        "pre"
+        "pre[id]"
       ]
     },
     {
@@ -26724,7 +26725,7 @@
       "payload_html": "<pre id=x tabindex=1 onfocusin=alert(1)></pre>",
       "payload_context": "html",
       "expected_tags": [
-        "pre"
+        "pre[id]"
       ]
     },
     {
@@ -26760,7 +26761,7 @@
       "payload_html": "<pre onblur=alert(1) tabindex=1 id=x></pre><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "pre"
+        "pre[id]"
       ]
     },
     {
@@ -26814,7 +26815,7 @@
       "payload_html": "<pre onfocusout=alert(1) tabindex=1 id=x></pre><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "pre"
+        "pre[id]"
       ]
     },
     {
@@ -28535,7 +28536,7 @@
       "payload_html": "<s id=x tabindex=1 onactivate=alert(1)></s>",
       "payload_context": "html",
       "expected_tags": [
-        "s"
+        "s[id]"
       ]
     },
     {
@@ -28544,7 +28545,7 @@
       "payload_html": "<s id=x tabindex=1 onbeforeactivate=alert(1)></s>",
       "payload_context": "html",
       "expected_tags": [
-        "s"
+        "s[id]"
       ]
     },
     {
@@ -28553,7 +28554,7 @@
       "payload_html": "<s id=x tabindex=1 onbeforedeactivate=alert(1)></s><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "s"
+        "s[id]"
       ]
     },
     {
@@ -28562,7 +28563,7 @@
       "payload_html": "<s id=x tabindex=1 ondeactivate=alert(1)></s><input id=y autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "s"
+        "s[id]"
       ]
     },
     {
@@ -28571,7 +28572,7 @@
       "payload_html": "<s id=x tabindex=1 onfocus=alert(1)></s>",
       "payload_context": "html",
       "expected_tags": [
-        "s"
+        "s[id]"
       ]
     },
     {
@@ -28580,7 +28581,7 @@
       "payload_html": "<s id=x tabindex=1 onfocusin=alert(1)></s>",
       "payload_context": "html",
       "expected_tags": [
-        "s"
+        "s[id]"
       ]
     },
     {
@@ -28616,7 +28617,7 @@
       "payload_html": "<s onblur=alert(1) tabindex=1 id=x></s><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "s"
+        "s[id]"
       ]
     },
     {
@@ -28670,7 +28671,7 @@
       "payload_html": "<s onfocusout=alert(1) tabindex=1 id=x></s><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "s"
+        "s[id]"
       ]
     },
     {
@@ -30867,7 +30868,7 @@
       "payload_html": "<span id=x tabindex=1 onactivate=alert(1)></span>",
       "payload_context": "html",
       "expected_tags": [
-        "span"
+        "span[id]"
       ]
     },
     {
@@ -30876,7 +30877,7 @@
       "payload_html": "<span id=x tabindex=1 onbeforeactivate=alert(1)></span>",
       "payload_context": "html",
       "expected_tags": [
-        "span"
+        "span[id]"
       ]
     },
     {
@@ -30885,7 +30886,7 @@
       "payload_html": "<span id=x tabindex=1 onbeforedeactivate=alert(1)></span><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "span"
+        "span[id]"
       ]
     },
     {
@@ -30894,7 +30895,7 @@
       "payload_html": "<span id=x tabindex=1 ondeactivate=alert(1)></span><input id=y autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "span"
+        "span[id]"
       ]
     },
     {
@@ -30903,7 +30904,7 @@
       "payload_html": "<span id=x tabindex=1 onfocus=alert(1)></span>",
       "payload_context": "html",
       "expected_tags": [
-        "span"
+        "span[id]"
       ]
     },
     {
@@ -30912,7 +30913,7 @@
       "payload_html": "<span id=x tabindex=1 onfocusin=alert(1)></span>",
       "payload_context": "html",
       "expected_tags": [
-        "span"
+        "span[id]"
       ]
     },
     {
@@ -30948,7 +30949,7 @@
       "payload_html": "<span onblur=alert(1) tabindex=1 id=x></span><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "span"
+        "span[id]"
       ]
     },
     {
@@ -31002,7 +31003,7 @@
       "payload_html": "<span onfocusout=alert(1) tabindex=1 id=x></span><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "span"
+        "span[id]"
       ]
     },
     {
@@ -31379,7 +31380,7 @@
       "payload_html": "<strong id=x tabindex=1 onactivate=alert(1)></strong>",
       "payload_context": "html",
       "expected_tags": [
-        "strong"
+        "strong[id]"
       ]
     },
     {
@@ -31388,7 +31389,7 @@
       "payload_html": "<strong id=x tabindex=1 onbeforeactivate=alert(1)></strong>",
       "payload_context": "html",
       "expected_tags": [
-        "strong"
+        "strong[id]"
       ]
     },
     {
@@ -31397,7 +31398,7 @@
       "payload_html": "<strong id=x tabindex=1 onbeforedeactivate=alert(1)></strong><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "strong"
+        "strong[id]"
       ]
     },
     {
@@ -31406,7 +31407,7 @@
       "payload_html": "<strong id=x tabindex=1 ondeactivate=alert(1)></strong><input id=y autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "strong"
+        "strong[id]"
       ]
     },
     {
@@ -31415,7 +31416,7 @@
       "payload_html": "<strong id=x tabindex=1 onfocus=alert(1)></strong>",
       "payload_context": "html",
       "expected_tags": [
-        "strong"
+        "strong[id]"
       ]
     },
     {
@@ -31424,7 +31425,7 @@
       "payload_html": "<strong id=x tabindex=1 onfocusin=alert(1)></strong>",
       "payload_context": "html",
       "expected_tags": [
-        "strong"
+        "strong[id]"
       ]
     },
     {
@@ -31460,7 +31461,7 @@
       "payload_html": "<strong onblur=alert(1) tabindex=1 id=x></strong><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "strong"
+        "strong[id]"
       ]
     },
     {
@@ -31514,7 +31515,7 @@
       "payload_html": "<strong onfocusout=alert(1) tabindex=1 id=x></strong><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "strong"
+        "strong[id]"
       ]
     },
     {
@@ -31860,7 +31861,7 @@
       "payload_html": "<style>:target {color: red;}</style><a id=x style=\"transition:color 10s\" ontransitioncancel=alert(1)></a>",
       "payload_context": "html",
       "expected_tags": [
-        "a"
+        "a[id, style]"
       ]
     },
     {
@@ -31925,7 +31926,7 @@
       "payload_html": "<style>:target {color: red;}</style><b id=x style=\"transition:color 10s\" ontransitioncancel=alert(1)></b>",
       "payload_context": "html",
       "expected_tags": [
-        "b"
+        "b[id, style]"
       ]
     },
     {
@@ -31983,7 +31984,7 @@
       "payload_html": "<style>:target {color: red;}</style><blockquote id=x style=\"transition:color 10s\" ontransitioncancel=alert(1)></blockquote>",
       "payload_context": "html",
       "expected_tags": [
-        "blockquote"
+        "blockquote[id, style]"
       ]
     },
     {
@@ -31999,7 +32000,7 @@
       "payload_html": "<style>:target {color: red;}</style><br id=x style=\"transition:color 10s\" ontransitioncancel=alert(1)></br>",
       "payload_context": "html",
       "expected_tags": [
-        "br"
+        "br[id, style]"
       ]
     },
     {
@@ -32043,7 +32044,7 @@
       "payload_html": "<style>:target {color: red;}</style><code id=x style=\"transition:color 10s\" ontransitioncancel=alert(1)></code>",
       "payload_context": "html",
       "expected_tags": [
-        "code"
+        "code[id, style]"
       ]
     },
     {
@@ -32136,7 +32137,7 @@
       "payload_html": "<style>:target {color: red;}</style><div id=x style=\"transition:color 10s\" ontransitioncancel=alert(1)></div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id, style]"
       ]
     },
     {
@@ -32166,7 +32167,7 @@
       "payload_html": "<style>:target {color: red;}</style><em id=x style=\"transition:color 10s\" ontransitioncancel=alert(1)></em>",
       "payload_context": "html",
       "expected_tags": [
-        "em"
+        "em[id, style]"
       ]
     },
     {
@@ -32238,7 +32239,7 @@
       "payload_html": "<style>:target {color: red;}</style><h1 id=x style=\"transition:color 10s\" ontransitioncancel=alert(1)></h1>",
       "payload_context": "html",
       "expected_tags": [
-        "h1"
+        "h1[id, style]"
       ]
     },
     {
@@ -32268,7 +32269,7 @@
       "payload_html": "<style>:target {color: red;}</style><hr id=x style=\"transition:color 10s\" ontransitioncancel=alert(1)></hr>",
       "payload_context": "html",
       "expected_tags": [
-        "hr"
+        "hr[id, style]"
       ]
     },
     {
@@ -32284,7 +32285,7 @@
       "payload_html": "<style>:target {color: red;}</style><i id=x style=\"transition:color 10s\" ontransitioncancel=alert(1)></i>",
       "payload_context": "html",
       "expected_tags": [
-        "i"
+        "i[id, style]"
       ]
     },
     {
@@ -32300,7 +32301,7 @@
       "payload_html": "<style>:target {color: red;}</style><image id=x style=\"transition:color 10s\" ontransitioncancel=alert(1)></image>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[id]"
       ]
     },
     {
@@ -32309,7 +32310,7 @@
       "payload_html": "<style>:target {color: red;}</style><img id=x style=\"transition:color 10s\" ontransitioncancel=alert(1)></img>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[id, style]"
       ]
     },
     {
@@ -32367,7 +32368,7 @@
       "payload_html": "<style>:target {color: red;}</style><li id=x style=\"transition:color 10s\" ontransitioncancel=alert(1)></li>",
       "payload_context": "html",
       "expected_tags": [
-        "li"
+        "li[id, style]"
       ]
     },
     {
@@ -32502,7 +32503,7 @@
       "payload_html": "<style>:target {color: red;}</style><ol id=x style=\"transition:color 10s\" ontransitioncancel=alert(1)></ol>",
       "payload_context": "html",
       "expected_tags": [
-        "ol"
+        "ol[id, style]"
       ]
     },
     {
@@ -32532,7 +32533,7 @@
       "payload_html": "<style>:target {color: red;}</style><p id=x style=\"transition:color 10s\" ontransitioncancel=alert(1)></p>",
       "payload_context": "html",
       "expected_tags": [
-        "p"
+        "p[id, style]"
       ]
     },
     {
@@ -32562,7 +32563,7 @@
       "payload_html": "<style>:target {color: red;}</style><pre id=x style=\"transition:color 10s\" ontransitioncancel=alert(1)></pre>",
       "payload_context": "html",
       "expected_tags": [
-        "pre"
+        "pre[id, style]"
       ]
     },
     {
@@ -32620,7 +32621,7 @@
       "payload_html": "<style>:target {color: red;}</style><s id=x style=\"transition:color 10s\" ontransitioncancel=alert(1)></s>",
       "payload_context": "html",
       "expected_tags": [
-        "s"
+        "s[id, style]"
       ]
     },
     {
@@ -32692,7 +32693,7 @@
       "payload_html": "<style>:target {color: red;}</style><span id=x style=\"transition:color 10s\" ontransitioncancel=alert(1)></span>",
       "payload_context": "html",
       "expected_tags": [
-        "span"
+        "span[id, style]"
       ]
     },
     {
@@ -32708,7 +32709,7 @@
       "payload_html": "<style>:target {color: red;}</style><strong id=x style=\"transition:color 10s\" ontransitioncancel=alert(1)></strong>",
       "payload_context": "html",
       "expected_tags": [
-        "strong"
+        "strong[id, style]"
       ]
     },
     {
@@ -32724,7 +32725,7 @@
       "payload_html": "<style>:target {color: red;}</style><sub id=x style=\"transition:color 10s\" ontransitioncancel=alert(1)></sub>",
       "payload_context": "html",
       "expected_tags": [
-        "sub"
+        "sub[id, style]"
       ]
     },
     {
@@ -32740,7 +32741,7 @@
       "payload_html": "<style>:target {color: red;}</style><sup id=x style=\"transition:color 10s\" ontransitioncancel=alert(1)></sup>",
       "payload_context": "html",
       "expected_tags": [
-        "sup"
+        "sup[id, style]"
       ]
     },
     {
@@ -32756,7 +32757,7 @@
       "payload_html": "<style>:target {color: red;}</style><table id=x style=\"transition:color 10s\" ontransitioncancel=alert(1)></table>",
       "payload_context": "html",
       "expected_tags": [
-        "table"
+        "table[id, style]"
       ]
     },
     {
@@ -32849,7 +32850,7 @@
       "payload_html": "<style>:target {color: red;}</style><u id=x style=\"transition:color 10s\" ontransitioncancel=alert(1)></u>",
       "payload_context": "html",
       "expected_tags": [
-        "u"
+        "u[id, style]"
       ]
     },
     {
@@ -32858,7 +32859,7 @@
       "payload_html": "<style>:target {color: red;}</style><ul id=x style=\"transition:color 10s\" ontransitioncancel=alert(1)></ul>",
       "payload_context": "html",
       "expected_tags": [
-        "ul"
+        "ul[id, style]"
       ]
     },
     {
@@ -32895,7 +32896,7 @@
       "payload_html": "<style>:target {color:red;}</style><a id=x style=\"transition:color 1s\" ontransitionend=alert(1)></a>",
       "payload_context": "html",
       "expected_tags": [
-        "a"
+        "a[id, style]"
       ]
     },
     {
@@ -32960,7 +32961,7 @@
       "payload_html": "<style>:target {color:red;}</style><b id=x style=\"transition:color 1s\" ontransitionend=alert(1)></b>",
       "payload_context": "html",
       "expected_tags": [
-        "b"
+        "b[id, style]"
       ]
     },
     {
@@ -33018,7 +33019,7 @@
       "payload_html": "<style>:target {color:red;}</style><blockquote id=x style=\"transition:color 1s\" ontransitionend=alert(1)></blockquote>",
       "payload_context": "html",
       "expected_tags": [
-        "blockquote"
+        "blockquote[id, style]"
       ]
     },
     {
@@ -33034,7 +33035,7 @@
       "payload_html": "<style>:target {color:red;}</style><br id=x style=\"transition:color 1s\" ontransitionend=alert(1)></br>",
       "payload_context": "html",
       "expected_tags": [
-        "br"
+        "br[id, style]"
       ]
     },
     {
@@ -33078,7 +33079,7 @@
       "payload_html": "<style>:target {color:red;}</style><code id=x style=\"transition:color 1s\" ontransitionend=alert(1)></code>",
       "payload_context": "html",
       "expected_tags": [
-        "code"
+        "code[id, style]"
       ]
     },
     {
@@ -33171,7 +33172,7 @@
       "payload_html": "<style>:target {color:red;}</style><div id=x style=\"transition:color 1s\" ontransitionend=alert(1)></div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id, style]"
       ]
     },
     {
@@ -33201,7 +33202,7 @@
       "payload_html": "<style>:target {color:red;}</style><em id=x style=\"transition:color 1s\" ontransitionend=alert(1)></em>",
       "payload_context": "html",
       "expected_tags": [
-        "em"
+        "em[id, style]"
       ]
     },
     {
@@ -33273,7 +33274,7 @@
       "payload_html": "<style>:target {color:red;}</style><h1 id=x style=\"transition:color 1s\" ontransitionend=alert(1)></h1>",
       "payload_context": "html",
       "expected_tags": [
-        "h1"
+        "h1[id, style]"
       ]
     },
     {
@@ -33303,7 +33304,7 @@
       "payload_html": "<style>:target {color:red;}</style><hr id=x style=\"transition:color 1s\" ontransitionend=alert(1)></hr>",
       "payload_context": "html",
       "expected_tags": [
-        "hr"
+        "hr[id, style]"
       ]
     },
     {
@@ -33319,7 +33320,7 @@
       "payload_html": "<style>:target {color:red;}</style><i id=x style=\"transition:color 1s\" ontransitionend=alert(1)></i>",
       "payload_context": "html",
       "expected_tags": [
-        "i"
+        "i[id, style]"
       ]
     },
     {
@@ -33335,7 +33336,7 @@
       "payload_html": "<style>:target {color:red;}</style><image id=x style=\"transition:color 1s\" ontransitionend=alert(1)></image>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[id]"
       ]
     },
     {
@@ -33344,7 +33345,7 @@
       "payload_html": "<style>:target {color:red;}</style><img id=x style=\"transition:color 1s\" ontransitionend=alert(1)></img>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[id, style]"
       ]
     },
     {
@@ -33402,7 +33403,7 @@
       "payload_html": "<style>:target {color:red;}</style><li id=x style=\"transition:color 1s\" ontransitionend=alert(1)></li>",
       "payload_context": "html",
       "expected_tags": [
-        "li"
+        "li[id, style]"
       ]
     },
     {
@@ -33537,7 +33538,7 @@
       "payload_html": "<style>:target {color:red;}</style><ol id=x style=\"transition:color 1s\" ontransitionend=alert(1)></ol>",
       "payload_context": "html",
       "expected_tags": [
-        "ol"
+        "ol[id, style]"
       ]
     },
     {
@@ -33567,7 +33568,7 @@
       "payload_html": "<style>:target {color:red;}</style><p id=x style=\"transition:color 1s\" ontransitionend=alert(1)></p>",
       "payload_context": "html",
       "expected_tags": [
-        "p"
+        "p[id, style]"
       ]
     },
     {
@@ -33597,7 +33598,7 @@
       "payload_html": "<style>:target {color:red;}</style><pre id=x style=\"transition:color 1s\" ontransitionend=alert(1)></pre>",
       "payload_context": "html",
       "expected_tags": [
-        "pre"
+        "pre[id, style]"
       ]
     },
     {
@@ -33655,7 +33656,7 @@
       "payload_html": "<style>:target {color:red;}</style><s id=x style=\"transition:color 1s\" ontransitionend=alert(1)></s>",
       "payload_context": "html",
       "expected_tags": [
-        "s"
+        "s[id, style]"
       ]
     },
     {
@@ -33727,7 +33728,7 @@
       "payload_html": "<style>:target {color:red;}</style><span id=x style=\"transition:color 1s\" ontransitionend=alert(1)></span>",
       "payload_context": "html",
       "expected_tags": [
-        "span"
+        "span[id, style]"
       ]
     },
     {
@@ -33743,7 +33744,7 @@
       "payload_html": "<style>:target {color:red;}</style><strong id=x style=\"transition:color 1s\" ontransitionend=alert(1)></strong>",
       "payload_context": "html",
       "expected_tags": [
-        "strong"
+        "strong[id, style]"
       ]
     },
     {
@@ -33759,7 +33760,7 @@
       "payload_html": "<style>:target {color:red;}</style><sub id=x style=\"transition:color 1s\" ontransitionend=alert(1)></sub>",
       "payload_context": "html",
       "expected_tags": [
-        "sub"
+        "sub[id, style]"
       ]
     },
     {
@@ -33775,7 +33776,7 @@
       "payload_html": "<style>:target {color:red;}</style><sup id=x style=\"transition:color 1s\" ontransitionend=alert(1)></sup>",
       "payload_context": "html",
       "expected_tags": [
-        "sup"
+        "sup[id, style]"
       ]
     },
     {
@@ -33791,7 +33792,7 @@
       "payload_html": "<style>:target {color:red;}</style><table id=x style=\"transition:color 1s\" ontransitionend=alert(1)></table>",
       "payload_context": "html",
       "expected_tags": [
-        "table"
+        "table[id, style]"
       ]
     },
     {
@@ -33884,7 +33885,7 @@
       "payload_html": "<style>:target {color:red;}</style><u id=x style=\"transition:color 1s\" ontransitionend=alert(1)></u>",
       "payload_context": "html",
       "expected_tags": [
-        "u"
+        "u[id, style]"
       ]
     },
     {
@@ -33893,7 +33894,7 @@
       "payload_html": "<style>:target {color:red;}</style><ul id=x style=\"transition:color 1s\" ontransitionend=alert(1)></ul>",
       "payload_context": "html",
       "expected_tags": [
-        "ul"
+        "ul[id, style]"
       ]
     },
     {
@@ -33930,7 +33931,7 @@
       "payload_html": "<style>:target {transform: rotate(180deg);}</style><a id=x style=\"transition:transform 2s\" ontransitionrun=alert(1)></a>",
       "payload_context": "html",
       "expected_tags": [
-        "a"
+        "a[id, style]"
       ]
     },
     {
@@ -33995,7 +33996,7 @@
       "payload_html": "<style>:target {transform: rotate(180deg);}</style><b id=x style=\"transition:transform 2s\" ontransitionrun=alert(1)></b>",
       "payload_context": "html",
       "expected_tags": [
-        "b"
+        "b[id, style]"
       ]
     },
     {
@@ -34053,7 +34054,7 @@
       "payload_html": "<style>:target {transform: rotate(180deg);}</style><blockquote id=x style=\"transition:transform 2s\" ontransitionrun=alert(1)></blockquote>",
       "payload_context": "html",
       "expected_tags": [
-        "blockquote"
+        "blockquote[id, style]"
       ]
     },
     {
@@ -34069,7 +34070,7 @@
       "payload_html": "<style>:target {transform: rotate(180deg);}</style><br id=x style=\"transition:transform 2s\" ontransitionrun=alert(1)></br>",
       "payload_context": "html",
       "expected_tags": [
-        "br"
+        "br[id, style]"
       ]
     },
     {
@@ -34113,7 +34114,7 @@
       "payload_html": "<style>:target {transform: rotate(180deg);}</style><code id=x style=\"transition:transform 2s\" ontransitionrun=alert(1)></code>",
       "payload_context": "html",
       "expected_tags": [
-        "code"
+        "code[id, style]"
       ]
     },
     {
@@ -34206,7 +34207,7 @@
       "payload_html": "<style>:target {transform: rotate(180deg);}</style><div id=x style=\"transition:transform 2s\" ontransitionrun=alert(1)></div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id, style]"
       ]
     },
     {
@@ -34236,7 +34237,7 @@
       "payload_html": "<style>:target {transform: rotate(180deg);}</style><em id=x style=\"transition:transform 2s\" ontransitionrun=alert(1)></em>",
       "payload_context": "html",
       "expected_tags": [
-        "em"
+        "em[id, style]"
       ]
     },
     {
@@ -34308,7 +34309,7 @@
       "payload_html": "<style>:target {transform: rotate(180deg);}</style><h1 id=x style=\"transition:transform 2s\" ontransitionrun=alert(1)></h1>",
       "payload_context": "html",
       "expected_tags": [
-        "h1"
+        "h1[id, style]"
       ]
     },
     {
@@ -34338,7 +34339,7 @@
       "payload_html": "<style>:target {transform: rotate(180deg);}</style><hr id=x style=\"transition:transform 2s\" ontransitionrun=alert(1)></hr>",
       "payload_context": "html",
       "expected_tags": [
-        "hr"
+        "hr[id, style]"
       ]
     },
     {
@@ -34354,7 +34355,7 @@
       "payload_html": "<style>:target {transform: rotate(180deg);}</style><i id=x style=\"transition:transform 2s\" ontransitionrun=alert(1)></i>",
       "payload_context": "html",
       "expected_tags": [
-        "i"
+        "i[id, style]"
       ]
     },
     {
@@ -34370,7 +34371,7 @@
       "payload_html": "<style>:target {transform: rotate(180deg);}</style><image id=x style=\"transition:transform 2s\" ontransitionrun=alert(1)></image>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[id]"
       ]
     },
     {
@@ -34379,7 +34380,7 @@
       "payload_html": "<style>:target {transform: rotate(180deg);}</style><img id=x style=\"transition:transform 2s\" ontransitionrun=alert(1)></img>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[id, style]"
       ]
     },
     {
@@ -34437,7 +34438,7 @@
       "payload_html": "<style>:target {transform: rotate(180deg);}</style><li id=x style=\"transition:transform 2s\" ontransitionrun=alert(1)></li>",
       "payload_context": "html",
       "expected_tags": [
-        "li"
+        "li[id, style]"
       ]
     },
     {
@@ -34572,7 +34573,7 @@
       "payload_html": "<style>:target {transform: rotate(180deg);}</style><ol id=x style=\"transition:transform 2s\" ontransitionrun=alert(1)></ol>",
       "payload_context": "html",
       "expected_tags": [
-        "ol"
+        "ol[id, style]"
       ]
     },
     {
@@ -34602,7 +34603,7 @@
       "payload_html": "<style>:target {transform: rotate(180deg);}</style><p id=x style=\"transition:transform 2s\" ontransitionrun=alert(1)></p>",
       "payload_context": "html",
       "expected_tags": [
-        "p"
+        "p[id, style]"
       ]
     },
     {
@@ -34632,7 +34633,7 @@
       "payload_html": "<style>:target {transform: rotate(180deg);}</style><pre id=x style=\"transition:transform 2s\" ontransitionrun=alert(1)></pre>",
       "payload_context": "html",
       "expected_tags": [
-        "pre"
+        "pre[id, style]"
       ]
     },
     {
@@ -34690,7 +34691,7 @@
       "payload_html": "<style>:target {transform: rotate(180deg);}</style><s id=x style=\"transition:transform 2s\" ontransitionrun=alert(1)></s>",
       "payload_context": "html",
       "expected_tags": [
-        "s"
+        "s[id, style]"
       ]
     },
     {
@@ -34762,7 +34763,7 @@
       "payload_html": "<style>:target {transform: rotate(180deg);}</style><span id=x style=\"transition:transform 2s\" ontransitionrun=alert(1)></span>",
       "payload_context": "html",
       "expected_tags": [
-        "span"
+        "span[id, style]"
       ]
     },
     {
@@ -34778,7 +34779,7 @@
       "payload_html": "<style>:target {transform: rotate(180deg);}</style><strong id=x style=\"transition:transform 2s\" ontransitionrun=alert(1)></strong>",
       "payload_context": "html",
       "expected_tags": [
-        "strong"
+        "strong[id, style]"
       ]
     },
     {
@@ -34794,7 +34795,7 @@
       "payload_html": "<style>:target {transform: rotate(180deg);}</style><sub id=x style=\"transition:transform 2s\" ontransitionrun=alert(1)></sub>",
       "payload_context": "html",
       "expected_tags": [
-        "sub"
+        "sub[id, style]"
       ]
     },
     {
@@ -34810,7 +34811,7 @@
       "payload_html": "<style>:target {transform: rotate(180deg);}</style><sup id=x style=\"transition:transform 2s\" ontransitionrun=alert(1)></sup>",
       "payload_context": "html",
       "expected_tags": [
-        "sup"
+        "sup[id, style]"
       ]
     },
     {
@@ -34826,7 +34827,7 @@
       "payload_html": "<style>:target {transform: rotate(180deg);}</style><table id=x style=\"transition:transform 2s\" ontransitionrun=alert(1)></table>",
       "payload_context": "html",
       "expected_tags": [
-        "table"
+        "table[id, style]"
       ]
     },
     {
@@ -34919,7 +34920,7 @@
       "payload_html": "<style>:target {transform: rotate(180deg);}</style><u id=x style=\"transition:transform 2s\" ontransitionrun=alert(1)></u>",
       "payload_context": "html",
       "expected_tags": [
-        "u"
+        "u[id, style]"
       ]
     },
     {
@@ -34928,7 +34929,7 @@
       "payload_html": "<style>:target {transform: rotate(180deg);}</style><ul id=x style=\"transition:transform 2s\" ontransitionrun=alert(1)></ul>",
       "payload_context": "html",
       "expected_tags": [
-        "ul"
+        "ul[id, style]"
       ]
     },
     {
@@ -34979,7 +34980,7 @@
       "payload_html": "<style>@keyframes slidein {}</style><a style=\"animation-duration:1s;animation-name:slidein;animation-iteration-count:2\" onanimationiteration=\"alert(1)\"></a>",
       "payload_context": "html",
       "expected_tags": [
-        "a"
+        "a[style]"
       ]
     },
     {
@@ -35044,7 +35045,7 @@
       "payload_html": "<style>@keyframes slidein {}</style><b style=\"animation-duration:1s;animation-name:slidein;animation-iteration-count:2\" onanimationiteration=\"alert(1)\"></b>",
       "payload_context": "html",
       "expected_tags": [
-        "b"
+        "b[style]"
       ]
     },
     {
@@ -35102,7 +35103,7 @@
       "payload_html": "<style>@keyframes slidein {}</style><blockquote style=\"animation-duration:1s;animation-name:slidein;animation-iteration-count:2\" onanimationiteration=\"alert(1)\"></blockquote>",
       "payload_context": "html",
       "expected_tags": [
-        "blockquote"
+        "blockquote[style]"
       ]
     },
     {
@@ -35118,7 +35119,7 @@
       "payload_html": "<style>@keyframes slidein {}</style><br style=\"animation-duration:1s;animation-name:slidein;animation-iteration-count:2\" onanimationiteration=\"alert(1)\"></br>",
       "payload_context": "html",
       "expected_tags": [
-        "br"
+        "br[style]"
       ]
     },
     {
@@ -35162,7 +35163,7 @@
       "payload_html": "<style>@keyframes slidein {}</style><code style=\"animation-duration:1s;animation-name:slidein;animation-iteration-count:2\" onanimationiteration=\"alert(1)\"></code>",
       "payload_context": "html",
       "expected_tags": [
-        "code"
+        "code[style]"
       ]
     },
     {
@@ -35255,7 +35256,7 @@
       "payload_html": "<style>@keyframes slidein {}</style><div style=\"animation-duration:1s;animation-name:slidein;animation-iteration-count:2\" onanimationiteration=\"alert(1)\"></div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[style]"
       ]
     },
     {
@@ -35285,7 +35286,7 @@
       "payload_html": "<style>@keyframes slidein {}</style><em style=\"animation-duration:1s;animation-name:slidein;animation-iteration-count:2\" onanimationiteration=\"alert(1)\"></em>",
       "payload_context": "html",
       "expected_tags": [
-        "em"
+        "em[style]"
       ]
     },
     {
@@ -35357,7 +35358,7 @@
       "payload_html": "<style>@keyframes slidein {}</style><h1 style=\"animation-duration:1s;animation-name:slidein;animation-iteration-count:2\" onanimationiteration=\"alert(1)\"></h1>",
       "payload_context": "html",
       "expected_tags": [
-        "h1"
+        "h1[style]"
       ]
     },
     {
@@ -35387,7 +35388,7 @@
       "payload_html": "<style>@keyframes slidein {}</style><hr style=\"animation-duration:1s;animation-name:slidein;animation-iteration-count:2\" onanimationiteration=\"alert(1)\"></hr>",
       "payload_context": "html",
       "expected_tags": [
-        "hr"
+        "hr[style]"
       ]
     },
     {
@@ -35403,7 +35404,7 @@
       "payload_html": "<style>@keyframes slidein {}</style><i style=\"animation-duration:1s;animation-name:slidein;animation-iteration-count:2\" onanimationiteration=\"alert(1)\"></i>",
       "payload_context": "html",
       "expected_tags": [
-        "i"
+        "i[style]"
       ]
     },
     {
@@ -35428,7 +35429,7 @@
       "payload_html": "<style>@keyframes slidein {}</style><img style=\"animation-duration:1s;animation-name:slidein;animation-iteration-count:2\" onanimationiteration=\"alert(1)\"></img>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[style]"
       ]
     },
     {
@@ -35486,7 +35487,7 @@
       "payload_html": "<style>@keyframes slidein {}</style><li style=\"animation-duration:1s;animation-name:slidein;animation-iteration-count:2\" onanimationiteration=\"alert(1)\"></li>",
       "payload_context": "html",
       "expected_tags": [
-        "li"
+        "li[style]"
       ]
     },
     {
@@ -35621,7 +35622,7 @@
       "payload_html": "<style>@keyframes slidein {}</style><ol style=\"animation-duration:1s;animation-name:slidein;animation-iteration-count:2\" onanimationiteration=\"alert(1)\"></ol>",
       "payload_context": "html",
       "expected_tags": [
-        "ol"
+        "ol[style]"
       ]
     },
     {
@@ -35651,7 +35652,7 @@
       "payload_html": "<style>@keyframes slidein {}</style><p style=\"animation-duration:1s;animation-name:slidein;animation-iteration-count:2\" onanimationiteration=\"alert(1)\"></p>",
       "payload_context": "html",
       "expected_tags": [
-        "p"
+        "p[style]"
       ]
     },
     {
@@ -35681,7 +35682,7 @@
       "payload_html": "<style>@keyframes slidein {}</style><pre style=\"animation-duration:1s;animation-name:slidein;animation-iteration-count:2\" onanimationiteration=\"alert(1)\"></pre>",
       "payload_context": "html",
       "expected_tags": [
-        "pre"
+        "pre[style]"
       ]
     },
     {
@@ -35739,7 +35740,7 @@
       "payload_html": "<style>@keyframes slidein {}</style><s style=\"animation-duration:1s;animation-name:slidein;animation-iteration-count:2\" onanimationiteration=\"alert(1)\"></s>",
       "payload_context": "html",
       "expected_tags": [
-        "s"
+        "s[style]"
       ]
     },
     {
@@ -35811,7 +35812,7 @@
       "payload_html": "<style>@keyframes slidein {}</style><span style=\"animation-duration:1s;animation-name:slidein;animation-iteration-count:2\" onanimationiteration=\"alert(1)\"></span>",
       "payload_context": "html",
       "expected_tags": [
-        "span"
+        "span[style]"
       ]
     },
     {
@@ -35827,7 +35828,7 @@
       "payload_html": "<style>@keyframes slidein {}</style><strong style=\"animation-duration:1s;animation-name:slidein;animation-iteration-count:2\" onanimationiteration=\"alert(1)\"></strong>",
       "payload_context": "html",
       "expected_tags": [
-        "strong"
+        "strong[style]"
       ]
     },
     {
@@ -35843,7 +35844,7 @@
       "payload_html": "<style>@keyframes slidein {}</style><sub style=\"animation-duration:1s;animation-name:slidein;animation-iteration-count:2\" onanimationiteration=\"alert(1)\"></sub>",
       "payload_context": "html",
       "expected_tags": [
-        "sub"
+        "sub[style]"
       ]
     },
     {
@@ -35859,7 +35860,7 @@
       "payload_html": "<style>@keyframes slidein {}</style><sup style=\"animation-duration:1s;animation-name:slidein;animation-iteration-count:2\" onanimationiteration=\"alert(1)\"></sup>",
       "payload_context": "html",
       "expected_tags": [
-        "sup"
+        "sup[style]"
       ]
     },
     {
@@ -35875,7 +35876,7 @@
       "payload_html": "<style>@keyframes slidein {}</style><table style=\"animation-duration:1s;animation-name:slidein;animation-iteration-count:2\" onanimationiteration=\"alert(1)\"></table>",
       "payload_context": "html",
       "expected_tags": [
-        "table"
+        "table[style]"
       ]
     },
     {
@@ -35968,7 +35969,7 @@
       "payload_html": "<style>@keyframes slidein {}</style><u style=\"animation-duration:1s;animation-name:slidein;animation-iteration-count:2\" onanimationiteration=\"alert(1)\"></u>",
       "payload_context": "html",
       "expected_tags": [
-        "u"
+        "u[style]"
       ]
     },
     {
@@ -35977,7 +35978,7 @@
       "payload_html": "<style>@keyframes slidein {}</style><ul style=\"animation-duration:1s;animation-name:slidein;animation-iteration-count:2\" onanimationiteration=\"alert(1)\"></ul>",
       "payload_context": "html",
       "expected_tags": [
-        "ul"
+        "ul[style]"
       ]
     },
     {
@@ -36021,7 +36022,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><a id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></a>",
       "payload_context": "html",
       "expected_tags": [
-        "a"
+        "a[id, style]"
       ]
     },
     {
@@ -36086,7 +36087,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><b id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></b>",
       "payload_context": "html",
       "expected_tags": [
-        "b"
+        "b[id, style]"
       ]
     },
     {
@@ -36144,7 +36145,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><blockquote id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></blockquote>",
       "payload_context": "html",
       "expected_tags": [
-        "blockquote"
+        "blockquote[id, style]"
       ]
     },
     {
@@ -36160,7 +36161,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><br id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></br>",
       "payload_context": "html",
       "expected_tags": [
-        "br"
+        "br[id, style]"
       ]
     },
     {
@@ -36204,7 +36205,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><code id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></code>",
       "payload_context": "html",
       "expected_tags": [
-        "code"
+        "code[id, style]"
       ]
     },
     {
@@ -36297,7 +36298,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><div id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id, style]"
       ]
     },
     {
@@ -36327,7 +36328,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><em id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></em>",
       "payload_context": "html",
       "expected_tags": [
-        "em"
+        "em[id, style]"
       ]
     },
     {
@@ -36399,7 +36400,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><h1 id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></h1>",
       "payload_context": "html",
       "expected_tags": [
-        "h1"
+        "h1[id, style]"
       ]
     },
     {
@@ -36429,7 +36430,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><hr id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></hr>",
       "payload_context": "html",
       "expected_tags": [
-        "hr"
+        "hr[id, style]"
       ]
     },
     {
@@ -36445,7 +36446,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><i id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></i>",
       "payload_context": "html",
       "expected_tags": [
-        "i"
+        "i[id, style]"
       ]
     },
     {
@@ -36461,7 +36462,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><image id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></image>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[id]"
       ]
     },
     {
@@ -36470,7 +36471,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><img id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></img>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[id, style]"
       ]
     },
     {
@@ -36528,7 +36529,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><li id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></li>",
       "payload_context": "html",
       "expected_tags": [
-        "li"
+        "li[id, style]"
       ]
     },
     {
@@ -36663,7 +36664,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><ol id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></ol>",
       "payload_context": "html",
       "expected_tags": [
-        "ol"
+        "ol[id, style]"
       ]
     },
     {
@@ -36693,7 +36694,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><p id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></p>",
       "payload_context": "html",
       "expected_tags": [
-        "p"
+        "p[id, style]"
       ]
     },
     {
@@ -36723,7 +36724,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><pre id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></pre>",
       "payload_context": "html",
       "expected_tags": [
-        "pre"
+        "pre[id, style]"
       ]
     },
     {
@@ -36781,7 +36782,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><s id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></s>",
       "payload_context": "html",
       "expected_tags": [
-        "s"
+        "s[id, style]"
       ]
     },
     {
@@ -36853,7 +36854,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><span id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></span>",
       "payload_context": "html",
       "expected_tags": [
-        "span"
+        "span[id, style]"
       ]
     },
     {
@@ -36869,7 +36870,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><strong id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></strong>",
       "payload_context": "html",
       "expected_tags": [
-        "strong"
+        "strong[id, style]"
       ]
     },
     {
@@ -36885,7 +36886,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><sub id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></sub>",
       "payload_context": "html",
       "expected_tags": [
-        "sub"
+        "sub[id, style]"
       ]
     },
     {
@@ -36901,7 +36902,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><sup id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></sup>",
       "payload_context": "html",
       "expected_tags": [
-        "sup"
+        "sup[id, style]"
       ]
     },
     {
@@ -36917,7 +36918,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><table id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></table>",
       "payload_context": "html",
       "expected_tags": [
-        "table"
+        "table[id, style]"
       ]
     },
     {
@@ -37010,7 +37011,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><u id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></u>",
       "payload_context": "html",
       "expected_tags": [
-        "u"
+        "u[id, style]"
       ]
     },
     {
@@ -37019,7 +37020,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><ul id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></ul>",
       "payload_context": "html",
       "expected_tags": [
-        "ul"
+        "ul[id, style]"
       ]
     },
     {
@@ -37056,7 +37057,7 @@
       "payload_html": "<style>@keyframes x{}</style><a style=\"animation-name:x\" onanimationend=\"alert(1)\"></a>",
       "payload_context": "html",
       "expected_tags": [
-        "a"
+        "a[style]"
       ]
     },
     {
@@ -37065,7 +37066,7 @@
       "payload_html": "<style>@keyframes x{}</style><a style=\"animation-name:x\" onanimationstart=\"alert(1)\"></a>",
       "payload_context": "html",
       "expected_tags": [
-        "a"
+        "a[style]"
       ]
     },
     {
@@ -37186,7 +37187,7 @@
       "payload_html": "<style>@keyframes x{}</style><b style=\"animation-name:x\" onanimationend=\"alert(1)\"></b>",
       "payload_context": "html",
       "expected_tags": [
-        "b"
+        "b[style]"
       ]
     },
     {
@@ -37195,7 +37196,7 @@
       "payload_html": "<style>@keyframes x{}</style><b style=\"animation-name:x\" onanimationstart=\"alert(1)\"></b>",
       "payload_context": "html",
       "expected_tags": [
-        "b"
+        "b[style]"
       ]
     },
     {
@@ -37302,7 +37303,7 @@
       "payload_html": "<style>@keyframes x{}</style><blockquote style=\"animation-name:x\" onanimationend=\"alert(1)\"></blockquote>",
       "payload_context": "html",
       "expected_tags": [
-        "blockquote"
+        "blockquote[style]"
       ]
     },
     {
@@ -37311,7 +37312,7 @@
       "payload_html": "<style>@keyframes x{}</style><blockquote style=\"animation-name:x\" onanimationstart=\"alert(1)\"></blockquote>",
       "payload_context": "html",
       "expected_tags": [
-        "blockquote"
+        "blockquote[style]"
       ]
     },
     {
@@ -37334,7 +37335,7 @@
       "payload_html": "<style>@keyframes x{}</style><br style=\"animation-name:x\" onanimationend=\"alert(1)\"></br>",
       "payload_context": "html",
       "expected_tags": [
-        "br"
+        "br[style]"
       ]
     },
     {
@@ -37343,7 +37344,7 @@
       "payload_html": "<style>@keyframes x{}</style><br style=\"animation-name:x\" onanimationstart=\"alert(1)\"></br>",
       "payload_context": "html",
       "expected_tags": [
-        "br"
+        "br[style]"
       ]
     },
     {
@@ -37422,7 +37423,7 @@
       "payload_html": "<style>@keyframes x{}</style><code style=\"animation-name:x\" onanimationend=\"alert(1)\"></code>",
       "payload_context": "html",
       "expected_tags": [
-        "code"
+        "code[style]"
       ]
     },
     {
@@ -37431,7 +37432,7 @@
       "payload_html": "<style>@keyframes x{}</style><code style=\"animation-name:x\" onanimationstart=\"alert(1)\"></code>",
       "payload_context": "html",
       "expected_tags": [
-        "code"
+        "code[style]"
       ]
     },
     {
@@ -37608,7 +37609,7 @@
       "payload_html": "<style>@keyframes x{}</style><div style=\"animation-name:x\" onanimationend=\"alert(1)\"></div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[style]"
       ]
     },
     {
@@ -37617,7 +37618,7 @@
       "payload_html": "<style>@keyframes x{}</style><div style=\"animation-name:x\" onanimationstart=\"alert(1)\"></div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[style]"
       ]
     },
     {
@@ -37668,7 +37669,7 @@
       "payload_html": "<style>@keyframes x{}</style><em style=\"animation-name:x\" onanimationend=\"alert(1)\"></em>",
       "payload_context": "html",
       "expected_tags": [
-        "em"
+        "em[style]"
       ]
     },
     {
@@ -37677,7 +37678,7 @@
       "payload_html": "<style>@keyframes x{}</style><em style=\"animation-name:x\" onanimationstart=\"alert(1)\"></em>",
       "payload_context": "html",
       "expected_tags": [
-        "em"
+        "em[style]"
       ]
     },
     {
@@ -37812,7 +37813,7 @@
       "payload_html": "<style>@keyframes x{}</style><h1 style=\"animation-name:x\" onanimationend=\"alert(1)\"></h1>",
       "payload_context": "html",
       "expected_tags": [
-        "h1"
+        "h1[style]"
       ]
     },
     {
@@ -37821,7 +37822,7 @@
       "payload_html": "<style>@keyframes x{}</style><h1 style=\"animation-name:x\" onanimationstart=\"alert(1)\"></h1>",
       "payload_context": "html",
       "expected_tags": [
-        "h1"
+        "h1[style]"
       ]
     },
     {
@@ -37872,7 +37873,7 @@
       "payload_html": "<style>@keyframes x{}</style><hr style=\"animation-name:x\" onanimationend=\"alert(1)\"></hr>",
       "payload_context": "html",
       "expected_tags": [
-        "hr"
+        "hr[style]"
       ]
     },
     {
@@ -37881,7 +37882,7 @@
       "payload_html": "<style>@keyframes x{}</style><hr style=\"animation-name:x\" onanimationstart=\"alert(1)\"></hr>",
       "payload_context": "html",
       "expected_tags": [
-        "hr"
+        "hr[style]"
       ]
     },
     {
@@ -37904,7 +37905,7 @@
       "payload_html": "<style>@keyframes x{}</style><i style=\"animation-name:x\" onanimationend=\"alert(1)\"></i>",
       "payload_context": "html",
       "expected_tags": [
-        "i"
+        "i[style]"
       ]
     },
     {
@@ -37913,7 +37914,7 @@
       "payload_html": "<style>@keyframes x{}</style><i style=\"animation-name:x\" onanimationstart=\"alert(1)\"></i>",
       "payload_context": "html",
       "expected_tags": [
-        "i"
+        "i[style]"
       ]
     },
     {
@@ -37954,7 +37955,7 @@
       "payload_html": "<style>@keyframes x{}</style><img style=\"animation-name:x\" onanimationend=\"alert(1)\"></img>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[style]"
       ]
     },
     {
@@ -37963,7 +37964,7 @@
       "payload_html": "<style>@keyframes x{}</style><img style=\"animation-name:x\" onanimationstart=\"alert(1)\"></img>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[style]"
       ]
     },
     {
@@ -38070,7 +38071,7 @@
       "payload_html": "<style>@keyframes x{}</style><li style=\"animation-name:x\" onanimationend=\"alert(1)\"></li>",
       "payload_context": "html",
       "expected_tags": [
-        "li"
+        "li[style]"
       ]
     },
     {
@@ -38079,7 +38080,7 @@
       "payload_html": "<style>@keyframes x{}</style><li style=\"animation-name:x\" onanimationstart=\"alert(1)\"></li>",
       "payload_context": "html",
       "expected_tags": [
-        "li"
+        "li[style]"
       ]
     },
     {
@@ -38340,7 +38341,7 @@
       "payload_html": "<style>@keyframes x{}</style><ol style=\"animation-name:x\" onanimationend=\"alert(1)\"></ol>",
       "payload_context": "html",
       "expected_tags": [
-        "ol"
+        "ol[style]"
       ]
     },
     {
@@ -38349,7 +38350,7 @@
       "payload_html": "<style>@keyframes x{}</style><ol style=\"animation-name:x\" onanimationstart=\"alert(1)\"></ol>",
       "payload_context": "html",
       "expected_tags": [
-        "ol"
+        "ol[style]"
       ]
     },
     {
@@ -38400,7 +38401,7 @@
       "payload_html": "<style>@keyframes x{}</style><p style=\"animation-name:x\" onanimationend=\"alert(1)\"></p>",
       "payload_context": "html",
       "expected_tags": [
-        "p"
+        "p[style]"
       ]
     },
     {
@@ -38409,7 +38410,7 @@
       "payload_html": "<style>@keyframes x{}</style><p style=\"animation-name:x\" onanimationstart=\"alert(1)\"></p>",
       "payload_context": "html",
       "expected_tags": [
-        "p"
+        "p[style]"
       ]
     },
     {
@@ -38460,7 +38461,7 @@
       "payload_html": "<style>@keyframes x{}</style><pre style=\"animation-name:x\" onanimationend=\"alert(1)\"></pre>",
       "payload_context": "html",
       "expected_tags": [
-        "pre"
+        "pre[style]"
       ]
     },
     {
@@ -38469,7 +38470,7 @@
       "payload_html": "<style>@keyframes x{}</style><pre style=\"animation-name:x\" onanimationstart=\"alert(1)\"></pre>",
       "payload_context": "html",
       "expected_tags": [
-        "pre"
+        "pre[style]"
       ]
     },
     {
@@ -38576,7 +38577,7 @@
       "payload_html": "<style>@keyframes x{}</style><s style=\"animation-name:x\" onanimationend=\"alert(1)\"></s>",
       "payload_context": "html",
       "expected_tags": [
-        "s"
+        "s[style]"
       ]
     },
     {
@@ -38585,7 +38586,7 @@
       "payload_html": "<style>@keyframes x{}</style><s style=\"animation-name:x\" onanimationstart=\"alert(1)\"></s>",
       "payload_context": "html",
       "expected_tags": [
-        "s"
+        "s[style]"
       ]
     },
     {
@@ -38720,7 +38721,7 @@
       "payload_html": "<style>@keyframes x{}</style><span style=\"animation-name:x\" onanimationend=\"alert(1)\"></span>",
       "payload_context": "html",
       "expected_tags": [
-        "span"
+        "span[style]"
       ]
     },
     {
@@ -38729,7 +38730,7 @@
       "payload_html": "<style>@keyframes x{}</style><span style=\"animation-name:x\" onanimationstart=\"alert(1)\"></span>",
       "payload_context": "html",
       "expected_tags": [
-        "span"
+        "span[style]"
       ]
     },
     {
@@ -38752,7 +38753,7 @@
       "payload_html": "<style>@keyframes x{}</style><strong style=\"animation-name:x\" onanimationend=\"alert(1)\"></strong>",
       "payload_context": "html",
       "expected_tags": [
-        "strong"
+        "strong[style]"
       ]
     },
     {
@@ -38761,7 +38762,7 @@
       "payload_html": "<style>@keyframes x{}</style><strong style=\"animation-name:x\" onanimationstart=\"alert(1)\"></strong>",
       "payload_context": "html",
       "expected_tags": [
-        "strong"
+        "strong[style]"
       ]
     },
     {
@@ -38784,7 +38785,7 @@
       "payload_html": "<style>@keyframes x{}</style><sub style=\"animation-name:x\" onanimationend=\"alert(1)\"></sub>",
       "payload_context": "html",
       "expected_tags": [
-        "sub"
+        "sub[style]"
       ]
     },
     {
@@ -38793,7 +38794,7 @@
       "payload_html": "<style>@keyframes x{}</style><sub style=\"animation-name:x\" onanimationstart=\"alert(1)\"></sub>",
       "payload_context": "html",
       "expected_tags": [
-        "sub"
+        "sub[style]"
       ]
     },
     {
@@ -38816,7 +38817,7 @@
       "payload_html": "<style>@keyframes x{}</style><sup style=\"animation-name:x\" onanimationend=\"alert(1)\"></sup>",
       "payload_context": "html",
       "expected_tags": [
-        "sup"
+        "sup[style]"
       ]
     },
     {
@@ -38825,7 +38826,7 @@
       "payload_html": "<style>@keyframes x{}</style><sup style=\"animation-name:x\" onanimationstart=\"alert(1)\"></sup>",
       "payload_context": "html",
       "expected_tags": [
-        "sup"
+        "sup[style]"
       ]
     },
     {
@@ -38848,7 +38849,7 @@
       "payload_html": "<style>@keyframes x{}</style><table style=\"animation-name:x\" onanimationend=\"alert(1)\"></table>",
       "payload_context": "html",
       "expected_tags": [
-        "table"
+        "table[style]"
       ]
     },
     {
@@ -38857,7 +38858,7 @@
       "payload_html": "<style>@keyframes x{}</style><table style=\"animation-name:x\" onanimationstart=\"alert(1)\"></table>",
       "payload_context": "html",
       "expected_tags": [
-        "table"
+        "table[style]"
       ]
     },
     {
@@ -39034,7 +39035,7 @@
       "payload_html": "<style>@keyframes x{}</style><u style=\"animation-name:x\" onanimationend=\"alert(1)\"></u>",
       "payload_context": "html",
       "expected_tags": [
-        "u"
+        "u[style]"
       ]
     },
     {
@@ -39043,7 +39044,7 @@
       "payload_html": "<style>@keyframes x{}</style><u style=\"animation-name:x\" onanimationstart=\"alert(1)\"></u>",
       "payload_context": "html",
       "expected_tags": [
-        "u"
+        "u[style]"
       ]
     },
     {
@@ -39052,7 +39053,7 @@
       "payload_html": "<style>@keyframes x{}</style><ul style=\"animation-name:x\" onanimationend=\"alert(1)\"></ul>",
       "payload_context": "html",
       "expected_tags": [
-        "ul"
+        "ul[style]"
       ]
     },
     {
@@ -39061,7 +39062,7 @@
       "payload_html": "<style>@keyframes x{}</style><ul style=\"animation-name:x\" onanimationstart=\"alert(1)\"></ul>",
       "payload_context": "html",
       "expected_tags": [
-        "ul"
+        "ul[style]"
       ]
     },
     {
@@ -39185,7 +39186,7 @@
       "payload_html": "<sub id=x tabindex=1 onactivate=alert(1)></sub>",
       "payload_context": "html",
       "expected_tags": [
-        "sub"
+        "sub[id]"
       ]
     },
     {
@@ -39194,7 +39195,7 @@
       "payload_html": "<sub id=x tabindex=1 onbeforeactivate=alert(1)></sub>",
       "payload_context": "html",
       "expected_tags": [
-        "sub"
+        "sub[id]"
       ]
     },
     {
@@ -39203,7 +39204,7 @@
       "payload_html": "<sub id=x tabindex=1 onbeforedeactivate=alert(1)></sub><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "sub"
+        "sub[id]"
       ]
     },
     {
@@ -39212,7 +39213,7 @@
       "payload_html": "<sub id=x tabindex=1 ondeactivate=alert(1)></sub><input id=y autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "sub"
+        "sub[id]"
       ]
     },
     {
@@ -39221,7 +39222,7 @@
       "payload_html": "<sub id=x tabindex=1 onfocus=alert(1)></sub>",
       "payload_context": "html",
       "expected_tags": [
-        "sub"
+        "sub[id]"
       ]
     },
     {
@@ -39230,7 +39231,7 @@
       "payload_html": "<sub id=x tabindex=1 onfocusin=alert(1)></sub>",
       "payload_context": "html",
       "expected_tags": [
-        "sub"
+        "sub[id]"
       ]
     },
     {
@@ -39266,7 +39267,7 @@
       "payload_html": "<sub onblur=alert(1) tabindex=1 id=x></sub><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "sub"
+        "sub[id]"
       ]
     },
     {
@@ -39320,7 +39321,7 @@
       "payload_html": "<sub onfocusout=alert(1) tabindex=1 id=x></sub><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "sub"
+        "sub[id]"
       ]
     },
     {
@@ -39697,7 +39698,7 @@
       "payload_html": "<sup id=x tabindex=1 onactivate=alert(1)></sup>",
       "payload_context": "html",
       "expected_tags": [
-        "sup"
+        "sup[id]"
       ]
     },
     {
@@ -39706,7 +39707,7 @@
       "payload_html": "<sup id=x tabindex=1 onbeforeactivate=alert(1)></sup>",
       "payload_context": "html",
       "expected_tags": [
-        "sup"
+        "sup[id]"
       ]
     },
     {
@@ -39715,7 +39716,7 @@
       "payload_html": "<sup id=x tabindex=1 onbeforedeactivate=alert(1)></sup><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "sup"
+        "sup[id]"
       ]
     },
     {
@@ -39724,7 +39725,7 @@
       "payload_html": "<sup id=x tabindex=1 ondeactivate=alert(1)></sup><input id=y autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "sup"
+        "sup[id]"
       ]
     },
     {
@@ -39733,7 +39734,7 @@
       "payload_html": "<sup id=x tabindex=1 onfocus=alert(1)></sup>",
       "payload_context": "html",
       "expected_tags": [
-        "sup"
+        "sup[id]"
       ]
     },
     {
@@ -39742,7 +39743,7 @@
       "payload_html": "<sup id=x tabindex=1 onfocusin=alert(1)></sup>",
       "payload_context": "html",
       "expected_tags": [
-        "sup"
+        "sup[id]"
       ]
     },
     {
@@ -39778,7 +39779,7 @@
       "payload_html": "<sup onblur=alert(1) tabindex=1 id=x></sup><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "sup"
+        "sup[id]"
       ]
     },
     {
@@ -39832,7 +39833,7 @@
       "payload_html": "<sup onfocusout=alert(1) tabindex=1 id=x></sup><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "sup"
+        "sup[id]"
       ]
     },
     {
@@ -41259,7 +41260,7 @@
       "payload_html": "<table id=x tabindex=1 onactivate=alert(1)></table>",
       "payload_context": "html",
       "expected_tags": [
-        "table"
+        "table[id]"
       ]
     },
     {
@@ -41268,7 +41269,7 @@
       "payload_html": "<table id=x tabindex=1 onbeforeactivate=alert(1)></table>",
       "payload_context": "html",
       "expected_tags": [
-        "table"
+        "table[id]"
       ]
     },
     {
@@ -41277,7 +41278,7 @@
       "payload_html": "<table id=x tabindex=1 onbeforedeactivate=alert(1)></table><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "table"
+        "table[id]"
       ]
     },
     {
@@ -41286,7 +41287,7 @@
       "payload_html": "<table id=x tabindex=1 ondeactivate=alert(1)></table><input id=y autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "table"
+        "table[id]"
       ]
     },
     {
@@ -41295,7 +41296,7 @@
       "payload_html": "<table id=x tabindex=1 onfocus=alert(1)></table>",
       "payload_context": "html",
       "expected_tags": [
-        "table"
+        "table[id]"
       ]
     },
     {
@@ -41304,7 +41305,7 @@
       "payload_html": "<table id=x tabindex=1 onfocusin=alert(1)></table>",
       "payload_context": "html",
       "expected_tags": [
-        "table"
+        "table[id]"
       ]
     },
     {
@@ -41340,7 +41341,7 @@
       "payload_html": "<table onblur=alert(1) tabindex=1 id=x></table><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "table"
+        "table[id]"
       ]
     },
     {
@@ -41394,7 +41395,7 @@
       "payload_html": "<table onfocusout=alert(1) tabindex=1 id=x></table><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "table"
+        "table[id]"
       ]
     },
     {
@@ -44263,7 +44264,7 @@
       "payload_html": "<u id=x tabindex=1 onactivate=alert(1)></u>",
       "payload_context": "html",
       "expected_tags": [
-        "u"
+        "u[id]"
       ]
     },
     {
@@ -44272,7 +44273,7 @@
       "payload_html": "<u id=x tabindex=1 onbeforeactivate=alert(1)></u>",
       "payload_context": "html",
       "expected_tags": [
-        "u"
+        "u[id]"
       ]
     },
     {
@@ -44281,7 +44282,7 @@
       "payload_html": "<u id=x tabindex=1 onbeforedeactivate=alert(1)></u><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "u"
+        "u[id]"
       ]
     },
     {
@@ -44290,7 +44291,7 @@
       "payload_html": "<u id=x tabindex=1 ondeactivate=alert(1)></u><input id=y autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "u"
+        "u[id]"
       ]
     },
     {
@@ -44299,7 +44300,7 @@
       "payload_html": "<u id=x tabindex=1 onfocus=alert(1)></u>",
       "payload_context": "html",
       "expected_tags": [
-        "u"
+        "u[id]"
       ]
     },
     {
@@ -44308,7 +44309,7 @@
       "payload_html": "<u id=x tabindex=1 onfocusin=alert(1)></u>",
       "payload_context": "html",
       "expected_tags": [
-        "u"
+        "u[id]"
       ]
     },
     {
@@ -44344,7 +44345,7 @@
       "payload_html": "<u onblur=alert(1) tabindex=1 id=x></u><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "u"
+        "u[id]"
       ]
     },
     {
@@ -44398,7 +44399,7 @@
       "payload_html": "<u onfocusout=alert(1) tabindex=1 id=x></u><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "u"
+        "u[id]"
       ]
     },
     {
@@ -44551,7 +44552,7 @@
       "payload_html": "<ul id=x tabindex=1 onactivate=alert(1)></ul>",
       "payload_context": "html",
       "expected_tags": [
-        "ul"
+        "ul[id]"
       ]
     },
     {
@@ -44560,7 +44561,7 @@
       "payload_html": "<ul id=x tabindex=1 onbeforeactivate=alert(1)></ul>",
       "payload_context": "html",
       "expected_tags": [
-        "ul"
+        "ul[id]"
       ]
     },
     {
@@ -44569,7 +44570,7 @@
       "payload_html": "<ul id=x tabindex=1 onbeforedeactivate=alert(1)></ul><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "ul"
+        "ul[id]"
       ]
     },
     {
@@ -44578,7 +44579,7 @@
       "payload_html": "<ul id=x tabindex=1 ondeactivate=alert(1)></ul><input id=y autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "ul"
+        "ul[id]"
       ]
     },
     {
@@ -44587,7 +44588,7 @@
       "payload_html": "<ul id=x tabindex=1 onfocus=alert(1)></ul>",
       "payload_context": "html",
       "expected_tags": [
-        "ul"
+        "ul[id]"
       ]
     },
     {
@@ -44596,7 +44597,7 @@
       "payload_html": "<ul id=x tabindex=1 onfocusin=alert(1)></ul>",
       "payload_context": "html",
       "expected_tags": [
-        "ul"
+        "ul[id]"
       ]
     },
     {
@@ -44632,7 +44633,7 @@
       "payload_html": "<ul onblur=alert(1) tabindex=1 id=x></ul><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "ul"
+        "ul[id]"
       ]
     },
     {
@@ -44686,7 +44687,7 @@
       "payload_html": "<ul onfocusout=alert(1) tabindex=1 id=x></ul><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "ul"
+        "ul[id]"
       ]
     },
     {
@@ -46070,7 +46071,7 @@
       "payload_html": "<img src=http://www.google.fr/images/srpr/logo3w.png onload=alert(this.ownerDocument.cookie) width=0 height= 0 /> #",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[height, src, width]"
       ]
     },
     {
@@ -46079,7 +46080,7 @@
       "payload_html": "<script>  function foo(elem, doc, text) {   elem.onclick = function (e) {    e.__defineGetter__(text[0], function () { return true })    alert(Safe.get());   };      var event = doc.createEvent(text[1]);   event.initEvent(text[2], true, true);   elem.dispatchEvent(event);  } </script> <img src=http://www.google.fr/images/srpr/logo3w.png onload=foo(this,this.ownerDocument,this.name.split(/,/)) name=isTrusted,MouseEvent,click width=0 height=0 /> #",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[height, src, width]"
       ]
     },
     {
@@ -46404,7 +46405,7 @@
       "payload_html": "<img src=`xx:xx`onerror=alert(1)>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[src]"
       ]
     },
     {
@@ -46543,7 +46544,7 @@
       "payload_html": "<--`<img/src=` onerror=alert(1)> --!>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[src]"
       ]
     },
     {
@@ -46559,7 +46560,7 @@
       "payload_html": "<div  style=\"position:absolute;top:0;left:0;width:100%;height:100%\"  onmouseover=\"prompt(1)\" onclick=\"alert(1)\">x</button>?",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[style]"
       ]
     },
     {
@@ -46568,7 +46569,7 @@
       "payload_html": "\"><img src=x onerror=window.open('https://www.google.com/');>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[src]"
       ]
     },
     {
@@ -46593,7 +46594,7 @@
       "payload_html": "\"><img src=x onerror=prompt(1);>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[src]"
       ]
     },
     {
@@ -46632,7 +46633,7 @@
       "payload_html": "<IMG SRC=`javascript:alert(\"RSnake says, 'XSS'\")`>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[src]"
       ]
     },
     {
@@ -46987,7 +46988,7 @@
       "payload_html": "<A href=\"javascript%26colon;confirm()\">click",
       "payload_context": "html",
       "expected_tags": [
-        "a"
+        "a[href]"
       ]
     },
     {
@@ -47003,7 +47004,7 @@
       "payload_html": "<A href=javas%26#99;ript:alert(1)>click",
       "payload_context": "html",
       "expected_tags": [
-        "a"
+        "a[href]"
       ]
     },
     {
@@ -47026,7 +47027,7 @@
       "payload_html": "<--`<iMG/srC=` onerror=confirm``> --!>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[src]"
       ]
     },
     {
@@ -47121,8 +47122,8 @@
       "payload_html": "<div id=\"1\"><form id=\"test\"></form><button form=\"test\" formaction=\"javascript:alert(1)\">X</button>//[\"'`-->]]>]</div><div id=\"2\"><meta charset=\"x-imap4-modified-utf7\">&ADz&AGn&AG0&AEf&ACA&AHM&AHI&AGO&AD0&AGn&ACA&AG8Abg&AGUAcgByAG8AcgA9AGEAbABlAHIAdAAoADEAKQ&ACAAPABi//[\"'`-->]]>]</div><div id=\"3\"><meta charset=\"x-imap4-modified-utf7\">&<script&S1&TS&1>alert&A7&(1)&R&UA;&&<&A9&11/script&X&>//[\"'`-->]]>]</div><div id=\"4\">0?<script>Worker(\"#\").onmessage=function(_)eval(_.data)</script> :postMessage(importScripts('data:;base64,cG9zdE1lc3NhZ2UoJ2FsZXJ0KDEpJyk'))//[\"'`-->]]>]</div><div id=\"5\"><script>crypto.generateCRMFRequest('CN=0',0,0,null,'alert(5)',384,null,'rsa-dual-use')</script>//[\"'`-->]]>]</div><div id=\"6\"><script>({set/**/$($){_/**/setter=$,_=1}}).$=alert</script>//[\"'`-->]]>]</div><div id=\"7\"><input onfocus=alert(7) autofocus>//[\"'`-->]]>]</div><div id=\"8\"><input onblur=alert(8) autofocus><input autofocus>//[\"'`-->]]>]</div><div id=\"9\"><a style=\"-o-link:'javascript:alert(9)';-o-link-source:current\">X</a>//[\"'`-->]]>]</div><div id=\"10\"><video poster=javascript:alert(10)//></video>//[\"'`-->]]>]</div><div id=\"11\"><svg xmlns=\"http://www.w3.org/2000/svg\"><g onload=\"javascript:alert(11)\"></g></svg>//[\"'`-->]]>]</div><div id=\"12\"><body onscroll=alert(12)><br><br><br><br><br><br>...<br><br><br><br><input autofocus>//[\"'`-->]]>]</div><div id=\"13\"><x repeat=\"template\" repeat-start=\"999999\">0<y repeat=\"template\" repeat-start=\"999999\">1</y></x>//[\"'`-->]]>]</div><div id=\"14\"><input pattern=^((a+.)a)+$ value=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa!>//[\"'`-->]]>]</div><div id=\"15\"><script>({0:#0=alert/#0#/#0#(0)})</script>//[\"'`-->]]>]</div><div id=\"16\">X<x style=`behavior:url(#default#time2)` onbegin=`alert(16)` >//[\"'`-->]]>]</div><div id=\"17\"><?xml-stylesheet href=\"javascript:alert(17)\"?><root/>//[\"'`-->]]>]</div><div id=\"18\"><script xmlns=\"http://www.w3.org/1999/xhtml\">&#x61;l&#x65;rt&#40;1)</script>//[\"'`-->]]>]</div><div id=\"19\"><meta charset=\"x-mac-farsi\">¼script ¾alert(19)//¼/script ¾//[\"'`-->]]>]</div><div id=\"20\"><script>ReferenceError.prototype.__defineGetter__('name', function(){alert(20)}),x</script>//[\"'`-->]]>]</div><div id=\"21\"><script>Object.__noSuchMethod__ = Function,[{}][0].constructor._('alert(21)')()</script>//[\"'`-->]]>]</div><div id=\"22\"><input onblur=focus() autofocus><input>//[\"'`-->]]>]</div><div id=\"23\"><form id=test onforminput=alert(23)><input></form><button form=test onformchange=alert(2)>X</button>//[\"'`-->]]>]</div><div id=\"24\">1<set/xmlns=`urn:schemas-microsoft-com:time` style=`beh&#x41vior:url(#default#time2)` attributename=`innerhtml` to=`&lt;img/src=&quot;x&quot;onerror=alert(24)&gt;`>//[\"'`-->]]>]</div><div id=\"25\"><script src=\"#\">{alert(25)}</script>;1//[\"'`-->]]>]</div><div id=\"26\">+ADw-html+AD4APA-body+AD4APA-div+AD4-top secret+ADw-/div+AD4APA-/body+AD4APA-/html+AD4-.toXMLString().match(/.*/m),alert(RegExp.input);//[\"'`-->]]>]</div><div id=\"27\"><style>p[foo=bar{}*{-o-link:'javascript:alert(27)'}{}*{-o-link-source:current}*{background:red}]{background:green};</style>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div",
-        "a",
+        "div[id]",
+        "a[style]",
         "br"
       ]
     },
@@ -47132,7 +47133,7 @@
       "payload_html": "<div id=\"28\">1<animate/xmlns=urn:schemas-microsoft-com:time style=behavior:url(#default#time2)  attributename=innerhtml values=&lt;img/src=&quot;.&quot;onerror=alert(28)&gt;>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47141,10 +47142,10 @@
       "payload_html": "<div id=\"29\"><link rel=stylesheet href=data:,*%7bx:expression(alert(29))%7d//[\"'`-->]]>]</div><div id=\"30\"><style>@import \"data:,*%7bx:expression(alert(30))%7D\";</style>//[\"'`-->]]>]</div><div id=\"31\"><frameset onload=alert(31)>//[\"'`-->]]>]</div><div id=\"32\"><table background=\"javascript:alert(32)\"></table>//[\"'`-->]]>]</div><div id=\"33\"><a style=\"pointer-events:none;position:absolute;\"><a style=\"position:absolute;\" onclick=\"alert(33);\">XXX</a></a><a href=\"javascript:alert(2)\">XXX</a>//[\"'`-->]]>]</div><div id=\"34\">1<vmlframe xmlns=urn:schemas-microsoft-com:vml style=behavior:url(#default#vml);position:absolute;width:100%;height:100% src=test.vml#xss></vmlframe>//[\"'`-->]]>]</div><div id=\"35\">1<a href=#><line xmlns=urn:schemas-microsoft-com:vml style=behavior:url(#default#vml);position:absolute href=javascript:alert(35) strokecolor=white strokeweight=1000px from=0 to=1000 /></a>//[\"'`-->]]>]</div><div id=\"36\"><a style=\"behavior:url(#default#AnchorClick);\" folder=\"javascript:alert(36)\">XXX</a>//[\"'`-->]]>]</div><div id=\"37\"><!--<img src=\"--><img src=x onerror=alert(37)//\">//[\"'`-->]]>]</div><div id=\"38\"><comment><img src=\"</comment><img src=x onerror=alert(38)//\">//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div",
+        "div[id]",
         "table",
         "a",
-        "img"
+        "img[src]"
       ]
     },
     {
@@ -47153,7 +47154,7 @@
       "payload_html": "<div id=\"39\"><!-- up to Opera 11.52, FF 3.6.28 -->",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47162,7 +47163,7 @@
       "payload_html": "<![><img src=\"]><img src=x onerror=alert(39)//\">",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[src]"
       ]
     },
     {
@@ -47187,8 +47188,8 @@
       "payload_html": "<div id=\"40\"><style><img src=\"</style><img src=x onerror=alert(40)//\">//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div",
-        "img"
+        "div[id]",
+        "img[src]"
       ]
     },
     {
@@ -47197,8 +47198,8 @@
       "payload_html": "<div id=\"41\"><li style=list-style:url() onerror=alert(41)></li>",
       "payload_context": "html",
       "expected_tags": [
-        "div",
-        "li"
+        "div[id]",
+        "li[style]"
       ]
     },
     {
@@ -47207,7 +47208,7 @@
       "payload_html": "<div style=content:url(data:image/svg+xml,%3Csvg/%3E);visibility:hidden onload=alert(41)></div>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[style]"
       ]
     },
     {
@@ -47216,8 +47217,8 @@
       "payload_html": "<div id=\"42\"><head><base href=\"javascript://\"/></head><body><a href=\"/. /,alert(42)//#\">XXX</a></body>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div",
-        "a"
+        "div[id]",
+        "a[href]"
       ]
     },
     {
@@ -47226,7 +47227,7 @@
       "payload_html": "<div id=\"43\"><?xml version=\"1.0\" standalone=\"no\"?>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47272,7 +47273,7 @@
       "payload_html": "<div id=\"53\"><xml id=\"xss\" src=\"test.htc\"></xml>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47307,7 +47308,7 @@
       "payload_html": "<div id=\"62\"><!-- IE 6-8 -->",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47344,7 +47345,7 @@
       "payload_html": "<div id=\"63\"><embed src=\"javascript:alert(63)\"></embed> // O10.10↓, OM10.0↓, GC6↓, FF",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47378,7 +47379,7 @@
       "payload_html": "<div id=\"64\"><!DOCTYPE x[<!ENTITY x SYSTEM \"http://html5sec.org/test.xxe\">]><y>&x;</y>//[\"'`-->]]>]</div><div id=\"65\"><svg onload=\"javascript:alert(65)\" xmlns=\"http://www.w3.org/2000/svg\"></svg>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47387,7 +47388,7 @@
       "payload_html": "<div id=\"66\"><?xml version=\"1.0\"?>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47410,7 +47411,7 @@
       "payload_html": "<div id=\"67\"><!DOCTYPE x [   <!ATTLIST img xmlns CDATA \"http://www.w3.org/1999/xhtml\" src CDATA \"xx:x\"onerror CDATA \"alert(67)\"onload CDATA \"alert(2)\">]><img />//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div",
+        "div[id]",
         "img"
       ]
     },
@@ -47420,7 +47421,7 @@
       "payload_html": "<div id=\"68\"><doc xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:html=\"http://www.w3.org/1999/xhtml\">   <html:style /><x xlink:href=\"javascript:alert(68)\" xlink:type=\"simple\">XXX</x></doc>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47429,8 +47430,7 @@
       "payload_html": "<div id=\"69\"><card xmlns=\"http://www.wapforum.org/2001/wml\"><onevent type=\"ontimer\"><go href=\"javascript:alert(69)\"/></onevent><timer value=\"1\"/></card>//[\"'`-->]]>]</div><div id=\"70\"><div style=width:1px;filter:glow onfilterchange=alert(70)>x</div>//[\"'`-->]]>]</div><div id=\"71\"><// style=x:expression\\28alert(71)\\29>//[\"'`-->]]>]</div><div id=\"72\"><form><button formaction=\"javascript:alert(72)\">X</button>//[\"'`-->]]>]</div><div id=\"73\"><event-source src=\"event.php\" onload=\"alert(73)\">//[\"'`-->]]>]</div><div id=\"74\"><a href=\"javascript:alert(74)\"><event-source src=\"data:application/x-dom-event-stream,Event:click%0Adata:XXX%0A%0A\" /></a>//[\"'`-->]]>]</div><div id=\"75\"><script<{alert(75)}/></script </>//[\"'`-->]]>]</div><div id=\"76\"><?xml-stylesheet type=\"text/css\"?><!DOCTYPE x SYSTEM \"test.dtd\"><x>&x;</x>//[\"'`-->]]>]</div><div id=\"77\"><?xml-stylesheet type=\"text/css\"?><root style=\"x:expression(alert(77))\"/>//[\"'`-->]]>]</div><div id=\"78\"><?xml-stylesheet type=\"text/xsl\" href=\"#\"?><img xmlns=\"x-schema:test.xdr\"/>//[\"'`-->]]>]</div><div id=\"79\"><object allowscriptaccess=\"always\" data=\"test.swf\"></object>//[\"'`-->]]>]</div><div id=\"80\"><style>*{x:ｅｘｐｒｅｓｓｉｏｎ(alert(80))}</style>//[\"'`-->]]>]</div><div id=\"81\"><x xmlns:xlink=\"http://www.w3.org/1999/xlink\" xlink:actuate=\"onLoad\" xlink:href=\"javascript:alert(81)\" xlink:type=\"simple\"/>//[\"'`-->]]>]</div><div id=\"82\"><?xml-stylesheet type=\"text/css\" href=\"data:,*%7bx:expression(write(2));%7d\"?>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div",
-        "a",
+        "div[id]",
         "img"
       ]
     },
@@ -47440,7 +47440,7 @@
       "payload_html": "<div id=\"83\"><x:template xmlns:x=\"http://www.wapforum.org/2001/wml\"  x:ontimer=\"$(x:unesc)j$(y:escape)a$(z:noecs)v$(x)a$(y)s$(z)cript$x:alert(83)\"><x:timer value=\"1\"/></x:template>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47449,7 +47449,7 @@
       "payload_html": "<div id=\"84\"><x xmlns:ev=\"http://www.w3.org/2001/xml-events\" ev:event=\"load\" ev:handler=\"javascript:alert(84)//#x\"/>//[\"'`-->]]>]</div><div id=\"85\"><x xmlns:ev=\"http://www.w3.org/2001/xml-events\" ev:event=\"load\" ev:handler=\"test.evt#x\"/>//[\"'`-->]]>]</div><div id=\"86\"><body oninput=alert(86)><input autofocus>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47458,7 +47458,7 @@
       "payload_html": "<div id=\"87\"><svg xmlns=\"http://www.w3.org/2000/svg\">",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47483,7 +47483,7 @@
       "payload_html": "<div id=\"88\"><svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47529,7 +47529,7 @@
       "payload_html": "<div id=\"89\"><svg xmlns=\"http://www.w3.org/2000/svg\">",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47552,7 +47552,7 @@
       "payload_html": "<div id=\"90\"><!-- Up to Opera 10.63 -->",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47561,7 +47561,7 @@
       "payload_html": "<div style=content:url(test2.svg)></div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[style]"
       ]
     },
     {
@@ -47584,7 +47584,7 @@
       "payload_html": "<div style=\"background:url(test5.svg)\">PRESS ENTER</div>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[style]"
       ]
     },
     {
@@ -47593,7 +47593,7 @@
       "payload_html": "<div id=\"91\">[A]",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47653,7 +47653,7 @@
       "payload_html": "<div id=\"94\"><svg xmlns=\"http://www.w3.org/2000/svg\">",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47669,7 +47669,7 @@
       "payload_html": "<div id=\"95\"><svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47685,7 +47685,7 @@
       "payload_html": "<div id=\"96\"><iframe src=mhtml:http://html5sec.org/test.html!xss.html></iframe>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47701,7 +47701,7 @@
       "payload_html": "<div id=\"97\"><!-- IE 5-9 -->",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47710,7 +47710,7 @@
       "payload_html": "<div id=d><x xmlns=\"><iframe onload=alert(97)\"></div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47733,7 +47733,7 @@
       "payload_html": "<div id=d><x xmlns='\"><iframe onload=alert(2)//'></div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47765,7 +47765,7 @@
       "payload_html": "<div id=\"99\">XXX<style>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47809,9 +47809,9 @@
       "payload_html": "<div id=\"100\"><img[a][b]src=x[d]onerror[c]=[e]\"alert(100)\">//[\"'`-->]]>]</div><div id=\"101\"><a href=\"[a]java[b]script[c]:alert(101)\">XXX</a>//[\"'`-->]]>]</div><div id=\"102\"><img src=\"x` `<script>alert(102)</script>\"` `>//[\"'`-->]]>]</div><div id=\"103\"><script>history.pushState(0,0,'/i/am/somewhere_else');</script>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div",
-        "img",
-        "a"
+        "div[id]",
+        "img[src]",
+        "a[href]"
       ]
     },
     {
@@ -47820,7 +47820,7 @@
       "payload_html": "<div id=\"104\"><svg xmlns=\"http://www.w3.org/2000/svg\" id=\"foo\">",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47836,8 +47836,8 @@
       "payload_html": "<div id=\"105\"><iframe src=\"data:image/svg-xml,%1F%8B%08%00%00%00%00%00%02%03%B3)N.%CA%2C(Q%A8%C8%CD%C9%2B%B6U%CA())%B0%D2%D7%2F%2F%2F%D7%2B7%D6%CB%2FJ%D77%B4%B4%B4%D4%AF%C8(%C9%CDQ%B2K%CCI-*%D10%D4%B4%D1%87%E8%B2%03\"></iframe>//[\"'`-->]]>]</div><div id=\"106\"><img src onerror /\" '\"= alt=alert(106)//\">//[\"'`-->]]>]</div><div id=\"107\"><title onpropertychange=alert(107)></title><title title=></title>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div",
-        "img"
+        "div[id]",
+        "img[src]"
       ]
     },
     {
@@ -47846,7 +47846,7 @@
       "payload_html": "<div id=\"108\"><!-- IE 5-8 standards mode -->",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47855,8 +47855,8 @@
       "payload_html": "<a href=http://foo.bar/#x=`y></a><img alt=\"`><img src=xx:x onerror=alert(108)></a>\">",
       "payload_context": "html",
       "expected_tags": [
-        "a",
-        "img"
+        "a[href]",
+        "img[alt]"
       ]
     },
     {
@@ -47872,7 +47872,7 @@
       "payload_html": "<!a foo=x=`y><img alt=\"`><img src=xx:x onerror=alert(2)//\">",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[alt]"
       ]
     },
     {
@@ -47881,7 +47881,7 @@
       "payload_html": "<?a foo=x=`y><img alt=\"`><img src=xx:x onerror=alert(3)//\">//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[alt]"
       ]
     },
     {
@@ -47890,7 +47890,7 @@
       "payload_html": "<div id=\"109\"><svg xmlns=\"http://www.w3.org/2000/svg\">",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47899,7 +47899,7 @@
       "payload_html": "<a id=\"x\"><rect fill=\"white\" width=\"1000\" height=\"1000\"/></a>",
       "payload_context": "html",
       "expected_tags": [
-        "a"
+        "a[id]"
       ]
     },
     {
@@ -47915,7 +47915,7 @@
       "payload_html": "<div id=\"110\"><svg xmlns=\"http://www.w3.org/2000/svg\">",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47940,7 +47940,7 @@
       "payload_html": "<div id=\"113\"><div id=\"x\">XXX</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47956,7 +47956,7 @@
       "payload_html": "<div id=\"114\"><x style=\"background:url('x[a];color:red;/*')\">XXX</x>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47965,7 +47965,7 @@
       "payload_html": "<div id=\"115\"><!--[if]><script>alert(115)</script -->",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -47981,7 +47981,7 @@
       "payload_html": "<div id=\"116\"><div id=\"x\">x</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -48011,8 +48011,8 @@
       "payload_html": "<div id=\"117\"><a href=\"http://attacker.org\">",
       "payload_context": "html",
       "expected_tags": [
-        "div",
-        "a"
+        "div[id]",
+        "a[href]"
       ]
     },
     {
@@ -48052,7 +48052,7 @@
       "payload_html": "<div id=\"119\"><iframe src=\"view-source:http://www.example.org/\" frameborder=\"0\" style=\"width:400px;height:180px\"></iframe>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -48068,7 +48068,7 @@
       "payload_html": "<div id=\"120\"><script>function makePopups(){for (i=1;i<6;i++) {window.open('popup.html','spam'+i,'width=50,height=50');}}</script>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -48077,7 +48077,7 @@
       "payload_html": "<body><a href=\"#\" onclick=\"makePopups()\">Spam</a>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "a"
+        "a[href]"
       ]
     },
     {
@@ -48086,7 +48086,7 @@
       "payload_html": "<div id=\"121\"><html xmlns=\"http://www.w3.org/1999/xhtml\"",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -48123,7 +48123,7 @@
       "payload_html": "<div id=\"122\"><iframe sandbox=\"allow-same-origin allow-forms allow-scripts\" src=\"http://example.org/\"></iframe>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -48132,8 +48132,8 @@
       "payload_html": "<div id=\"123\"><span class=foo>Some text</span>",
       "payload_context": "html",
       "expected_tags": [
-        "div",
-        "span"
+        "div[id]",
+        "span[class]"
       ]
     },
     {
@@ -48142,7 +48142,7 @@
       "payload_html": "<a class=bar href=\"http://www.example.org\">www.example.org</a>",
       "payload_context": "html",
       "expected_tags": [
-        "a"
+        "a[class, href]"
       ]
     },
     {
@@ -48165,7 +48165,7 @@
       "payload_html": "<div id=\"124\"><script src=\"/\\example.com\\foo.js\"></script> // Safari 5.0, Chrome 9, 10",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -48181,7 +48181,7 @@
       "payload_html": "<div id=\"125\"><?xml version=\"1.0\"?>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -48225,7 +48225,7 @@
       "payload_html": "<div id=\"126\"><object id=\"x\" classid=\"clsid:CB927D12-4FF7-4a9e-A169-56E4B8A75598\"></object>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -48241,7 +48241,7 @@
       "payload_html": "<div id=\"127\"><svg xmlns=\"http://www.w3.org/2000/svg\" id=\"x\">",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -48264,7 +48264,7 @@
       "payload_html": "<div id=\"128\"><svg><style>&lt;img/src=x onerror=alert(128)// </b>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -48273,7 +48273,7 @@
       "payload_html": "<div id=\"129\"><svg>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -48291,7 +48291,7 @@
       "payload_html": "<div id=\"130\"><math href=\"javascript:alert(130)\">CLICKME</math>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -48328,7 +48328,7 @@
       "payload_html": "<div id=\"131\"><b>drag and drop one of the following strings to the drop box:</b>",
       "payload_context": "html",
       "expected_tags": [
-        "div",
+        "div[id]",
         "b"
       ]
     },
@@ -48375,7 +48375,7 @@
       "payload_html": "<div id=\"dropbox\" style=\"height: 360px;width: 500px;border: 5px solid #000;position: relative;\" ondragover=\"event.preventDefault()\">+ Drop Box +</div>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id, style]"
       ]
     },
     {
@@ -48384,7 +48384,7 @@
       "payload_html": "<div id=\"132\"><!doctype html>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -48481,7 +48481,7 @@
       "payload_html": "<div id=\"133\"><!-- `<img/src=xx:xx onerror=alert(133)//--!>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -48490,7 +48490,7 @@
       "payload_html": "<div id=\"134\"><xmp>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -48527,7 +48527,7 @@
       "payload_html": "<div id=\"135\"><?xml-stylesheet type=\"text/xsl\" href=\"#\" ?>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -48578,7 +48578,7 @@
       "payload_html": "<div id=\"136\"><form action=\"\" method=\"post\">",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -48622,7 +48622,7 @@
       "payload_html": "<div id=\"137\"><svg>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -48654,7 +48654,7 @@
       "payload_html": "<div id=\"138\"><link rel=\"import\" href=\"test.svg\" />//[\"'`-->]]>]</div><div id=\"139\"><iframe srcdoc=\"&lt;img src&equals;x:x onerror&equals;alert&lpar;1&rpar;&gt;\" />//[\"'`-->]]>]</div>undefined",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]"
       ]
     },
     {
@@ -48691,7 +48691,7 @@
       "payload_html": "<div style=xss:expression(alert(1))>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[style]"
       ]
     },
     {
@@ -48700,7 +48700,7 @@
       "payload_html": "<div style=xss:expression(1)-alert(1)>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[style]"
       ]
     },
     {
@@ -48709,7 +48709,7 @@
       "payload_html": "<div style=xss:expressio\\6e(alert(1))>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[style]"
       ]
     },
     {
@@ -48718,7 +48718,7 @@
       "payload_html": "<div style=xss:expressio\\006e(alert(1))>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[style]"
       ]
     },
     {
@@ -48727,7 +48727,7 @@
       "payload_html": "<div style=xss:expressio\\00006e(alert(1))>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[style]"
       ]
     }
   ]

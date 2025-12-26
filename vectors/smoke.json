@@ -10,7 +10,7 @@
 			"description": "Baseline XSS check: image onerror should execute when not sanitized.",
 			"payload_html": "<img src=x onerror=alert(1)>",
 			"payload_context": "html",
-			"expected_tags": ["img"]
+			"expected_tags": ["img[src]"]
 		}
 	]
 }

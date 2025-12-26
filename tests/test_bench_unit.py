@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import tempfile
 
-from xssbench.bench import run_bench, Vector
+from xssbench.bench import ExpectedTag, run_bench, Vector
 from xssbench.sanitizers import Sanitizer
 
 
@@ -15,14 +15,14 @@ def test_run_bench_uses_runner_and_counts_executed() -> None:
             description="",
             payload_html="<img src=x onerror=1>",
             payload_context="html",
-            expected_tags=("img",),
+            expected_tags=(ExpectedTag("img", frozenset({"src"})),),
         ),
         Vector(
             id="v2",
             description="",
             payload_html="<b>ok</b>",
             payload_context="html",
-            expected_tags=("b",),
+            expected_tags=(ExpectedTag("b"),),
         ),
     ]
 
@@ -54,28 +54,28 @@ def test_run_bench_external_script_request_counts_as_xss() -> None:
             description="",
             payload_html="<b>ok</b>",
             payload_context="html",
-            expected_tags=("b",),
+            expected_tags=(ExpectedTag("b"),),
         ),
         Vector(
             id="v2",
             description="",
-            payload_html='<script src="https://example.com/x.js"></script>',
+            payload_html='<img src="https://example.com/x.js">',
             payload_context="html",
-            expected_tags=("script",),
+            expected_tags=(ExpectedTag("img", frozenset({"src"})),),
         ),
         Vector(
             id="v3",
             description="",
             payload_html="<b>ok2</b>",
             payload_context="html",
-            expected_tags=("b",),
+            expected_tags=(ExpectedTag("b"),),
         ),
     ]
 
     sanitizer = Sanitizer(name="noop", description="", sanitize=lambda html: html)
 
     def fake_runner(*, payload_html: str, sanitized_html: str, timeout_ms: int, **_kwargs):
-        if "script src" in sanitized_html:
+        if 'src="https://example.com/x.js"' in sanitized_html:
             return type("VR", (), {"executed": True, "details": "external script"})()
         return type("VR", (), {"executed": False, "details": "no"})()
 
@@ -119,6 +119,74 @@ def test_load_vectors_accepts_meta_wrapper() -> None:
         vectors = load_vectors([p])
 
     assert [v.id for v in vectors] == ["v1"]
+
+
+def test_load_vectors_accepts_bare_tag_expected_tags() -> None:
+    from xssbench.bench import load_vectors
+
+    payload = {
+        "schema": "xssbench.vectorfile.v1",
+        "meta": {
+            "tool": "xssbench",
+            "source_url": "https://example.invalid/",
+            "license": {
+                "spdx": "MIT",
+                "url": "https://spdx.org/licenses/MIT.html",
+                "file": "vectors/example-LICENSE.txt",
+            },
+        },
+        "vectors": [
+            {
+                "id": "v1",
+                "expected_tags": ["img"],
+                "description": "d",
+                "payload_html": "<img src=x>",
+                "payload_context": "html",
+            }
+        ],
+    }
+
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "vectors.json"
+        p.write_text(json.dumps(payload), encoding="utf-8")
+        vectors = load_vectors([p])
+
+    assert vectors[0].expected_tags == (ExpectedTag("img"),)
+
+
+def test_load_vectors_rejects_empty_bracket_expected_tags() -> None:
+    from xssbench.bench import load_vectors
+
+    payload = {
+        "schema": "xssbench.vectorfile.v1",
+        "meta": {
+            "tool": "xssbench",
+            "source_url": "https://example.invalid/",
+            "license": {
+                "spdx": "MIT",
+                "url": "https://spdx.org/licenses/MIT.html",
+                "file": "vectors/example-LICENSE.txt",
+            },
+        },
+        "vectors": [
+            {
+                "id": "v1",
+                "expected_tags": ["img[]"],
+                "description": "d",
+                "payload_html": "<img>",
+                "payload_context": "html",
+            }
+        ],
+    }
+
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "vectors.json"
+        p.write_text(json.dumps(payload), encoding="utf-8")
+        try:
+            load_vectors([p])
+            raise AssertionError("Expected load_vectors to reject empty-bracket expected_tags")
+        except ValueError as exc:
+            assert "must not use empty brackets" in str(exc)
 
 
 def test_load_vectors_ignores_unknown_meta_keys() -> None:
@@ -165,14 +233,14 @@ def test_run_bench_fail_fast_stops_after_first_xss() -> None:
             description="",
             payload_html="<img src=x onerror=1>",
             payload_context="html",
-            expected_tags=("img",),
+            expected_tags=(ExpectedTag("img", frozenset({"src"})),),
         ),
         Vector(
             id="v2",
             description="",
             payload_html="<b>ok</b>",
             payload_context="html",
-            expected_tags=("b",),
+            expected_tags=(ExpectedTag("b"),),
         ),
     ]
 
@@ -386,7 +454,7 @@ def test_run_bench_skips_unsupported_contexts() -> None:
             description="",
             payload_html="<b>ok</b>",
             payload_context="html",
-            expected_tags=("b",),
+            expected_tags=(ExpectedTag("b"),),
         ),
     ]
 
@@ -420,7 +488,7 @@ def test_run_bench_wraps_onerror_attr_payload_before_sanitizing() -> None:
             description="",
             payload_html="alert(1)",
             payload_context="onerror_attr",
-            expected_tags=("img",),
+            expected_tags=(ExpectedTag("img", frozenset({"src"})),),
         ),
     ]
 
@@ -459,7 +527,7 @@ def test_run_bench_marks_missing_expected_tags_as_lossy_and_skips_runner() -> No
             description="",
             payload_html="<b>keep</b>",
             payload_context="html",
-            expected_tags=("b",),
+            expected_tags=(ExpectedTag("b"),),
         ),
     ]
 
@@ -506,3 +574,75 @@ def test_run_bench_empty_expected_tags_means_no_tags_allowed() -> None:
     assert summary.total_lossy == 1
     assert called["n"] == 0
     assert summary.results[0].outcome == "lossy"
+
+
+def test_run_bench_attribute_requirements_require_at_least_one_element() -> None:
+    vectors = [
+        Vector(
+            id="v1",
+            description="",
+            payload_html="<a href='#'>x</a>",
+            payload_context="html",
+            expected_tags=(ExpectedTag("a", frozenset({"href"})),),
+        ),
+    ]
+
+    # Sanitizer returns two <a> tags; only one keeps href -> should be lossy.
+    sanitizer = Sanitizer(
+        name="s",
+        description="",
+        sanitize=lambda _html: "<a>x</a><a href='#'>y</a>",
+    )
+
+    called = {"n": 0}
+
+    def fake_runner(**_kwargs):
+        called["n"] += 1
+        return type("VR", (), {"executed": False, "details": "no"})()
+
+    summary = run_bench(vectors=vectors, sanitizers=[sanitizer], runner=fake_runner)
+
+    assert summary.total_cases == 1
+    assert summary.total_lossy == 0
+    assert called["n"] == 1
+    assert summary.results[0].outcome == "pass"
+
+
+def test_run_bench_bare_tag_requires_attribute_free_element() -> None:
+    vectors = [
+        Vector(
+            id="v1",
+            description="",
+            payload_html="<a href='#'>x</a>",
+            payload_context="html",
+            expected_tags=(ExpectedTag("a"),),
+        ),
+    ]
+
+    sanitizer = Sanitizer(
+        name="s",
+        description="",
+        sanitize=lambda _html: "<a href='#'>y</a>",
+    )
+
+    called = {"n": 0}
+
+    def fake_runner(**_kwargs):
+        called["n"] += 1
+        return type("VR", (), {"executed": False, "details": "no"})()
+
+    summary = run_bench(vectors=vectors, sanitizers=[sanitizer], runner=fake_runner)
+    assert summary.total_cases == 1
+    assert summary.total_lossy == 1
+    assert called["n"] == 0
+    assert summary.results[0].outcome == "lossy"
+
+    sanitizer2 = Sanitizer(
+        name="s2",
+        description="",
+        sanitize=lambda _html: "<a>y</a>",
+    )
+    summary2 = run_bench(vectors=vectors, sanitizers=[sanitizer2], runner=fake_runner)
+    assert summary2.total_cases == 1
+    assert summary2.total_lossy == 0
+    assert summary2.results[0].outcome == "pass"

@@ -14,35 +14,35 @@
 			"description": "IMG onerror alert",
 			"payload_html": "<img src=x onerror=\"alert(1)\">",
 			"payload_context": "html",
-			"expected_tags": ["img"]
+			"expected_tags": ["img[src]"]
 		},
 		{
 			"id": "js-exec-html-002-img-onerror-confirm",
 			"description": "IMG onerror confirm",
 			"payload_html": "<img src=x onerror=\"confirm(1)\">",
 			"payload_context": "html",
-			"expected_tags": ["img"]
+			"expected_tags": ["img[src]"]
 		},
 		{
 			"id": "js-exec-html-003-img-onerror-prompt",
 			"description": "IMG onerror prompt",
 			"payload_html": "<img src=x onerror=\"prompt(1)\">",
 			"payload_context": "html",
-			"expected_tags": ["img"]
+			"expected_tags": ["img[src]"]
 		},
 		{
 			"id": "js-exec-html-004-img-onerror-window-alert",
 			"description": "IMG onerror window.alert",
 			"payload_html": "<img src=x onerror=\"window.alert(1)\">",
 			"payload_context": "html",
-			"expected_tags": ["img"]
+			"expected_tags": ["img[src]"]
 		},
 		{
 			"id": "js-exec-html-005-img-onerror-this-alert",
 			"description": "IMG onerror this.ownerDocument.defaultView.alert",
 			"payload_html": "<img src=x onerror=\"this.ownerDocument.defaultView.alert(1)\">",
 			"payload_context": "html",
-			"expected_tags": ["img"]
+			"expected_tags": ["img[src]"]
 		},
 		{
 			"id": "js-exec-html-006-div-onmouseover-alert",
@@ -84,14 +84,14 @@
 			"description": "A onclick alert",
 			"payload_html": "<a href=\"#\" onclick=\"alert(1)\">x</a>",
 			"payload_context": "html",
-			"expected_tags": ["a"]
+			"expected_tags": ["a[href]"]
 		},
 		{
 			"id": "js-exec-html-012-a-onclick-location",
 			"description": "A onclick location navigation",
 			"payload_html": "<a href=\"#\" onclick=\"location='http://example.com/'\">x</a>",
 			"payload_context": "html",
-			"expected_tags": ["a"]
+			"expected_tags": ["a[href]"]
 		},
 		{
 			"id": "js-exec-html-013-input-onfocus-alert",

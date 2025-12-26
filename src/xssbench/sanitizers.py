@@ -57,7 +57,7 @@ DEFAULT_ALLOWED_TAGS: tuple[str, ...] = (
 DEFAULT_ALLOWED_TAGS_SET: frozenset[str] = frozenset(DEFAULT_ALLOWED_TAGS)
 
 
-_GLOBAL_ATTRS: frozenset[str] = frozenset({"class", "id", "title", "lang", "dir"})
+_GLOBAL_ATTRS: frozenset[str] = frozenset({"class", "id", "title", "lang", "dir", "style"})
 
 _A_ATTRS: frozenset[str] = frozenset({"href", "title"})
 
@@ -66,6 +66,30 @@ _IMG_ATTRS: frozenset[str] = frozenset({"src", "alt", "title", "width", "height"
 _TABLE_CELL_ATTRS: frozenset[str] = frozenset({"colspan", "rowspan"})
 
 _URL_PROTOCOLS: tuple[str, ...] = ("http", "https", "mailto", "tel")
+
+
+def allowed_url_protocols() -> tuple[str, ...]:
+    return _URL_PROTOCOLS
+
+
+def allowed_attributes_for_tag(tag: str) -> frozenset[str]:
+    """Return the allowlisted attributes for a given tag (shared policy).
+
+    This is used both by sanitizer configuration (bleach/nh3/lxml-html-clean)
+    and by the benchmark when interpreting `expected_tags` attribute requirements.
+    """
+
+    t = str(tag).strip().lower()
+    if not t:
+        return frozenset()
+
+    if t == "a":
+        return frozenset(set(_GLOBAL_ATTRS) | set(_A_ATTRS))
+    if t == "img":
+        return frozenset(set(_GLOBAL_ATTRS) | set(_IMG_ATTRS))
+    if t in {"th", "td"}:
+        return frozenset(set(_GLOBAL_ATTRS) | set(_TABLE_CELL_ATTRS))
+    return _GLOBAL_ATTRS
 
 
 @dataclass(frozen=True, slots=True)
@@ -94,6 +118,14 @@ def _maybe_bleach() -> Sanitizer | None:
     # Shared allowlist policy (see module constants).
     from bleach.sanitizer import Cleaner  # type: ignore
 
+    css_sanitizer = None
+    try:
+        from bleach.css_sanitizer import CSSSanitizer  # type: ignore
+
+        css_sanitizer = CSSSanitizer()
+    except Exception:
+        css_sanitizer = None
+
     def _bleach_attr_filter(tag: str, name: str, value: str) -> bool:
         if name in _GLOBAL_ATTRS:
             return True
@@ -105,13 +137,16 @@ def _maybe_bleach() -> Sanitizer | None:
             return True
         return False
 
-    cleaner = Cleaner(
+    cleaner_kwargs = dict(
         tags=list(DEFAULT_ALLOWED_TAGS),
         attributes=_bleach_attr_filter,
         protocols=list(_URL_PROTOCOLS),
         strip=True,
         strip_comments=True,
     )
+    if css_sanitizer is not None:
+        cleaner_kwargs["css_sanitizer"] = css_sanitizer
+    cleaner = Cleaner(**cleaner_kwargs)
 
     def _sanitize(html: str) -> str:
         return cleaner.clean(html)
@@ -121,23 +156,6 @@ def _maybe_bleach() -> Sanitizer | None:
         description="bleach Cleaner shared allowlist (keep common markup; strip dangerous)",
         sanitize=_sanitize,
         # bleach is an HTML sanitizer; JS-string/JS-code and event-handler JS are out of scope.
-        supported_contexts={"html", "html_head", "html_outer"},
-    )
-
-
-def _maybe_bleach_default() -> Sanitizer | None:
-    try:
-        import bleach  # type: ignore
-    except Exception:
-        return None
-
-    def _sanitize(html: str) -> str:
-        return bleach.clean(html)
-
-    return Sanitizer(
-        name="bleach_default",
-        description="bleach.clean(html) with default settings (often very strict)",
-        sanitize=_sanitize,
         supported_contexts={"html", "html_head", "html_outer"},
     )
 
@@ -169,6 +187,7 @@ def _maybe_nh3() -> Sanitizer | None:
             tags=allowed_tags,
             attributes=allowed_attributes,
             url_schemes=set(_URL_PROTOCOLS),
+            link_rel=None,  # Disable automatic rel management.
         )
 
     return Sanitizer(
@@ -176,23 +195,6 @@ def _maybe_nh3() -> Sanitizer | None:
         description="nh3 shared allowlist (keep common markup; strip dangerous)",
         sanitize=_sanitize,
         # nh3 is an HTML sanitizer; JS-string/JS-code and event-handler JS are out of scope.
-        supported_contexts={"html", "html_head", "html_outer"},
-    )
-
-
-def _maybe_nh3_default() -> Sanitizer | None:
-    try:
-        import nh3  # type: ignore
-    except Exception:
-        return None
-
-    def _sanitize(html: str) -> str:
-        return nh3.clean(html)
-
-    return Sanitizer(
-        name="nh3_default",
-        description="nh3.clean(html) with default settings (often very strict)",
-        sanitize=_sanitize,
         supported_contexts={"html", "html_head", "html_outer"},
     )
 
@@ -287,9 +289,7 @@ def available_sanitizers() -> dict[str, Sanitizer]:
 
     for maybe in (
         _maybe_bleach(),
-        _maybe_bleach_default(),
         _maybe_nh3(),
-        _maybe_nh3_default(),
         _maybe_lxml_html_clean(),
     ):
         if maybe is not None:
