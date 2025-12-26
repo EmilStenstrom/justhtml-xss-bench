@@ -55,3 +55,27 @@ def test_external_script_fetch_counts_as_executed() -> None:
         pytest.skip(str(exc))
 
     assert result.executed is True
+
+
+def test_lxml_html_clean_does_not_add_wrapper_div() -> None:
+    from xssbench.sanitizers import available_sanitizers
+
+    sanitizers = available_sanitizers()
+    s = sanitizers.get("lxml_html_clean")
+    if s is None:
+        return
+
+    out = s.sanitize("<b>Hello</b>")
+    assert out.strip().lower() == "<b>hello</b>"
+
+
+def test_lxml_html_clean_empty_input_is_ok() -> None:
+    from xssbench.sanitizers import available_sanitizers
+
+    sanitizers = available_sanitizers()
+    s = sanitizers.get("lxml_html_clean")
+    if s is None:
+        return
+
+    assert s.sanitize("") == ""
+    assert s.sanitize("   ") == ""

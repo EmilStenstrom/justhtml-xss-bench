@@ -9,839 +9,1013 @@
     }
   },
   "vectors": [
-  {
-    "id": "js-exec-html-001-img-onerror-alert",
-    "description": "IMG onerror alert",
-    "payload_html": "<img src=x onerror=\"alert(1)\">",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-002-img-onerror-confirm",
-    "description": "IMG onerror confirm",
-    "payload_html": "<img src=x onerror=\"confirm(1)\">",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-003-img-onerror-prompt",
-    "description": "IMG onerror prompt",
-    "payload_html": "<img src=x onerror=\"prompt(1)\">",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-004-img-onerror-window-alert",
-    "description": "IMG onerror window.alert",
-    "payload_html": "<img src=x onerror=\"window.alert(1)\">",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-005-img-onerror-this-alert",
-    "description": "IMG onerror this.ownerDocument.defaultView.alert",
-    "payload_html": "<img src=x onerror=\"this.ownerDocument.defaultView.alert(1)\">",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-006-div-onmouseover-alert",
-    "description": "DIV onmouseover alert",
-    "payload_html": "<div onmouseover=\"alert(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-007-div-onmouseenter-alert",
-    "description": "DIV onmouseenter alert",
-    "payload_html": "<div onmouseenter=\"alert(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-008-div-onclick-alert",
-    "description": "DIV onclick alert",
-    "payload_html": "<div onclick=\"alert(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-009-button-onclick-alert",
-    "description": "BUTTON onclick alert",
-    "payload_html": "<button onclick=\"alert(1)\">x</button>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-010-button-onclick-confirm",
-    "description": "BUTTON onclick confirm",
-    "payload_html": "<button onclick=\"confirm(1)\">x</button>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-011-a-onclick-alert",
-    "description": "A onclick alert",
-    "payload_html": "<a href=\"#\" onclick=\"alert(1)\">x</a>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-012-a-onclick-location",
-    "description": "A onclick location navigation",
-    "payload_html": "<a href=\"#\" onclick=\"location='http://example.com/'\">x</a>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-013-input-onfocus-alert",
-    "description": "INPUT onfocus alert",
-    "payload_html": "<input onfocus=\"alert(1)\" value=\"x\">",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-014-input-onfocusin-alert",
-    "description": "INPUT onfocusin alert",
-    "payload_html": "<input onfocusin=\"alert(1)\" value=\"x\">",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-015-textarea-onfocus-alert",
-    "description": "TEXTAREA onfocus alert",
-    "payload_html": "<textarea onfocus=\"alert(1)\">x</textarea>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-016-details-ontoggle-alert",
-    "description": "DETAILS ontoggle alert",
-    "payload_html": "<details open ontoggle=\"alert(1)\"><summary>x</summary></details>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-017-marquee-onstart-alert",
-    "description": "MARQUEE onstart alert",
-    "payload_html": "<marquee onstart=\"alert(1)\">x</marquee>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-018-svg-onload-alert",
-    "description": "SVG onload alert",
-    "payload_html": "<svg xmlns=\"http://www.w3.org/2000/svg\" onload=\"alert(1)\"></svg>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-019-svg-onload-confirm",
-    "description": "SVG onload confirm",
-    "payload_html": "<svg xmlns=\"http://www.w3.org/2000/svg\" onload=\"confirm(1)\"></svg>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-020-iframe-srcdoc-script-alert",
-    "description": "IFRAME srcdoc script alert",
-    "payload_html": "<iframe srcdoc=\"<script>alert(1)</script>\"></iframe>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-021-iframe-srcdoc-svg-onload",
-    "description": "IFRAME srcdoc SVG onload",
-    "payload_html": "<iframe srcdoc=\"<svg xmlns='http://www.w3.org/2000/svg' onload='alert(1)'></svg>\"></iframe>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-022-video-onerror-alert",
-    "description": "VIDEO onerror alert",
-    "payload_html": "<video src=x onerror=\"alert(1)\"></video>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-023-audio-onerror-alert",
-    "description": "AUDIO onerror alert",
-    "payload_html": "<audio src=x onerror=\"alert(1)\"></audio>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-024-source-onerror-alert",
-    "description": "SOURCE onerror alert (in VIDEO)",
-    "payload_html": "<video><source src=x onerror=\"alert(1)\"></video>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-025-form-onsubmit-alert",
-    "description": "FORM onsubmit alert",
-    "payload_html": "<form onsubmit=\"alert(1)\"><button type=submit>x</button></form>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-027-div-onclick-02",
-    "description": "DIV onclick -> confirm(1)",
-    "payload_html": "<div onclick=\"confirm(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-028-div-onclick-03",
-    "description": "DIV onclick -> prompt(1)",
-    "payload_html": "<div onclick=\"prompt(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-029-div-onclick-04",
-    "description": "DIV onclick -> window.alert(1)",
-    "payload_html": "<div onclick=\"window.alert(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-030-div-onclick-05",
-    "description": "DIV onclick -> globalThis.alert(1)",
-    "payload_html": "<div onclick=\"globalThis.alert(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-031-div-onclick-06",
-    "description": "DIV onclick -> (0,alert)(1)",
-    "payload_html": "<div onclick=\"(0,alert)(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-033-div-onmouseover-08",
-    "description": "DIV onmouseover -> confirm(1)",
-    "payload_html": "<div onmouseover=\"confirm(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-034-div-onmouseover-09",
-    "description": "DIV onmouseover -> prompt(1)",
-    "payload_html": "<div onmouseover=\"prompt(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-035-div-onmouseover-10",
-    "description": "DIV onmouseover -> window.alert(1)",
-    "payload_html": "<div onmouseover=\"window.alert(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-036-div-onmouseover-11",
-    "description": "DIV onmouseover -> globalThis.alert(1)",
-    "payload_html": "<div onmouseover=\"globalThis.alert(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-037-div-onmouseover-12",
-    "description": "DIV onmouseover -> (0,alert)(1)",
-    "payload_html": "<div onmouseover=\"(0,alert)(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-039-div-onmouseenter-14",
-    "description": "DIV onmouseenter -> confirm(1)",
-    "payload_html": "<div onmouseenter=\"confirm(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-040-div-onmouseenter-15",
-    "description": "DIV onmouseenter -> prompt(1)",
-    "payload_html": "<div onmouseenter=\"prompt(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-041-div-onmouseenter-16",
-    "description": "DIV onmouseenter -> window.alert(1)",
-    "payload_html": "<div onmouseenter=\"window.alert(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-042-div-onmouseenter-17",
-    "description": "DIV onmouseenter -> globalThis.alert(1)",
-    "payload_html": "<div onmouseenter=\"globalThis.alert(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-043-div-onmouseenter-18",
-    "description": "DIV onmouseenter -> (0,alert)(1)",
-    "payload_html": "<div onmouseenter=\"(0,alert)(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-044-div-onfocus-19",
-    "description": "DIV onfocus -> alert(1)",
-    "payload_html": "<div onfocus=\"alert(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-045-div-onfocus-20",
-    "description": "DIV onfocus -> confirm(1)",
-    "payload_html": "<div onfocus=\"confirm(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-046-div-onfocus-21",
-    "description": "DIV onfocus -> prompt(1)",
-    "payload_html": "<div onfocus=\"prompt(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-047-div-onfocus-22",
-    "description": "DIV onfocus -> window.alert(1)",
-    "payload_html": "<div onfocus=\"window.alert(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-048-div-onfocus-23",
-    "description": "DIV onfocus -> globalThis.alert(1)",
-    "payload_html": "<div onfocus=\"globalThis.alert(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-049-div-onfocus-24",
-    "description": "DIV onfocus -> (0,alert)(1)",
-    "payload_html": "<div onfocus=\"(0,alert)(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-050-div-onfocusin-25",
-    "description": "DIV onfocusin -> alert(1)",
-    "payload_html": "<div onfocusin=\"alert(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-051-div-onfocusin-26",
-    "description": "DIV onfocusin -> confirm(1)",
-    "payload_html": "<div onfocusin=\"confirm(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-052-div-onfocusin-27",
-    "description": "DIV onfocusin -> prompt(1)",
-    "payload_html": "<div onfocusin=\"prompt(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-053-div-onfocusin-28",
-    "description": "DIV onfocusin -> window.alert(1)",
-    "payload_html": "<div onfocusin=\"window.alert(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-054-div-onfocusin-29",
-    "description": "DIV onfocusin -> globalThis.alert(1)",
-    "payload_html": "<div onfocusin=\"globalThis.alert(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-055-div-onfocusin-30",
-    "description": "DIV onfocusin -> (0,alert)(1)",
-    "payload_html": "<div onfocusin=\"(0,alert)(1)\">x</div>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-056-span-onclick-31",
-    "description": "SPAN onclick -> alert(1)",
-    "payload_html": "<span onclick=\"alert(1)\">x</span>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-057-span-onclick-32",
-    "description": "SPAN onclick -> confirm(1)",
-    "payload_html": "<span onclick=\"confirm(1)\">x</span>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-058-span-onclick-33",
-    "description": "SPAN onclick -> prompt(1)",
-    "payload_html": "<span onclick=\"prompt(1)\">x</span>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-059-span-onclick-34",
-    "description": "SPAN onclick -> window.alert(1)",
-    "payload_html": "<span onclick=\"window.alert(1)\">x</span>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-060-span-onclick-35",
-    "description": "SPAN onclick -> globalThis.alert(1)",
-    "payload_html": "<span onclick=\"globalThis.alert(1)\">x</span>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-061-span-onclick-36",
-    "description": "SPAN onclick -> (0,alert)(1)",
-    "payload_html": "<span onclick=\"(0,alert)(1)\">x</span>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-062-span-onmouseover-37",
-    "description": "SPAN onmouseover -> alert(1)",
-    "payload_html": "<span onmouseover=\"alert(1)\">x</span>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-063-span-onmouseover-38",
-    "description": "SPAN onmouseover -> confirm(1)",
-    "payload_html": "<span onmouseover=\"confirm(1)\">x</span>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-064-span-onmouseover-39",
-    "description": "SPAN onmouseover -> prompt(1)",
-    "payload_html": "<span onmouseover=\"prompt(1)\">x</span>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-html-065-span-onmouseover-40",
-    "description": "SPAN onmouseover -> window.alert(1)",
-    "payload_html": "<span onmouseover=\"window.alert(1)\">x</span>",
-    "payload_context": "html"
-  },
-  {
-    "id": "js-exec-head-001-head-script-alert",
-    "description": "SCRIPT in head alert",
-    "payload_html": "<script>alert(1)</script>",
-    "payload_context": "html_head"
-  },
-  {
-    "id": "js-exec-head-002-head-script-confirm",
-    "description": "SCRIPT in head confirm",
-    "payload_html": "<script>confirm(1)</script>",
-    "payload_context": "html_head"
-  },
-  {
-    "id": "js-exec-head-003-head-script-prompt",
-    "description": "SCRIPT in head prompt",
-    "payload_html": "<script>prompt(1)</script>",
-    "payload_context": "html_head"
-  },
-  {
-    "id": "js-exec-head-004-head-meta-refresh-js",
-    "description": "META refresh javascript: URL",
-    "payload_html": "<meta http-equiv=\"refresh\" content=\"0;url=javascript:alert(1)\">",
-    "payload_context": "html_head"
-  },
-  {
-    "id": "js-exec-head-005-head-meta-refresh-http",
-    "description": "META refresh http navigation",
-    "payload_html": "<meta http-equiv=\"refresh\" content=\"0;url=http://example.com/\">",
-    "payload_context": "html_head"
-  },
-  {
-    "id": "js-exec-outer-001-outer-body-onload-alert",
-    "description": "BODY onload alert",
-    "payload_html": "<body onload=\"alert(1)\">",
-    "payload_context": "html_outer"
-  },
-  {
-    "id": "js-exec-outer-002-outer-frameset-onload-alert",
-    "description": "FRAMESET onload alert",
-    "payload_html": "<frameset onload=\"alert(1)\"></frameset>",
-    "payload_context": "html_outer"
-  },
-  {
-    "id": "js-exec-outer-003-outer-html-body-svg-onload",
-    "description": "HTML/BODY fragment with SVG onload",
-    "payload_html": "<html><body><svg xmlns=\"http://www.w3.org/2000/svg\" onload=\"alert(1)\"></svg></body></html>",
-    "payload_context": "html_outer"
-  },
-  {
-    "id": "js-exec-href-001-href-js-alert",
-    "description": "javascript:alert",
-    "payload_html": "javascript:alert(1)",
-    "payload_context": "href"
-  },
-  {
-    "id": "js-exec-href-002-href-js-confirm",
-    "description": "javascript:confirm",
-    "payload_html": "javascript:confirm(1)",
-    "payload_context": "href"
-  },
-  {
-    "id": "js-exec-href-003-href-js-prompt",
-    "description": "javascript:prompt",
-    "payload_html": "javascript:prompt(1)",
-    "payload_context": "href"
-  },
-  {
-    "id": "js-exec-href-004-href-js-location",
-    "description": "javascript:location=...",
-    "payload_html": "javascript:location='http://example.com/'",
-    "payload_context": "href"
-  },
-  {
-    "id": "js-exec-href-005-href-data-html-alert",
-    "description": "data:text/html with script",
-    "payload_html": "data:text/html,<script>alert(1)</script>",
-    "payload_context": "href"
-  },
-  {
-    "id": "js-exec-href-006-href-http-nav",
-    "description": "http navigation",
-    "payload_html": "http://example.com/",
-    "payload_context": "href"
-  },
-  {
-    "id": "js-exec-href-007-href-relative-nav",
-    "description": "relative navigation",
-    "payload_html": "/relative/path",
-    "payload_context": "href"
-  },
-  {
-    "id": "js-exec-js-001-js-alert",
-    "description": "alert(1)",
-    "payload_html": "alert(1)",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-002-js-window-alert",
-    "description": "window.alert(1)",
-    "payload_html": "window.alert(1)",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-003-js-self-alert",
-    "description": "self.alert(1)",
-    "payload_html": "self.alert(1)",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-004-js-top-alert",
-    "description": "top.alert(1)",
-    "payload_html": "top.alert(1)",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-005-js-globalthis-alert",
-    "description": "globalThis.alert(1)",
-    "payload_html": "globalThis.alert(1)",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-006-js-call",
-    "description": "alert.call(window,1)",
-    "payload_html": "alert.call(window,1)",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-007-js-apply",
-    "description": "alert.apply(window,[1])",
-    "payload_html": "alert.apply(window,[1])",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-008-js-comma",
-    "description": "(0,alert)(1)",
-    "payload_html": "(0,alert)(1)",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-009-js-bracket",
-    "description": "window['alert'](1)",
-    "payload_html": "window['alert'](1)",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-010-js-bracket2",
-    "description": "globalThis[\"alert\"](1)",
-    "payload_html": "globalThis[\"alert\"](1)",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-011-js-function-ctor",
-    "description": "Function(\"alert(1)\")()",
-    "payload_html": "Function(\"alert(1)\")()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-012-js-function-ctor2",
-    "description": "new Function(\"alert(1)\")()",
-    "payload_html": "new Function(\"alert(1)\")()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-013-js-eval",
-    "description": "eval(\"alert(1)\")",
-    "payload_html": "eval(\"alert(1)\")",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-014-js-settimeout-fn",
-    "description": "setTimeout(()=>alert(1),0)",
-    "payload_html": "setTimeout(()=>alert(1),0)",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-015-js-settimeout-str",
-    "description": "setTimeout(\"alert(1)\",0)",
-    "payload_html": "setTimeout(\"alert(1)\",0)",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-016-js-settimeout-args",
-    "description": "setTimeout(alert,0,1)",
-    "payload_html": "setTimeout(alert,0,1)",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-017-js-setinterval-once",
-    "description": "setInterval(()=>{alert(1);clearInterval(i)},0)",
-    "payload_html": "var i=setInterval(()=>{alert(1);clearInterval(i)},0)",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-018-js-promise",
-    "description": "Promise.resolve().then(()=>alert(1))",
-    "payload_html": "Promise.resolve().then(()=>alert(1))",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-019-js-queuemicrotask",
-    "description": "queueMicrotask(()=>alert(1))",
-    "payload_html": "queueMicrotask(()=>alert(1))",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-020-js-raf",
-    "description": "requestAnimationFrame(()=>alert(1))",
-    "payload_html": "requestAnimationFrame(()=>alert(1))",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-021-js-onerror-throw",
-    "description": "window.onerror=alert;throw 1",
-    "payload_html": "window.onerror=alert;throw 1",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-022-js-onunhandledrejection",
-    "description": "unhandledrejection -> alert",
-    "payload_html": "window.onunhandledrejection=(e)=>alert(1);Promise.reject(1)",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-023-js-eventlistener",
-    "description": "addEventListener+dispatchEvent",
-    "payload_html": "addEventListener(\"x\",()=>alert(1));dispatchEvent(new Event(\"x\"))",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-024-js-doc-write",
-    "description": "document.write script",
-    "payload_html": "document.write(\"<script>alert(1)</script>\")",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-025-js-location-assign",
-    "description": "location.assign",
-    "payload_html": "location.assign(\"http://example.com/\")",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-026-js-location-href",
-    "description": "location.href",
-    "payload_html": "location.href=\"http://example.com/\"",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-027-js-open",
-    "description": "window.open",
-    "payload_html": "window.open(\"http://example.com/\")",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-028-js-history-pushstate",
-    "description": "history.pushState",
-    "payload_html": "history.pushState({},\"\", \"#x\");alert(1)",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-029-js-console-error-alert",
-    "description": "console then alert",
-    "payload_html": "console.log(\"x\");alert(1)",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-030-js-request-redirect",
-    "description": "setTimeout location",
-    "payload_html": "setTimeout(()=>{location=\"http://example.com/\"},0)",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-js-031-js-iife-1",
-    "description": "IIFE alert variant 1",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js"
-  },
-  {
-    "id": "js-exec-jsarg-001-arg-breakout-alert",
-    "description": "close call then alert",
-    "payload_html": "0);alert(1);//",
-    "payload_context": "js_arg"
-  },
-  {
-    "id": "js-exec-jsarg-002-arg-breakout-confirm",
-    "description": "close call then confirm",
-    "payload_html": "0);confirm(1);//",
-    "payload_context": "js_arg"
-  },
-  {
-    "id": "js-exec-jsarg-003-arg-breakout-prompt",
-    "description": "close call then prompt",
-    "payload_html": "0);prompt(1);//",
-    "payload_context": "js_arg"
-  },
-  {
-    "id": "js-exec-jsarg-004-arg-breakout-location",
-    "description": "close call then navigate",
-    "payload_html": "0);location='http://example.com/';//",
-    "payload_context": "js_arg"
-  },
-  {
-    "id": "js-exec-jsarg-005-arg-seq-alert",
-    "description": "sequence operator",
-    "payload_html": "0,alert(1)",
-    "payload_context": "js_arg"
-  },
-  {
-    "id": "js-exec-jsarg-006-arg-iife",
-    "description": "IIFE in arg",
-    "payload_html": "(function(){alert(1)})()",
-    "payload_context": "js_arg"
-  },
-  {
-    "id": "js-exec-jsarg-007-arg-function",
-    "description": "Function ctor in arg",
-    "payload_html": "Function(\"alert(1)\")()",
-    "payload_context": "js_arg"
-  },
-  {
-    "id": "js-exec-jsarg-008-arg-eval",
-    "description": "eval in arg",
-    "payload_html": "eval(\"alert(1)\")",
-    "payload_context": "js_arg"
-  },
-  {
-    "id": "js-exec-jsarg-009-arg-promise",
-    "description": "promise chain",
-    "payload_html": "Promise.resolve().then(()=>alert(1))",
-    "payload_context": "js_arg"
-  },
-  {
-    "id": "js-exec-jsarg-010-arg-raf",
-    "description": "raf",
-    "payload_html": "requestAnimationFrame(()=>alert(1))",
-    "payload_context": "js_arg"
-  },
-  {
-    "id": "js-exec-jsstr-001-str-breakout-quote-alert",
-    "description": "break out of single quote",
-    "payload_html": "';alert(1);//",
-    "payload_context": "js_string"
-  },
-  {
-    "id": "js-exec-jsstr-002-str-breakout-quote-confirm",
-    "description": "break out of single quote confirm",
-    "payload_html": "';confirm(1);//",
-    "payload_context": "js_string"
-  },
-  {
-    "id": "js-exec-jsstr-003-str-breakout-quote-prompt",
-    "description": "break out of single quote prompt",
-    "payload_html": "';prompt(1);//",
-    "payload_context": "js_string"
-  },
-  {
-    "id": "js-exec-jsstr-004-str-breakout-script-tag",
-    "description": "close script tag then alert",
-    "payload_html": "</script><script>alert(1)</script>",
-    "payload_context": "js_string"
-  },
-  {
-    "id": "js-exec-jsstr-005-str-breakout-new-function",
-    "description": "Function ctor",
-    "payload_html": "';(new Function('alert(1)'))();//",
-    "payload_context": "js_string"
-  },
-  {
-    "id": "js-exec-jsstr-006-str-breakout-eval",
-    "description": "eval",
-    "payload_html": "';eval('alert(1)');//",
-    "payload_context": "js_string"
-  },
-  {
-    "id": "js-exec-jsdstr-001-dstr-breakout-alert",
-    "description": "break out of double quote",
-    "payload_html": "\";alert(1);//",
-    "payload_context": "js_string_double"
-  },
-  {
-    "id": "js-exec-jsdstr-002-dstr-breakout-confirm",
-    "description": "break out of double quote confirm",
-    "payload_html": "\";confirm(1);//",
-    "payload_context": "js_string_double"
-  },
-  {
-    "id": "js-exec-jsdstr-003-dstr-breakout-prompt",
-    "description": "break out of double quote prompt",
-    "payload_html": "\";prompt(1);//",
-    "payload_context": "js_string_double"
-  },
-  {
-    "id": "js-exec-jsdstr-004-dstr-breakout-script",
-    "description": "close script tag then alert",
-    "payload_html": "</script><script>alert(1)</script>",
-    "payload_context": "js_string_double"
-  },
-  {
-    "id": "js-exec-jsdstr-005-dstr-breakout-function",
-    "description": "Function ctor",
-    "payload_html": "\";(new Function(\"alert(1)\"))();//",
-    "payload_context": "js_string_double"
-  },
-  {
-    "id": "js-exec-onerror-001-attr-alert",
-    "description": "alert(1)",
-    "payload_html": "alert(1)",
-    "payload_context": "onerror_attr"
-  },
-  {
-    "id": "js-exec-onerror-002-attr-confirm",
-    "description": "confirm(1)",
-    "payload_html": "confirm(1)",
-    "payload_context": "onerror_attr"
-  },
-  {
-    "id": "js-exec-onerror-003-attr-prompt",
-    "description": "prompt(1)",
-    "payload_html": "prompt(1)",
-    "payload_context": "onerror_attr"
-  },
-  {
-    "id": "js-exec-onerror-004-attr-window-alert",
-    "description": "window.alert(1)",
-    "payload_html": "window.alert(1)",
-    "payload_context": "onerror_attr"
-  },
-  {
-    "id": "js-exec-onerror-005-attr-globalthis-alert",
-    "description": "globalThis.alert(1)",
-    "payload_html": "globalThis.alert(1)",
-    "payload_context": "onerror_attr"
-  },
-  {
-    "id": "js-exec-onerror-006-attr-comma",
-    "description": "(0,alert)(1)",
-    "payload_html": "(0,alert)(1)",
-    "payload_context": "onerror_attr"
-  },
-  {
-    "id": "js-exec-onerror-007-attr-bracket",
-    "description": "window[\"alert\"](1)",
-    "payload_html": "window[\"alert\"](1)",
-    "payload_context": "onerror_attr"
-  },
-  {
-    "id": "js-exec-onerror-008-attr-function",
-    "description": "Function(\"alert(1)\")()",
-    "payload_html": "Function(\"alert(1)\")()",
-    "payload_context": "onerror_attr"
-  },
-  {
-    "id": "js-exec-onerror-009-attr-eval",
-    "description": "eval(\"alert(1)\")",
-    "payload_html": "eval(\"alert(1)\")",
-    "payload_context": "onerror_attr"
-  },
-  {
-    "id": "js-exec-onerror-010-attr-location",
-    "description": "navigate",
-    "payload_html": "location=\"http://example.com/\"",
-    "payload_context": "onerror_attr"
-  }
-]
+    {
+      "id": "js-exec-html-001-img-onerror-alert",
+      "description": "IMG onerror alert",
+      "payload_html": "<img src=x onerror=\"alert(1)\">",
+      "payload_context": "html",
+      "expected_tags": [
+        "img"
+      ]
+    },
+    {
+      "id": "js-exec-html-002-img-onerror-confirm",
+      "description": "IMG onerror confirm",
+      "payload_html": "<img src=x onerror=\"confirm(1)\">",
+      "payload_context": "html",
+      "expected_tags": [
+        "img"
+      ]
+    },
+    {
+      "id": "js-exec-html-003-img-onerror-prompt",
+      "description": "IMG onerror prompt",
+      "payload_html": "<img src=x onerror=\"prompt(1)\">",
+      "payload_context": "html",
+      "expected_tags": [
+        "img"
+      ]
+    },
+    {
+      "id": "js-exec-html-004-img-onerror-window-alert",
+      "description": "IMG onerror window.alert",
+      "payload_html": "<img src=x onerror=\"window.alert(1)\">",
+      "payload_context": "html",
+      "expected_tags": [
+        "img"
+      ]
+    },
+    {
+      "id": "js-exec-html-005-img-onerror-this-alert",
+      "description": "IMG onerror this.ownerDocument.defaultView.alert",
+      "payload_html": "<img src=x onerror=\"this.ownerDocument.defaultView.alert(1)\">",
+      "payload_context": "html",
+      "expected_tags": [
+        "img"
+      ]
+    },
+    {
+      "id": "js-exec-html-006-div-onmouseover-alert",
+      "description": "DIV onmouseover alert",
+      "payload_html": "<div onmouseover=\"alert(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-007-div-onmouseenter-alert",
+      "description": "DIV onmouseenter alert",
+      "payload_html": "<div onmouseenter=\"alert(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-008-div-onclick-alert",
+      "description": "DIV onclick alert",
+      "payload_html": "<div onclick=\"alert(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-009-button-onclick-alert",
+      "description": "BUTTON onclick alert",
+      "payload_html": "<button onclick=\"alert(1)\">x</button>",
+      "payload_context": "html",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-html-010-button-onclick-confirm",
+      "description": "BUTTON onclick confirm",
+      "payload_html": "<button onclick=\"confirm(1)\">x</button>",
+      "payload_context": "html",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-html-011-a-onclick-alert",
+      "description": "A onclick alert",
+      "payload_html": "<a href=\"#\" onclick=\"alert(1)\">x</a>",
+      "payload_context": "html",
+      "expected_tags": [
+        "a"
+      ]
+    },
+    {
+      "id": "js-exec-html-012-a-onclick-location",
+      "description": "A onclick location navigation",
+      "payload_html": "<a href=\"#\" onclick=\"location='http://example.com/'\">x</a>",
+      "payload_context": "html",
+      "expected_tags": [
+        "a"
+      ]
+    },
+    {
+      "id": "js-exec-html-013-input-onfocus-alert",
+      "description": "INPUT onfocus alert",
+      "payload_html": "<input onfocus=\"alert(1)\" value=\"x\">",
+      "payload_context": "html",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-html-014-input-onfocusin-alert",
+      "description": "INPUT onfocusin alert",
+      "payload_html": "<input onfocusin=\"alert(1)\" value=\"x\">",
+      "payload_context": "html",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-html-015-textarea-onfocus-alert",
+      "description": "TEXTAREA onfocus alert",
+      "payload_html": "<textarea onfocus=\"alert(1)\">x</textarea>",
+      "payload_context": "html",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-html-016-details-ontoggle-alert",
+      "description": "DETAILS ontoggle alert",
+      "payload_html": "<details open ontoggle=\"alert(1)\"><summary>x</summary></details>",
+      "payload_context": "html",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-html-017-marquee-onstart-alert",
+      "description": "MARQUEE onstart alert",
+      "payload_html": "<marquee onstart=\"alert(1)\">x</marquee>",
+      "payload_context": "html",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-html-018-svg-onload-alert",
+      "description": "SVG onload alert",
+      "payload_html": "<svg xmlns=\"http://www.w3.org/2000/svg\" onload=\"alert(1)\"></svg>",
+      "payload_context": "html",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-html-019-svg-onload-confirm",
+      "description": "SVG onload confirm",
+      "payload_html": "<svg xmlns=\"http://www.w3.org/2000/svg\" onload=\"confirm(1)\"></svg>",
+      "payload_context": "html",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-html-020-iframe-srcdoc-script-alert",
+      "description": "IFRAME srcdoc script alert",
+      "payload_html": "<iframe srcdoc=\"<script>alert(1)</script>\"></iframe>",
+      "payload_context": "html",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-html-021-iframe-srcdoc-svg-onload",
+      "description": "IFRAME srcdoc SVG onload",
+      "payload_html": "<iframe srcdoc=\"<svg xmlns='http://www.w3.org/2000/svg' onload='alert(1)'></svg>\"></iframe>",
+      "payload_context": "html",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-html-022-video-onerror-alert",
+      "description": "VIDEO onerror alert",
+      "payload_html": "<video src=x onerror=\"alert(1)\"></video>",
+      "payload_context": "html",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-html-023-audio-onerror-alert",
+      "description": "AUDIO onerror alert",
+      "payload_html": "<audio src=x onerror=\"alert(1)\"></audio>",
+      "payload_context": "html",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-html-024-source-onerror-alert",
+      "description": "SOURCE onerror alert (in VIDEO)",
+      "payload_html": "<video><source src=x onerror=\"alert(1)\"></video>",
+      "payload_context": "html",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-html-025-form-onsubmit-alert",
+      "description": "FORM onsubmit alert",
+      "payload_html": "<form onsubmit=\"alert(1)\"><button type=submit>x</button></form>",
+      "payload_context": "html",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-html-027-div-onclick-02",
+      "description": "DIV onclick -> confirm(1)",
+      "payload_html": "<div onclick=\"confirm(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-028-div-onclick-03",
+      "description": "DIV onclick -> prompt(1)",
+      "payload_html": "<div onclick=\"prompt(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-029-div-onclick-04",
+      "description": "DIV onclick -> window.alert(1)",
+      "payload_html": "<div onclick=\"window.alert(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-030-div-onclick-05",
+      "description": "DIV onclick -> globalThis.alert(1)",
+      "payload_html": "<div onclick=\"globalThis.alert(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-031-div-onclick-06",
+      "description": "DIV onclick -> (0,alert)(1)",
+      "payload_html": "<div onclick=\"(0,alert)(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-033-div-onmouseover-08",
+      "description": "DIV onmouseover -> confirm(1)",
+      "payload_html": "<div onmouseover=\"confirm(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-034-div-onmouseover-09",
+      "description": "DIV onmouseover -> prompt(1)",
+      "payload_html": "<div onmouseover=\"prompt(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-035-div-onmouseover-10",
+      "description": "DIV onmouseover -> window.alert(1)",
+      "payload_html": "<div onmouseover=\"window.alert(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-036-div-onmouseover-11",
+      "description": "DIV onmouseover -> globalThis.alert(1)",
+      "payload_html": "<div onmouseover=\"globalThis.alert(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-037-div-onmouseover-12",
+      "description": "DIV onmouseover -> (0,alert)(1)",
+      "payload_html": "<div onmouseover=\"(0,alert)(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-039-div-onmouseenter-14",
+      "description": "DIV onmouseenter -> confirm(1)",
+      "payload_html": "<div onmouseenter=\"confirm(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-040-div-onmouseenter-15",
+      "description": "DIV onmouseenter -> prompt(1)",
+      "payload_html": "<div onmouseenter=\"prompt(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-041-div-onmouseenter-16",
+      "description": "DIV onmouseenter -> window.alert(1)",
+      "payload_html": "<div onmouseenter=\"window.alert(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-042-div-onmouseenter-17",
+      "description": "DIV onmouseenter -> globalThis.alert(1)",
+      "payload_html": "<div onmouseenter=\"globalThis.alert(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-043-div-onmouseenter-18",
+      "description": "DIV onmouseenter -> (0,alert)(1)",
+      "payload_html": "<div onmouseenter=\"(0,alert)(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-044-div-onfocus-19",
+      "description": "DIV onfocus -> alert(1)",
+      "payload_html": "<div onfocus=\"alert(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-045-div-onfocus-20",
+      "description": "DIV onfocus -> confirm(1)",
+      "payload_html": "<div onfocus=\"confirm(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-046-div-onfocus-21",
+      "description": "DIV onfocus -> prompt(1)",
+      "payload_html": "<div onfocus=\"prompt(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-047-div-onfocus-22",
+      "description": "DIV onfocus -> window.alert(1)",
+      "payload_html": "<div onfocus=\"window.alert(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-048-div-onfocus-23",
+      "description": "DIV onfocus -> globalThis.alert(1)",
+      "payload_html": "<div onfocus=\"globalThis.alert(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-049-div-onfocus-24",
+      "description": "DIV onfocus -> (0,alert)(1)",
+      "payload_html": "<div onfocus=\"(0,alert)(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-050-div-onfocusin-25",
+      "description": "DIV onfocusin -> alert(1)",
+      "payload_html": "<div onfocusin=\"alert(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-051-div-onfocusin-26",
+      "description": "DIV onfocusin -> confirm(1)",
+      "payload_html": "<div onfocusin=\"confirm(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-052-div-onfocusin-27",
+      "description": "DIV onfocusin -> prompt(1)",
+      "payload_html": "<div onfocusin=\"prompt(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-053-div-onfocusin-28",
+      "description": "DIV onfocusin -> window.alert(1)",
+      "payload_html": "<div onfocusin=\"window.alert(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-054-div-onfocusin-29",
+      "description": "DIV onfocusin -> globalThis.alert(1)",
+      "payload_html": "<div onfocusin=\"globalThis.alert(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-055-div-onfocusin-30",
+      "description": "DIV onfocusin -> (0,alert)(1)",
+      "payload_html": "<div onfocusin=\"(0,alert)(1)\">x</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div"
+      ]
+    },
+    {
+      "id": "js-exec-html-056-span-onclick-31",
+      "description": "SPAN onclick -> alert(1)",
+      "payload_html": "<span onclick=\"alert(1)\">x</span>",
+      "payload_context": "html",
+      "expected_tags": [
+        "span"
+      ]
+    },
+    {
+      "id": "js-exec-html-057-span-onclick-32",
+      "description": "SPAN onclick -> confirm(1)",
+      "payload_html": "<span onclick=\"confirm(1)\">x</span>",
+      "payload_context": "html",
+      "expected_tags": [
+        "span"
+      ]
+    },
+    {
+      "id": "js-exec-html-058-span-onclick-33",
+      "description": "SPAN onclick -> prompt(1)",
+      "payload_html": "<span onclick=\"prompt(1)\">x</span>",
+      "payload_context": "html",
+      "expected_tags": [
+        "span"
+      ]
+    },
+    {
+      "id": "js-exec-html-059-span-onclick-34",
+      "description": "SPAN onclick -> window.alert(1)",
+      "payload_html": "<span onclick=\"window.alert(1)\">x</span>",
+      "payload_context": "html",
+      "expected_tags": [
+        "span"
+      ]
+    },
+    {
+      "id": "js-exec-html-060-span-onclick-35",
+      "description": "SPAN onclick -> globalThis.alert(1)",
+      "payload_html": "<span onclick=\"globalThis.alert(1)\">x</span>",
+      "payload_context": "html",
+      "expected_tags": [
+        "span"
+      ]
+    },
+    {
+      "id": "js-exec-html-061-span-onclick-36",
+      "description": "SPAN onclick -> (0,alert)(1)",
+      "payload_html": "<span onclick=\"(0,alert)(1)\">x</span>",
+      "payload_context": "html",
+      "expected_tags": [
+        "span"
+      ]
+    },
+    {
+      "id": "js-exec-html-062-span-onmouseover-37",
+      "description": "SPAN onmouseover -> alert(1)",
+      "payload_html": "<span onmouseover=\"alert(1)\">x</span>",
+      "payload_context": "html",
+      "expected_tags": [
+        "span"
+      ]
+    },
+    {
+      "id": "js-exec-html-063-span-onmouseover-38",
+      "description": "SPAN onmouseover -> confirm(1)",
+      "payload_html": "<span onmouseover=\"confirm(1)\">x</span>",
+      "payload_context": "html",
+      "expected_tags": [
+        "span"
+      ]
+    },
+    {
+      "id": "js-exec-html-064-span-onmouseover-39",
+      "description": "SPAN onmouseover -> prompt(1)",
+      "payload_html": "<span onmouseover=\"prompt(1)\">x</span>",
+      "payload_context": "html",
+      "expected_tags": [
+        "span"
+      ]
+    },
+    {
+      "id": "js-exec-html-065-span-onmouseover-40",
+      "description": "SPAN onmouseover -> window.alert(1)",
+      "payload_html": "<span onmouseover=\"window.alert(1)\">x</span>",
+      "payload_context": "html",
+      "expected_tags": [
+        "span"
+      ]
+    },
+    {
+      "id": "js-exec-head-001-head-script-alert",
+      "description": "SCRIPT in head alert",
+      "payload_html": "<script>alert(1)</script>",
+      "payload_context": "html_head",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-head-002-head-script-confirm",
+      "description": "SCRIPT in head confirm",
+      "payload_html": "<script>confirm(1)</script>",
+      "payload_context": "html_head",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-head-003-head-script-prompt",
+      "description": "SCRIPT in head prompt",
+      "payload_html": "<script>prompt(1)</script>",
+      "payload_context": "html_head",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-head-004-head-meta-refresh-js",
+      "description": "META refresh javascript: URL",
+      "payload_html": "<meta http-equiv=\"refresh\" content=\"0;url=javascript:alert(1)\">",
+      "payload_context": "html_head",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-head-005-head-meta-refresh-http",
+      "description": "META refresh http navigation",
+      "payload_html": "<meta http-equiv=\"refresh\" content=\"0;url=http://example.com/\">",
+      "payload_context": "html_head",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-outer-001-outer-body-onload-alert",
+      "description": "BODY onload alert",
+      "payload_html": "<body onload=\"alert(1)\">",
+      "payload_context": "html_outer",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-outer-002-outer-frameset-onload-alert",
+      "description": "FRAMESET onload alert",
+      "payload_html": "<frameset onload=\"alert(1)\"></frameset>",
+      "payload_context": "html_outer",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-outer-003-outer-html-body-svg-onload",
+      "description": "HTML/BODY fragment with SVG onload",
+      "payload_html": "<html><body><svg xmlns=\"http://www.w3.org/2000/svg\" onload=\"alert(1)\"></svg></body></html>",
+      "payload_context": "html_outer",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-href-001-href-js-alert",
+      "description": "javascript:alert",
+      "payload_html": "javascript:alert(1)",
+      "payload_context": "href"
+    },
+    {
+      "id": "js-exec-href-002-href-js-confirm",
+      "description": "javascript:confirm",
+      "payload_html": "javascript:confirm(1)",
+      "payload_context": "href"
+    },
+    {
+      "id": "js-exec-href-003-href-js-prompt",
+      "description": "javascript:prompt",
+      "payload_html": "javascript:prompt(1)",
+      "payload_context": "href"
+    },
+    {
+      "id": "js-exec-href-004-href-js-location",
+      "description": "javascript:location=...",
+      "payload_html": "javascript:location='http://example.com/'",
+      "payload_context": "href"
+    },
+    {
+      "id": "js-exec-href-005-href-data-html-alert",
+      "description": "data:text/html with script",
+      "payload_html": "data:text/html,<script>alert(1)</script>",
+      "payload_context": "href"
+    },
+    {
+      "id": "js-exec-href-006-href-http-nav",
+      "description": "http navigation",
+      "payload_html": "http://example.com/",
+      "payload_context": "href"
+    },
+    {
+      "id": "js-exec-href-007-href-relative-nav",
+      "description": "relative navigation",
+      "payload_html": "/relative/path",
+      "payload_context": "href"
+    },
+    {
+      "id": "js-exec-js-001-js-alert",
+      "description": "alert(1)",
+      "payload_html": "alert(1)",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-002-js-window-alert",
+      "description": "window.alert(1)",
+      "payload_html": "window.alert(1)",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-003-js-self-alert",
+      "description": "self.alert(1)",
+      "payload_html": "self.alert(1)",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-004-js-top-alert",
+      "description": "top.alert(1)",
+      "payload_html": "top.alert(1)",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-005-js-globalthis-alert",
+      "description": "globalThis.alert(1)",
+      "payload_html": "globalThis.alert(1)",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-006-js-call",
+      "description": "alert.call(window,1)",
+      "payload_html": "alert.call(window,1)",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-007-js-apply",
+      "description": "alert.apply(window,[1])",
+      "payload_html": "alert.apply(window,[1])",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-008-js-comma",
+      "description": "(0,alert)(1)",
+      "payload_html": "(0,alert)(1)",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-009-js-bracket",
+      "description": "window['alert'](1)",
+      "payload_html": "window['alert'](1)",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-010-js-bracket2",
+      "description": "globalThis[\"alert\"](1)",
+      "payload_html": "globalThis[\"alert\"](1)",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-011-js-function-ctor",
+      "description": "Function(\"alert(1)\")()",
+      "payload_html": "Function(\"alert(1)\")()",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-012-js-function-ctor2",
+      "description": "new Function(\"alert(1)\")()",
+      "payload_html": "new Function(\"alert(1)\")()",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-013-js-eval",
+      "description": "eval(\"alert(1)\")",
+      "payload_html": "eval(\"alert(1)\")",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-014-js-settimeout-fn",
+      "description": "setTimeout(()=>alert(1),0)",
+      "payload_html": "setTimeout(()=>alert(1),0)",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-015-js-settimeout-str",
+      "description": "setTimeout(\"alert(1)\",0)",
+      "payload_html": "setTimeout(\"alert(1)\",0)",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-016-js-settimeout-args",
+      "description": "setTimeout(alert,0,1)",
+      "payload_html": "setTimeout(alert,0,1)",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-017-js-setinterval-once",
+      "description": "setInterval(()=>{alert(1);clearInterval(i)},0)",
+      "payload_html": "var i=setInterval(()=>{alert(1);clearInterval(i)},0)",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-018-js-promise",
+      "description": "Promise.resolve().then(()=>alert(1))",
+      "payload_html": "Promise.resolve().then(()=>alert(1))",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-019-js-queuemicrotask",
+      "description": "queueMicrotask(()=>alert(1))",
+      "payload_html": "queueMicrotask(()=>alert(1))",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-020-js-raf",
+      "description": "requestAnimationFrame(()=>alert(1))",
+      "payload_html": "requestAnimationFrame(()=>alert(1))",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-021-js-onerror-throw",
+      "description": "window.onerror=alert;throw 1",
+      "payload_html": "window.onerror=alert;throw 1",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-022-js-onunhandledrejection",
+      "description": "unhandledrejection -> alert",
+      "payload_html": "window.onunhandledrejection=(e)=>alert(1);Promise.reject(1)",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-023-js-eventlistener",
+      "description": "addEventListener+dispatchEvent",
+      "payload_html": "addEventListener(\"x\",()=>alert(1));dispatchEvent(new Event(\"x\"))",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-024-js-doc-write",
+      "description": "document.write script",
+      "payload_html": "document.write(\"<script>alert(1)</script>\")",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-025-js-location-assign",
+      "description": "location.assign",
+      "payload_html": "location.assign(\"http://example.com/\")",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-026-js-location-href",
+      "description": "location.href",
+      "payload_html": "location.href=\"http://example.com/\"",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-027-js-open",
+      "description": "window.open",
+      "payload_html": "window.open(\"http://example.com/\")",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-028-js-history-pushstate",
+      "description": "history.pushState",
+      "payload_html": "history.pushState({},\"\", \"#x\");alert(1)",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-029-js-console-error-alert",
+      "description": "console then alert",
+      "payload_html": "console.log(\"x\");alert(1)",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-030-js-request-redirect",
+      "description": "setTimeout location",
+      "payload_html": "setTimeout(()=>{location=\"http://example.com/\"},0)",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-js-031-js-iife-1",
+      "description": "IIFE alert variant 1",
+      "payload_html": "(function(){alert(1)})()",
+      "payload_context": "js"
+    },
+    {
+      "id": "js-exec-jsarg-001-arg-breakout-alert",
+      "description": "close call then alert",
+      "payload_html": "0);alert(1);//",
+      "payload_context": "js_arg"
+    },
+    {
+      "id": "js-exec-jsarg-002-arg-breakout-confirm",
+      "description": "close call then confirm",
+      "payload_html": "0);confirm(1);//",
+      "payload_context": "js_arg"
+    },
+    {
+      "id": "js-exec-jsarg-003-arg-breakout-prompt",
+      "description": "close call then prompt",
+      "payload_html": "0);prompt(1);//",
+      "payload_context": "js_arg"
+    },
+    {
+      "id": "js-exec-jsarg-004-arg-breakout-location",
+      "description": "close call then navigate",
+      "payload_html": "0);location='http://example.com/';//",
+      "payload_context": "js_arg"
+    },
+    {
+      "id": "js-exec-jsarg-005-arg-seq-alert",
+      "description": "sequence operator",
+      "payload_html": "0,alert(1)",
+      "payload_context": "js_arg"
+    },
+    {
+      "id": "js-exec-jsarg-006-arg-iife",
+      "description": "IIFE in arg",
+      "payload_html": "(function(){alert(1)})()",
+      "payload_context": "js_arg"
+    },
+    {
+      "id": "js-exec-jsarg-007-arg-function",
+      "description": "Function ctor in arg",
+      "payload_html": "Function(\"alert(1)\")()",
+      "payload_context": "js_arg"
+    },
+    {
+      "id": "js-exec-jsarg-008-arg-eval",
+      "description": "eval in arg",
+      "payload_html": "eval(\"alert(1)\")",
+      "payload_context": "js_arg"
+    },
+    {
+      "id": "js-exec-jsarg-009-arg-promise",
+      "description": "promise chain",
+      "payload_html": "Promise.resolve().then(()=>alert(1))",
+      "payload_context": "js_arg"
+    },
+    {
+      "id": "js-exec-jsarg-010-arg-raf",
+      "description": "raf",
+      "payload_html": "requestAnimationFrame(()=>alert(1))",
+      "payload_context": "js_arg"
+    },
+    {
+      "id": "js-exec-jsstr-001-str-breakout-quote-alert",
+      "description": "break out of single quote",
+      "payload_html": "';alert(1);//",
+      "payload_context": "js_string"
+    },
+    {
+      "id": "js-exec-jsstr-002-str-breakout-quote-confirm",
+      "description": "break out of single quote confirm",
+      "payload_html": "';confirm(1);//",
+      "payload_context": "js_string"
+    },
+    {
+      "id": "js-exec-jsstr-003-str-breakout-quote-prompt",
+      "description": "break out of single quote prompt",
+      "payload_html": "';prompt(1);//",
+      "payload_context": "js_string"
+    },
+    {
+      "id": "js-exec-jsstr-004-str-breakout-script-tag",
+      "description": "close script tag then alert",
+      "payload_html": "</script><script>alert(1)</script>",
+      "payload_context": "js_string"
+    },
+    {
+      "id": "js-exec-jsstr-005-str-breakout-new-function",
+      "description": "Function ctor",
+      "payload_html": "';(new Function('alert(1)'))();//",
+      "payload_context": "js_string"
+    },
+    {
+      "id": "js-exec-jsstr-006-str-breakout-eval",
+      "description": "eval",
+      "payload_html": "';eval('alert(1)');//",
+      "payload_context": "js_string"
+    },
+    {
+      "id": "js-exec-jsdstr-001-dstr-breakout-alert",
+      "description": "break out of double quote",
+      "payload_html": "\";alert(1);//",
+      "payload_context": "js_string_double"
+    },
+    {
+      "id": "js-exec-jsdstr-002-dstr-breakout-confirm",
+      "description": "break out of double quote confirm",
+      "payload_html": "\";confirm(1);//",
+      "payload_context": "js_string_double"
+    },
+    {
+      "id": "js-exec-jsdstr-003-dstr-breakout-prompt",
+      "description": "break out of double quote prompt",
+      "payload_html": "\";prompt(1);//",
+      "payload_context": "js_string_double"
+    },
+    {
+      "id": "js-exec-jsdstr-004-dstr-breakout-script",
+      "description": "close script tag then alert",
+      "payload_html": "</script><script>alert(1)</script>",
+      "payload_context": "js_string_double"
+    },
+    {
+      "id": "js-exec-jsdstr-005-dstr-breakout-function",
+      "description": "Function ctor",
+      "payload_html": "\";(new Function(\"alert(1)\"))();//",
+      "payload_context": "js_string_double"
+    },
+    {
+      "id": "js-exec-onerror-001-attr-alert",
+      "description": "alert(1)",
+      "payload_html": "alert(1)",
+      "payload_context": "onerror_attr",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-onerror-002-attr-confirm",
+      "description": "confirm(1)",
+      "payload_html": "confirm(1)",
+      "payload_context": "onerror_attr",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-onerror-003-attr-prompt",
+      "description": "prompt(1)",
+      "payload_html": "prompt(1)",
+      "payload_context": "onerror_attr",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-onerror-004-attr-window-alert",
+      "description": "window.alert(1)",
+      "payload_html": "window.alert(1)",
+      "payload_context": "onerror_attr",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-onerror-005-attr-globalthis-alert",
+      "description": "globalThis.alert(1)",
+      "payload_html": "globalThis.alert(1)",
+      "payload_context": "onerror_attr",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-onerror-006-attr-comma",
+      "description": "(0,alert)(1)",
+      "payload_html": "(0,alert)(1)",
+      "payload_context": "onerror_attr",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-onerror-007-attr-bracket",
+      "description": "window[\"alert\"](1)",
+      "payload_html": "window[\"alert\"](1)",
+      "payload_context": "onerror_attr",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-onerror-008-attr-function",
+      "description": "Function(\"alert(1)\")()",
+      "payload_html": "Function(\"alert(1)\")()",
+      "payload_context": "onerror_attr",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-onerror-009-attr-eval",
+      "description": "eval(\"alert(1)\")",
+      "payload_html": "eval(\"alert(1)\")",
+      "payload_context": "onerror_attr",
+      "expected_tags": []
+    },
+    {
+      "id": "js-exec-onerror-010-attr-location",
+      "description": "navigate",
+      "payload_html": "location=\"http://example.com/\"",
+      "payload_context": "onerror_attr",
+      "expected_tags": []
+    }
+  ]
 }

@@ -25,10 +25,9 @@ class Vector:
     payload_html: str
     payload_context: PayloadContext = "html"
     # Tags we expect to survive sanitization.
-    # - None: no preservation expectation (backwards-compatible for old vector packs)
     # - (): explicitly expect NO tags to remain after sanitization
     # - ("a", "p", ...): expect these tags to remain after sanitization
-    expected_tags: tuple[str, ...] | None = None
+    expected_tags: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -81,6 +80,16 @@ class _TagCollector:
             # Best-effort: if parsing fails, return what we saw.
             pass
         return self.tags
+
+
+def _expected_tags_allowed_for_context(payload_context: PayloadContext) -> bool:
+    # expected_tags is a notion for HTML-fragment sanitization.
+    # It is explicitly forbidden for href and all js* contexts.
+    if payload_context == "href":
+        return False
+    if payload_context.startswith("js"):
+        return False
+    return True
 
 
 def _missing_expected_tags(*, expected_tags: Iterable[str], sanitized_html: str) -> list[str]:
@@ -169,7 +178,6 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
                 raise ValueError(f"Vector missing keys {sorted(missing)}: {path}")
 
             raw_context = item.get("payload_context")
-            expected_tags_key_present = "expected_tags" in item
             raw_expected_tags = item.get("expected_tags")
             if raw_context is None:
                 contexts: list[str] = ["html"]
@@ -202,12 +210,16 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
 
                 payload_html = str(item["payload_html"])
 
-                expected_tags: tuple[str, ...] | None
-                if not expected_tags_key_present:
-                    expected_tags = None
-                elif raw_expected_tags is None:
-                    raise ValueError(f"expected_tags must be a list of strings (got null): {path}")
-                elif isinstance(raw_expected_tags, list):
+                expected_tags: tuple[str, ...] = ()
+                if _expected_tags_allowed_for_context(payload_context):
+                    if raw_expected_tags is None:
+                        raise ValueError(
+                            f"expected_tags is required for payload_context {payload_context!r}: {path}"
+                        )
+                    if not isinstance(raw_expected_tags, list):
+                        raise ValueError(
+                            f"expected_tags must be a list of strings (got {type(raw_expected_tags)!r}): {path}"
+                        )
                     if not all(isinstance(x, str) for x in raw_expected_tags):
                         raise ValueError(f"expected_tags must contain only strings: {path}")
                     normalized = [_normalize_expected_tag(x) for x in raw_expected_tags]
@@ -220,9 +232,10 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
                             deduped.append(t)
                     expected_tags = tuple(deduped)
                 else:
-                    raise ValueError(
-                        f"expected_tags must be a list of strings (got {type(raw_expected_tags)!r}): {path}"
-                    )
+                    if "expected_tags" in item:
+                        raise ValueError(
+                            f"expected_tags is not allowed for payload_context {payload_context!r}: {path}"
+                        )
 
                 vectors.append(
                     Vector(
@@ -255,25 +268,17 @@ def run_bench(
 ) -> BenchSummary:
     def _prepare_for_sanitizer(
         *, vector: Vector, sanitizer: Sanitizer
-    ) -> tuple[str, str, PayloadContext]:
-        # Our vector files include contexts like `href` where the payload is not
-        # an HTML fragment by itself (it's an attribute value). HTML sanitizers
-        # such as nh3/bleach generally expect to see the attribute in context.
-        #
-        # For these, we wrap the payload in minimal HTML before sanitizing, and
-        # then run the sanitized HTML in normal `html` context.
-        if vector.payload_context == "href":
-            sanitizer_input_html = f'<a href="{vector.payload_html}">x</a>'
-            return sanitizer_input_html, sanitizer.sanitize(sanitizer_input_html), "html"
-
+    ) -> tuple[str, str, PayloadContext, str]:
         if vector.payload_context == "onerror_attr":
             sanitizer_input_html = (
                 f'<img src="nonexistent://x" onerror="{vector.payload_html}">'
             )
-            return sanitizer_input_html, sanitizer.sanitize(sanitizer_input_html), "html"
+            sanitized_html = sanitizer.sanitize(sanitizer_input_html)
+            return sanitizer_input_html, sanitized_html, "html", sanitized_html
 
         sanitizer_input_html = vector.payload_html
-        return sanitizer_input_html, sanitizer.sanitize(sanitizer_input_html), vector.payload_context
+        sanitized_html = sanitizer.sanitize(sanitizer_input_html)
+        return sanitizer_input_html, sanitized_html, vector.payload_context, sanitized_html
     def _auto_timeout_ms(*, payload_html: str, sanitized_html: str) -> int:
         # Conservative-but-fast heuristics. Most vectors are synchronous; only a
         # handful need longer to execute.
@@ -324,6 +329,30 @@ def run_bench(
             with BrowserHarness(browser=browser, headless=True) as harness:
                 for sanitizer in sanitizers:
                     for vector in vectors:
+                        if vector.payload_context == "href" and (
+                            sanitizer.supported_contexts is None
+                            or "href" not in sanitizer.supported_contexts
+                        ):
+                            result = BenchCaseResult(
+                                sanitizer=sanitizer.name,
+                                browser=browser,
+                                vector_id=vector.id,
+                                payload_context=vector.payload_context,
+                                run_payload_context=vector.payload_context,
+                                outcome="skip",
+                                executed=False,
+                                details=(
+                                    f"Skipped: {sanitizer.name} does not declare href attribute cleaning support"
+                                ),
+                                sanitizer_input_html="",
+                                sanitized_html="",
+                                rendered_html="",
+                            )
+                            results.append(result)
+                            case_index += 1
+                            if progress is not None:
+                                progress(case_index, total_planned, result)
+                            continue
                         if (
                             sanitizer.supported_contexts is not None
                             and vector.payload_context not in sanitizer.supported_contexts
@@ -349,7 +378,7 @@ def run_bench(
                                 progress(case_index, total_planned, result)
                             continue
                         try:
-                            sanitizer_input_html, sanitized_html, payload_context_to_run = _prepare_for_sanitizer(
+                            sanitizer_input_html, sanitized_html, payload_context_to_run, sanitized_html_to_run = _prepare_for_sanitizer(
                                 vector=vector, sanitizer=sanitizer
                             )
                         except Exception as exc:
@@ -372,7 +401,7 @@ def run_bench(
                                 progress(case_index, total_planned, result)
                             continue
 
-                        if vector.expected_tags is not None:
+                        if _expected_tags_allowed_for_context(vector.payload_context):
                             if len(vector.expected_tags) == 0:
                                 unexpected = _unexpected_tags_when_none_expected(
                                     sanitized_html=sanitized_html
@@ -429,7 +458,7 @@ def run_bench(
 
                         try:
                             rendered_html = render_html_document(
-                                sanitized_html=sanitized_html,
+                                sanitized_html=sanitized_html_to_run,
                                 payload_context=payload_context_to_run,
                             )
                             per_case_timeout_ms = _timeout_for_case(
@@ -438,7 +467,7 @@ def run_bench(
                             )
                             vector_result = harness.run(
                                 payload_html=vector.payload_html,
-                                sanitized_html=sanitized_html,
+                                sanitized_html=sanitized_html_to_run,
                                 payload_context=payload_context_to_run,
                                 timeout_ms=per_case_timeout_ms,
                             )
@@ -510,6 +539,30 @@ def run_bench(
         for browser in browsers:
             for vector in vectors:
                 try:
+                    if vector.payload_context == "href" and (
+                        sanitizer.supported_contexts is None
+                        or "href" not in sanitizer.supported_contexts
+                    ):
+                        result = BenchCaseResult(
+                            sanitizer=sanitizer.name,
+                            browser=browser,
+                            vector_id=vector.id,
+                            payload_context=vector.payload_context,
+                            run_payload_context=vector.payload_context,
+                            outcome="skip",
+                            executed=False,
+                            details=(
+                                f"Skipped: {sanitizer.name} does not declare href attribute cleaning support"
+                            ),
+                            sanitizer_input_html="",
+                            sanitized_html="",
+                            rendered_html="",
+                        )
+                        results.append(result)
+                        case_index += 1
+                        if progress is not None:
+                            progress(case_index, total_planned, result)
+                        continue
                     if (
                         sanitizer.supported_contexts is not None
                         and vector.payload_context not in sanitizer.supported_contexts
@@ -534,7 +587,7 @@ def run_bench(
                         if progress is not None:
                             progress(case_index, total_planned, result)
                         continue
-                    sanitizer_input_html, sanitized_html, payload_context_to_run = _prepare_for_sanitizer(
+                    sanitizer_input_html, sanitized_html, payload_context_to_run, sanitized_html_to_run = _prepare_for_sanitizer(
                         vector=vector, sanitizer=sanitizer
                     )
                 except Exception as exc:
@@ -557,7 +610,7 @@ def run_bench(
                         progress(case_index, total_planned, result)
                     continue
 
-                if vector.expected_tags is not None:
+                if _expected_tags_allowed_for_context(vector.payload_context):
                     if len(vector.expected_tags) == 0:
                         unexpected = _unexpected_tags_when_none_expected(
                             sanitized_html=sanitized_html
@@ -614,7 +667,7 @@ def run_bench(
 
                 try:
                     rendered_html = render_html_document(
-                        sanitized_html=sanitized_html,
+                        sanitized_html=sanitized_html_to_run,
                         payload_context=payload_context_to_run,
                     )
                     per_case_timeout_ms = _timeout_for_case(
@@ -623,7 +676,7 @@ def run_bench(
                     )
                     vector_result = runner(
                         payload_html=vector.payload_html,
-                        sanitized_html=sanitized_html,
+                        sanitized_html=sanitized_html_to_run,
                         payload_context=payload_context_to_run,
                         browser=browser,
                         timeout_ms=per_case_timeout_ms,

@@ -69,6 +69,7 @@ def test_portswigger_refs_file_generation_works_with_local_repo(tmp_path: Path, 
                         "description": "d",
                         "payload_html": "<IMG SRC=x ONERROR=alert(1)>",
                         "payload_context": "html",
+                        "expected_tags": [],
                     }
                 ],
             }

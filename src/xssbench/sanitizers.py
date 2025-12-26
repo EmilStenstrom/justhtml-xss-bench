@@ -6,6 +6,68 @@ from typing import Callable
 from .harness import PayloadContext
 
 
+# Shared sanitization policy
+#
+# Goal: preserve common structure/semantics (including div/span and tables)
+# while stripping scripting primitives, event handlers, and unsafe URLs.
+DEFAULT_ALLOWED_TAGS: tuple[str, ...] = (
+    # Text / structure
+    "p",
+    "br",
+    "div",
+    "span",
+    "blockquote",
+    "pre",
+    "code",
+    "hr",
+    # Emphasis
+    "strong",
+    "em",
+    "b",
+    "i",
+    "u",
+    "s",
+    "sub",
+    "sup",
+    # Lists
+    "ul",
+    "ol",
+    "li",
+    # Headings
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    # Links & media
+    "a",
+    "img",
+    # Tables
+    "table",
+    "thead",
+    "tbody",
+    "tfoot",
+    "tr",
+    "th",
+    "td",
+)
+
+
+DEFAULT_ALLOWED_TAGS_SET: frozenset[str] = frozenset(DEFAULT_ALLOWED_TAGS)
+
+
+_GLOBAL_ATTRS: frozenset[str] = frozenset({"class", "id", "title", "lang", "dir"})
+
+_A_ATTRS: frozenset[str] = frozenset({"href", "title"})
+
+_IMG_ATTRS: frozenset[str] = frozenset({"src", "alt", "title", "width", "height", "loading"})
+
+_TABLE_CELL_ATTRS: frozenset[str] = frozenset({"colspan", "rowspan"})
+
+_URL_PROTOCOLS: tuple[str, ...] = ("http", "https", "mailto", "tel")
+
+
 @dataclass(frozen=True, slots=True)
 class Sanitizer:
     name: str
@@ -29,74 +91,24 @@ def _maybe_bleach() -> Sanitizer | None:
     except Exception:
         return None
 
-    # A "rich" allowlist that aims to keep useful markup while blocking XSS.
-    # Intentionally does NOT allow inline CSS (style=...) by default.
+    # Shared allowlist policy (see module constants).
     from bleach.sanitizer import Cleaner  # type: ignore
 
-    allowed_tags: list[str] = [
-        # Text / structure
-        "p",
-        "br",
-        "div",
-        "span",
-        "blockquote",
-        "pre",
-        "code",
-        "hr",
-        # Emphasis
-        "b",
-        "strong",
-        "i",
-        "em",
-        "u",
-        "s",
-        "sub",
-        "sup",
-        # Lists
-        "ul",
-        "ol",
-        "li",
-        # Headings
-        "h1",
-        "h2",
-        "h3",
-        "h4",
-        "h5",
-        "h6",
-        # Links & media
-        "a",
-        "img",
-        # Tables
-        "table",
-        "thead",
-        "tbody",
-        "tfoot",
-        "tr",
-        "th",
-        "td",
-    ]
-
     def _bleach_attr_filter(tag: str, name: str, value: str) -> bool:
-        # Global attributes
-        if name in {"class", "id", "title", "lang", "dir"}:
+        if name in _GLOBAL_ATTRS:
             return True
-        if name.startswith("data-") or name.startswith("aria-"):
+        if tag == "a" and name in _A_ATTRS:
             return True
-
-        # Tag-specific
-        if tag == "a" and name in {"href", "rel", "target", "name"}:
+        if tag == "img" and name in _IMG_ATTRS:
             return True
-        if tag == "img" and name in {"src", "alt", "title", "width", "height", "loading"}:
+        if tag in {"th", "td"} and name in _TABLE_CELL_ATTRS:
             return True
-        if tag in {"th", "td"} and name in {"colspan", "rowspan"}:
-            return True
-
         return False
 
     cleaner = Cleaner(
-        tags=allowed_tags,
+        tags=list(DEFAULT_ALLOWED_TAGS),
         attributes=_bleach_attr_filter,
-        protocols=["http", "https", "mailto", "tel"],
+        protocols=list(_URL_PROTOCOLS),
         strip=True,
         strip_comments=True,
     )
@@ -106,10 +118,10 @@ def _maybe_bleach() -> Sanitizer | None:
 
     return Sanitizer(
         name="bleach",
-        description="bleach Cleaner rich allowlist (keep common markup; strip dangerous)",
+        description="bleach Cleaner shared allowlist (keep common markup; strip dangerous)",
         sanitize=_sanitize,
         # bleach is an HTML sanitizer; JS-string/JS-code and event-handler JS are out of scope.
-        supported_contexts={"html", "html_head", "html_outer", "href"},
+        supported_contexts={"html", "html_head", "html_outer"},
     )
 
 
@@ -126,7 +138,7 @@ def _maybe_bleach_default() -> Sanitizer | None:
         name="bleach_default",
         description="bleach.clean(html) with default settings (often very strict)",
         sanitize=_sanitize,
-        supported_contexts={"html", "html_head", "html_outer", "href"},
+        supported_contexts={"html", "html_head", "html_outer"},
     )
 
 
@@ -136,53 +148,18 @@ def _maybe_nh3() -> Sanitizer | None:
     except Exception:
         return None
 
-    allowed_tags: set[str] = {
-        "p",
-        "br",
-        "div",
-        "span",
-        "blockquote",
-        "pre",
-        "code",
-        "hr",
-        "b",
-        "strong",
-        "i",
-        "em",
-        "u",
-        "s",
-        "sub",
-        "sup",
-        "ul",
-        "ol",
-        "li",
-        "h1",
-        "h2",
-        "h3",
-        "h4",
-        "h5",
-        "h6",
-        "a",
-        "img",
-        "table",
-        "thead",
-        "tbody",
-        "tfoot",
-        "tr",
-        "th",
-        "td",
-    }
+    allowed_tags: set[str] = set(DEFAULT_ALLOWED_TAGS)
 
     # nh3 uses allowlisted attributes by tag, plus a global "*" entry.
     allowed_attributes: dict[str, set[str]] = {
-        "*": {"class", "id", "title", "lang", "dir"},
+        "*": set(_GLOBAL_ATTRS),
         # NOTE: do not allow `rel` here.
         # nh3 (ammonia) manages link rel via the separate `link_rel=` setting and
         # will panic if `rel` is configured as an allowed attribute.
-        "a": {"href", "target", "name"},
-        "img": {"src", "alt", "title", "width", "height", "loading"},
-        "th": {"colspan", "rowspan"},
-        "td": {"colspan", "rowspan"},
+        "a": set(_A_ATTRS),
+        "img": set(_IMG_ATTRS),
+        "th": set(_TABLE_CELL_ATTRS),
+        "td": set(_TABLE_CELL_ATTRS),
     }
 
     def _sanitize(html: str) -> str:
@@ -191,15 +168,15 @@ def _maybe_nh3() -> Sanitizer | None:
             html,
             tags=allowed_tags,
             attributes=allowed_attributes,
-            url_schemes={"http", "https", "mailto", "tel"},
+            url_schemes=set(_URL_PROTOCOLS),
         )
 
     return Sanitizer(
         name="nh3",
-        description="nh3 rich allowlist (keep common markup; strip dangerous)",
+        description="nh3 shared allowlist (keep common markup; strip dangerous)",
         sanitize=_sanitize,
         # nh3 is an HTML sanitizer; JS-string/JS-code and event-handler JS are out of scope.
-        supported_contexts={"html", "html_head", "html_outer", "href"},
+        supported_contexts={"html", "html_head", "html_outer"},
     )
 
 
@@ -216,7 +193,7 @@ def _maybe_nh3_default() -> Sanitizer | None:
         name="nh3_default",
         description="nh3.clean(html) with default settings (often very strict)",
         sanitize=_sanitize,
-        supported_contexts={"html", "html_head", "html_outer", "href"},
+        supported_contexts={"html", "html_head", "html_outer"},
     )
 
 
@@ -226,77 +203,15 @@ def _maybe_lxml_html_clean() -> Sanitizer | None:
     except Exception:
         return None
 
-    # Configure lxml-html-clean to approximate our "rich allowlist" policy used
-    # for bleach/nh3: preserve common markup, but strip scripts/events/styles,
-    # and avoid rewriting HTML fragments into full documents.
-    allowed_tags: set[str] = {
-        # Text / structure
-        "p",
-        "br",
-        "div",
-        "span",
-        "blockquote",
-        "pre",
-        "code",
-        "hr",
-        # Emphasis
-        "b",
-        "strong",
-        "i",
-        "em",
-        "u",
-        "s",
-        "sub",
-        "sup",
-        # Lists
-        "ul",
-        "ol",
-        "li",
-        # Headings
-        "h1",
-        "h2",
-        "h3",
-        "h4",
-        "h5",
-        "h6",
-        # Links & media
-        "a",
-        "img",
-        # Tables
-        "table",
-        "thead",
-        "tbody",
-        "tfoot",
-        "tr",
-        "th",
-        "td",
-    }
+    # Configure lxml-html-clean to match the shared allowlist policy.
+    allowed_tags: set[str] = set(DEFAULT_ALLOWED_TAGS)
 
-    # lxml-html-clean's attribute allowlist is global (not per-tag). Keep it
-    # conservative and aligned with our other rich sanitizers.
+    # lxml-html-clean's attribute allowlist is global (not per-tag).
     safe_attrs: frozenset[str] = frozenset(
-        {
-            # Global
-            "class",
-            "id",
-            "title",
-            "lang",
-            "dir",
-            # Links
-            "href",
-            "rel",
-            "target",
-            "name",
-            # Images
-            "src",
-            "alt",
-            "width",
-            "height",
-            "loading",
-            # Table cells
-            "colspan",
-            "rowspan",
-        }
+        set(_GLOBAL_ATTRS)
+        | set(_A_ATTRS)
+        | set(_IMG_ATTRS)
+        | set(_TABLE_CELL_ATTRS)
     )
 
     cleaner = Cleaner(
@@ -320,7 +235,14 @@ def _maybe_lxml_html_clean() -> Sanitizer | None:
     )
 
     def _sanitize(html: str) -> str:
-        cleaned = cleaner.clean_html(html)
+        if not html.strip():
+            return ""
+        try:
+            cleaned = cleaner.clean_html(html)
+        except Exception:
+            # lxml-html-clean may raise ParserError on some malformed/empty inputs.
+            # Treat as fully stripped output rather than a sanitizer error.
+            return ""
         if isinstance(cleaned, str):
             return cleaned
 
@@ -328,15 +250,17 @@ def _maybe_lxml_html_clean() -> Sanitizer | None:
         try:
             from lxml import etree  # type: ignore
 
-            return etree.tostring(cleaned, encoding="unicode", method="html")
+            serialized = etree.tostring(cleaned, encoding="unicode", method="html")
         except Exception:
-            return str(cleaned)
+            serialized = str(cleaned)
+
+        return serialized
 
     return Sanitizer(
         name="lxml_html_clean",
-        description="lxml-html-clean Cleaner rich allowlist (configured to match bleach/nh3 style)",
+        description="lxml-html-clean Cleaner shared allowlist (configured to match bleach/nh3 style)",
         sanitize=_sanitize,
-        supported_contexts={"html", "html_head", "html_outer", "href"},
+        supported_contexts={"html", "html_head", "html_outer"},
     )
 
 
@@ -351,7 +275,16 @@ def available_sanitizers() -> dict[str, Sanitizer]:
             name="noop",
             description="Baseline: returns HTML unchanged",
             sanitize=noop,
-            supported_contexts=None,
+            supported_contexts={
+                "html",
+                "html_head",
+                "html_outer",
+                "js",
+                "js_arg",
+                "js_string",
+                "js_string_double",
+                "onerror_attr",
+            },
         ),
     }
 
@@ -371,8 +304,8 @@ def available_sanitizers() -> dict[str, Sanitizer]:
 def default_sanitizers() -> dict[str, Sanitizer]:
     """Return the default sanitizer set for `xssbench`.
 
-    The goal is to represent "rich" HTML sanitization (preserve useful markup)
-    rather than "escape everything" baselines.
+    The goal is to represent a "semantic" HTML sanitization policy (preserve meaningful
+    markup for content), rather than "escape everything" baselines.
     """
 
     all_sanitizers = available_sanitizers()

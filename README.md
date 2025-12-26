@@ -75,6 +75,9 @@ Each vector object has (at minimum):
 	If any of these tags are missing from the sanitized output, the benchmark marks the case as `lossy`.
 	If the list is empty (`[]`), the benchmark expects the sanitized output to contain no tags at all.
 
+	`expected_tags` is required for HTML-fragment contexts (`html`, `html_head`, `html_outer`, `onerror_attr`).
+	It is forbidden for `href` and all `js*` contexts.
+
 `payload_context` is an enum:
 
 - `html`: embed into the initial HTML body (default)
