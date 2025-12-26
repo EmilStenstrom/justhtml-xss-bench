@@ -233,7 +233,15 @@ def test_load_vectors_forbids_expected_tags_for_href_context() -> None:
 
     payload = {
         "schema": "xssbench.vectorfile.v1",
-        "meta": {"tool": "xssbench", "source_url": "https://example.invalid/", "license": {"spdx": "MIT", "url": "https://spdx.org/licenses/MIT.html", "file": "vectors/example-LICENSE.txt"}},
+        "meta": {
+            "tool": "xssbench",
+            "source_url": "https://example.invalid/",
+            "license": {
+                "spdx": "MIT",
+                "url": "https://spdx.org/licenses/MIT.html",
+                "file": "vectors/example-LICENSE.txt",
+            },
+        },
         "vectors": [
             {
                 "id": "v1",
@@ -260,7 +268,15 @@ def test_load_vectors_forbids_expected_tags_for_js_context() -> None:
 
     payload = {
         "schema": "xssbench.vectorfile.v1",
-        "meta": {"tool": "xssbench", "source_url": "https://example.invalid/", "license": {"spdx": "MIT", "url": "https://spdx.org/licenses/MIT.html", "file": "vectors/example-LICENSE.txt"}},
+        "meta": {
+            "tool": "xssbench",
+            "source_url": "https://example.invalid/",
+            "license": {
+                "spdx": "MIT",
+                "url": "https://spdx.org/licenses/MIT.html",
+                "file": "vectors/example-LICENSE.txt",
+            },
+        },
         "vectors": [
             {
                 "id": "v1",
@@ -340,7 +356,14 @@ def test_run_bench_does_not_wrap_js_payload_before_sanitizing() -> None:
 
     sanitizer = Sanitizer(name="s", description="", sanitize=sanitize)
 
-    def fake_runner(*, payload_html: str, sanitized_html: str, payload_context: str, timeout_ms: int, **_kwargs):
+    def fake_runner(
+        *,
+        payload_html: str,
+        sanitized_html: str,
+        payload_context: str,
+        timeout_ms: int,
+        **_kwargs,
+    ):
         seen_payload_contexts.append(payload_context)
         return type("VR", (), {"executed": False, "details": "no"})()
 
@@ -374,7 +397,11 @@ def test_run_bench_skips_unsupported_contexts() -> None:
         supported_contexts={"html", "href", "html_head", "html_outer", "onerror_attr"},
     )
 
-    summary = run_bench(vectors=vectors, sanitizers=[sanitizer], runner=lambda **_: type("VR", (), {"executed": False, "details": "no"})())
+    summary = run_bench(
+        vectors=vectors,
+        sanitizers=[sanitizer],
+        runner=lambda **_: type("VR", (), {"executed": False, "details": "no"})(),
+    )
 
     assert summary.total_cases == 2
     assert summary.total_lossy == 0
@@ -406,7 +433,14 @@ def test_run_bench_wraps_onerror_attr_payload_before_sanitizing() -> None:
 
     sanitizer = Sanitizer(name="s", description="", sanitize=sanitize)
 
-    def fake_runner(*, payload_html: str, sanitized_html: str, payload_context: str, timeout_ms: int, **_kwargs):
+    def fake_runner(
+        *,
+        payload_html: str,
+        sanitized_html: str,
+        payload_context: str,
+        timeout_ms: int,
+        **_kwargs,
+    ):
         seen_payload_contexts.append(payload_context)
         return type("VR", (), {"executed": False, "details": "no"})()
 

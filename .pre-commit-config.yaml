@@ -1,0 +1,23 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-json
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.10
+    hooks:
+      - id: ruff
+        args: ["--select=E9,F63,F7,F82"]
+      - id: ruff-format
+
+  - repo: https://github.com/biomejs/pre-commit
+    rev: v2.3.10
+    hooks:
+      - id: biome-check
+        files: "\\.(jsonc?|jsx?|tsx?)$"
+        exclude: "^vectors/payloadbox-xss-payload-list\\.json$"

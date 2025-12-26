@@ -53,12 +53,7 @@ def _parse_html_tag(s: str, start: int) -> tuple[str, int] | None:
     def _is_attr_name_char(c: str) -> bool:
         # Mirrors the previous regex: [A-Za-z0-9_:\-]
         o = ord(c)
-        return (
-            (48 <= o <= 57)
-            or (65 <= o <= 90)
-            or (97 <= o <= 122)
-            or c in ("_", ":", "-")
-        )
+        return (48 <= o <= 57) or (65 <= o <= 90) or (97 <= o <= 122) or c in ("_", ":", "-")
 
     i = start + 1
     if i >= len(s):

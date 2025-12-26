@@ -158,9 +158,7 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
 
         schema = data.get("schema")
         if schema != "xssbench.vectorfile.v1":
-            raise ValueError(
-                f"Vector file schema must be 'xssbench.vectorfile.v1' (got {schema!r}): {path}"
-            )
+            raise ValueError(f"Vector file schema must be 'xssbench.vectorfile.v1' (got {schema!r}): {path}")
 
         if "vectors" not in data:
             raise ValueError(f"Vector file object must contain a 'vectors' key: {path}")
@@ -198,8 +196,7 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
                 payload_context = str(payload_context)
                 if payload_context not in allowed_contexts:
                     raise ValueError(
-                        f"Invalid payload_context {payload_context!r} in {path}. "
-                        f"Allowed: {sorted(allowed_contexts)}"
+                        f"Invalid payload_context {payload_context!r} in {path}. Allowed: {sorted(allowed_contexts)}"
                     )
 
                 vector_id = str(item["id"])
@@ -213,9 +210,7 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
                 expected_tags: tuple[str, ...] = ()
                 if _expected_tags_allowed_for_context(payload_context):
                     if raw_expected_tags is None:
-                        raise ValueError(
-                            f"expected_tags is required for payload_context {payload_context!r}: {path}"
-                        )
+                        raise ValueError(f"expected_tags is required for payload_context {payload_context!r}: {path}")
                     if not isinstance(raw_expected_tags, list):
                         raise ValueError(
                             f"expected_tags must be a list of strings (got {type(raw_expected_tags)!r}): {path}"
@@ -266,19 +261,21 @@ def run_bench(
     progress: Progress | None = None,
     fail_fast: bool = False,
 ) -> BenchSummary:
-    def _prepare_for_sanitizer(
-        *, vector: Vector, sanitizer: Sanitizer
-    ) -> tuple[str, str, PayloadContext, str]:
+    def _prepare_for_sanitizer(*, vector: Vector, sanitizer: Sanitizer) -> tuple[str, str, PayloadContext, str]:
         if vector.payload_context == "onerror_attr":
-            sanitizer_input_html = (
-                f'<img src="nonexistent://x" onerror="{vector.payload_html}">'
-            )
+            sanitizer_input_html = f'<img src="nonexistent://x" onerror="{vector.payload_html}">'
             sanitized_html = sanitizer.sanitize(sanitizer_input_html)
             return sanitizer_input_html, sanitized_html, "html", sanitized_html
 
         sanitizer_input_html = vector.payload_html
         sanitized_html = sanitizer.sanitize(sanitizer_input_html)
-        return sanitizer_input_html, sanitized_html, vector.payload_context, sanitized_html
+        return (
+            sanitizer_input_html,
+            sanitized_html,
+            vector.payload_context,
+            sanitized_html,
+        )
+
     def _auto_timeout_ms(*, payload_html: str, sanitized_html: str) -> int:
         # Conservative-but-fast heuristics. Most vectors are synchronous; only a
         # handful need longer to execute.
@@ -311,8 +308,10 @@ def run_bench(
         return 0
 
     def _timeout_for_case(*, payload_html: str, sanitized_html: str) -> int:
-        return timeout_ms if timeout_ms is not None else _auto_timeout_ms(
-            payload_html=payload_html, sanitized_html=sanitized_html
+        return (
+            timeout_ms
+            if timeout_ms is not None
+            else _auto_timeout_ms(payload_html=payload_html, sanitized_html=sanitized_html)
         )
 
     results: list[BenchCaseResult] = []
@@ -330,8 +329,7 @@ def run_bench(
                 for sanitizer in sanitizers:
                     for vector in vectors:
                         if vector.payload_context == "href" and (
-                            sanitizer.supported_contexts is None
-                            or "href" not in sanitizer.supported_contexts
+                            sanitizer.supported_contexts is None or "href" not in sanitizer.supported_contexts
                         ):
                             result = BenchCaseResult(
                                 sanitizer=sanitizer.name,
@@ -378,9 +376,12 @@ def run_bench(
                                 progress(case_index, total_planned, result)
                             continue
                         try:
-                            sanitizer_input_html, sanitized_html, payload_context_to_run, sanitized_html_to_run = _prepare_for_sanitizer(
-                                vector=vector, sanitizer=sanitizer
-                            )
+                            (
+                                sanitizer_input_html,
+                                sanitized_html,
+                                payload_context_to_run,
+                                sanitized_html_to_run,
+                            ) = _prepare_for_sanitizer(vector=vector, sanitizer=sanitizer)
                         except Exception as exc:
                             result = BenchCaseResult(
                                 sanitizer=sanitizer.name,
@@ -403,9 +404,7 @@ def run_bench(
 
                         if _expected_tags_allowed_for_context(vector.payload_context):
                             if len(vector.expected_tags) == 0:
-                                unexpected = _unexpected_tags_when_none_expected(
-                                    sanitized_html=sanitized_html
-                                )
+                                unexpected = _unexpected_tags_when_none_expected(sanitized_html=sanitized_html)
                                 if unexpected:
                                     result = BenchCaseResult(
                                         sanitizer=sanitizer.name,
@@ -443,8 +442,7 @@ def run_bench(
                                         outcome="lossy",
                                         executed=False,
                                         details=(
-                                            "Missing expected tags after sanitization: "
-                                            + ", ".join(missing_tags)
+                                            "Missing expected tags after sanitization: " + ", ".join(missing_tags)
                                         ),
                                         sanitizer_input_html=sanitizer_input_html,
                                         sanitized_html=sanitized_html,
@@ -540,8 +538,7 @@ def run_bench(
             for vector in vectors:
                 try:
                     if vector.payload_context == "href" and (
-                        sanitizer.supported_contexts is None
-                        or "href" not in sanitizer.supported_contexts
+                        sanitizer.supported_contexts is None or "href" not in sanitizer.supported_contexts
                     ):
                         result = BenchCaseResult(
                             sanitizer=sanitizer.name,
@@ -551,9 +548,7 @@ def run_bench(
                             run_payload_context=vector.payload_context,
                             outcome="skip",
                             executed=False,
-                            details=(
-                                f"Skipped: {sanitizer.name} does not declare href attribute cleaning support"
-                            ),
+                            details=(f"Skipped: {sanitizer.name} does not declare href attribute cleaning support"),
                             sanitizer_input_html="",
                             sanitized_html="",
                             rendered_html="",
@@ -575,9 +570,7 @@ def run_bench(
                             run_payload_context=vector.payload_context,
                             outcome="skip",
                             executed=False,
-                            details=(
-                                f"Skipped: {sanitizer.name} does not support context {vector.payload_context}"
-                            ),
+                            details=(f"Skipped: {sanitizer.name} does not support context {vector.payload_context}"),
                             sanitizer_input_html="",
                             sanitized_html="",
                             rendered_html="",
@@ -587,9 +580,12 @@ def run_bench(
                         if progress is not None:
                             progress(case_index, total_planned, result)
                         continue
-                    sanitizer_input_html, sanitized_html, payload_context_to_run, sanitized_html_to_run = _prepare_for_sanitizer(
-                        vector=vector, sanitizer=sanitizer
-                    )
+                    (
+                        sanitizer_input_html,
+                        sanitized_html,
+                        payload_context_to_run,
+                        sanitized_html_to_run,
+                    ) = _prepare_for_sanitizer(vector=vector, sanitizer=sanitizer)
                 except Exception as exc:
                     result = BenchCaseResult(
                         sanitizer=sanitizer.name,
@@ -612,9 +608,7 @@ def run_bench(
 
                 if _expected_tags_allowed_for_context(vector.payload_context):
                     if len(vector.expected_tags) == 0:
-                        unexpected = _unexpected_tags_when_none_expected(
-                            sanitized_html=sanitized_html
-                        )
+                        unexpected = _unexpected_tags_when_none_expected(sanitized_html=sanitized_html)
                         if unexpected:
                             result = BenchCaseResult(
                                 sanitizer=sanitizer.name,
@@ -625,8 +619,7 @@ def run_bench(
                                 outcome="lossy",
                                 executed=False,
                                 details=(
-                                    "Expected no tags after sanitization, but found: "
-                                    + ", ".join(unexpected[:20])
+                                    "Expected no tags after sanitization, but found: " + ", ".join(unexpected[:20])
                                 ),
                                 sanitizer_input_html=sanitizer_input_html,
                                 sanitized_html=sanitized_html,
@@ -651,10 +644,7 @@ def run_bench(
                                 run_payload_context=payload_context_to_run,
                                 outcome="lossy",
                                 executed=False,
-                                details=(
-                                    "Missing expected tags after sanitization: "
-                                    + ", ".join(missing_tags)
-                                ),
+                                details=("Missing expected tags after sanitization: " + ", ".join(missing_tags)),
                                 sanitizer_input_html=sanitizer_input_html,
                                 sanitized_html=sanitized_html,
                                 rendered_html="",

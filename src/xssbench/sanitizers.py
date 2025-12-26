@@ -208,10 +208,7 @@ def _maybe_lxml_html_clean() -> Sanitizer | None:
 
     # lxml-html-clean's attribute allowlist is global (not per-tag).
     safe_attrs: frozenset[str] = frozenset(
-        set(_GLOBAL_ATTRS)
-        | set(_A_ATTRS)
-        | set(_IMG_ATTRS)
-        | set(_TABLE_CELL_ATTRS)
+        set(_GLOBAL_ATTRS) | set(_A_ATTRS) | set(_IMG_ATTRS) | set(_TABLE_CELL_ATTRS)
     )
 
     cleaner = Cleaner(

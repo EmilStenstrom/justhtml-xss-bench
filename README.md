@@ -11,6 +11,23 @@ python -m playwright install chromium
 pytest
 ```
 
+## Linting / formatting (pre-commit)
+
+This repo is set up with `pre-commit` hooks for:
+
+- Python: Ruff (minimal lint + formatting)
+- JavaScript + JSON: Biome
+
+Setup:
+
+```bash
+python -m pip install -e ".[dev,test]"
+pre-commit install
+pre-commit run --all-files
+```
+
+Note: the Biome hook requires a working Node.js installation.
+
 ## Running the benchmark
 
 This repo also ships a small CLI that runs **many vectors** across **many sanitizers** and reports which combinations executed JavaScript in a real browser.
@@ -96,4 +113,3 @@ Each vector object has (at minimum):
 - Embeds sanitized HTML into a real browser page before load ("server-side" style).
 - Treats any attempted external script fetch (e.g. `<script src="https://…">`) as XSS executed.
 - Fails a test if the marker was hit.
-

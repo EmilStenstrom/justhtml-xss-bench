@@ -28,7 +28,9 @@ def _worker_init(vector_paths: list[str]) -> None:
     _WORKER_VECTORS = None
 
 
-def _worker_run(task: tuple[int, int, str, str, int | None, bool]) -> list[BenchCaseResult]:
+def _worker_run(
+    task: tuple[int, int, str, str, int | None, bool],
+) -> list[BenchCaseResult]:
     # task = (start, end, sanitizer_names_json, browsers_json, timeout_ms, fail_fast)
     global _WORKER_VECTORS
     start, end, sanitizer_names_json, browsers_json, timeout_ms, fail_fast = task
@@ -75,13 +77,19 @@ def _queue_worker_main(
     def _prepare_for_sanitizer(*, vector, sanitizer):
         if vector.payload_context == "href":
             sanitizer_input_html = f'<a href="{vector.payload_html}">x</a>'
-            return sanitizer_input_html, sanitizer.sanitize(sanitizer_input_html), "html"
+            return (
+                sanitizer_input_html,
+                sanitizer.sanitize(sanitizer_input_html),
+                "html",
+            )
 
         if vector.payload_context == "onerror_attr":
-            sanitizer_input_html = (
-                f'<img src="nonexistent://x" onerror="{vector.payload_html}">'
+            sanitizer_input_html = f'<img src="nonexistent://x" onerror="{vector.payload_html}">'
+            return (
+                sanitizer_input_html,
+                sanitizer.sanitize(sanitizer_input_html),
+                "html",
             )
-            return sanitizer_input_html, sanitizer.sanitize(sanitizer_input_html), "html"
 
         sanitizer_input_html = vector.payload_html
         return (
@@ -116,8 +124,10 @@ def _queue_worker_main(
         return 0
 
     def _timeout_for_case(*, payload_html: str, sanitized_html: str) -> int:
-        return int(timeout_ms) if timeout_ms is not None else _auto_timeout_ms(
-            payload_html=payload_html, sanitized_html=sanitized_html
+        return (
+            int(timeout_ms)
+            if timeout_ms is not None
+            else _auto_timeout_ms(payload_html=payload_html, sanitized_html=sanitized_html)
         )
 
     async def _async_main() -> None:
@@ -134,10 +144,7 @@ def _queue_worker_main(
         try:
             async with AsyncExitStack() as stack:
                 harnesses = {
-                    b: await stack.enter_async_context(
-                        AsyncBrowserHarness(browser=b, headless=True)
-                    )
-                    for b in browsers
+                    b: await stack.enter_async_context(AsyncBrowserHarness(browser=b, headless=True)) for b in browsers
                 }
 
                 while True:
@@ -198,9 +205,11 @@ def _queue_worker_main(
                                     continue
 
                                 try:
-                                    sanitizer_input_html, sanitized_html, payload_context_to_run = _prepare_for_sanitizer(
-                                        vector=vector, sanitizer=sanitizer
-                                    )
+                                    (
+                                        sanitizer_input_html,
+                                        sanitized_html,
+                                        payload_context_to_run,
+                                    ) = _prepare_for_sanitizer(vector=vector, sanitizer=sanitizer)
                                 except Exception as exc:
                                     part.append(
                                         BenchCaseResult(
@@ -220,9 +229,7 @@ def _queue_worker_main(
                                     continue
 
                                 if len(vector.expected_tags) == 0:
-                                    unexpected = _unexpected_tags_when_none_expected(
-                                        sanitized_html=sanitized_html
-                                    )
+                                    unexpected = _unexpected_tags_when_none_expected(sanitized_html=sanitized_html)
                                     if unexpected:
                                         part.append(
                                             BenchCaseResult(
@@ -491,9 +498,7 @@ def _print_table(summary) -> None:
     if xss:
         print("XSS:")
         for r in xss:
-            print(
-                f"- {r.sanitizer} / {r.browser} / {r.vector_id} ({r.payload_context}): {r.details}"
-            )
+            print(f"- {r.sanitizer} / {r.browser} / {r.vector_id} ({r.payload_context}): {r.details}")
             if getattr(r, "sanitizer_input_html", ""):
                 print(f"  sanitizer_input_html={_repr_truncated(getattr(r, 'sanitizer_input_html'))}")
             if r.sanitized_html:
@@ -504,9 +509,7 @@ def _print_table(summary) -> None:
             print("")
         print("Errors:")
         for r in errors:
-            print(
-                f"- {r.sanitizer} / {r.browser} / {r.vector_id} ({r.payload_context}): {r.details}"
-            )
+            print(f"- {r.sanitizer} / {r.browser} / {r.vector_id} ({r.payload_context}): {r.details}")
             if getattr(r, "sanitizer_input_html", ""):
                 print(f"  sanitizer_input_html={_repr_truncated(getattr(r, 'sanitizer_input_html'))}")
             if r.sanitized_html:
@@ -517,9 +520,7 @@ def _print_table(summary) -> None:
             print("")
         print("Lossy (expected tags stripped):")
         for r in lossy:
-            print(
-                f"- {r.sanitizer} / {r.browser} / {r.vector_id} ({r.payload_context}): {r.details}"
-            )
+            print(f"- {r.sanitizer} / {r.browser} / {r.vector_id} ({r.payload_context}): {r.details}")
             if getattr(r, "sanitizer_input_html", ""):
                 print(f"  sanitizer_input_html={_repr_truncated(getattr(r, 'sanitizer_input_html'))}")
             # Always print sanitized_html for lossy cases, even if it's empty.
@@ -529,10 +530,12 @@ def _print_table(summary) -> None:
     if xss or errors or lossy:
         print("")
 
-    header = f"{'sanitizer':<22}  {'browser':<8}  {'xss':>6}  {'lossy':>6}  {'errors':>6}  {'skipped':>7}  {'total':>5}"
+    header = (
+        f"{'sanitizer':<22}  {'browser':<8}  {'xss':>6}  {'lossy':>6}  {'errors':>6}  {'skipped':>7}  {'total':>5}"
+    )
     print(header)
     print("-" * len(header))
-    for (name, browser) in sorted(per.keys()):
+    for name, browser in sorted(per.keys()):
         row = per[(name, browser)]
         print(
             f"{name:<22}  {browser:<8}  {row['executed']:>6}  {row['lossy']:>6}  {row['errors']:>6}  {row['skipped']:>7}  {row['total']:>5}"
@@ -566,7 +569,10 @@ def main(argv: list[str] | None = None) -> int:
         repo_root = Path.cwd()
         ensure_portswigger_vectors_file(repo_root=repo_root, against_paths=vector_paths)
     except Exception as exc:
-        print(f"warning: could not generate PortSwigger vectors file: {exc}", file=sys.stderr)
+        print(
+            f"warning: could not generate PortSwigger vectors file: {exc}",
+            file=sys.stderr,
+        )
 
     vectors = load_vectors(vector_paths)
 
@@ -727,7 +733,7 @@ def main(argv: list[str] | None = None) -> int:
                             file=sys.stderr,
                             flush=True,
                         )
-                    for (_tid, (start_i, end_i)) in list(pending.items()):
+                    for _tid, (start_i, end_i) in list(pending.items()):
                         for v in vectors[start_i:end_i]:
                             for s in sanitizers:
                                 for b in browsers:
@@ -774,7 +780,7 @@ def main(argv: list[str] | None = None) -> int:
                                 file=sys.stderr,
                                 flush=True,
                             )
-                        for (_tid, (start_i, end_i)) in list(pending.items()):
+                        for _tid, (start_i, end_i) in list(pending.items()):
                             for v in vectors[start_i:end_i]:
                                 for s in sanitizers:
                                     for b in browsers:
@@ -863,13 +869,17 @@ def main(argv: list[str] | None = None) -> int:
                     p.terminate()
                     p.join(timeout=2)
 
-            summary = type("Summary", (), {
-                "total_cases": len(results),
-                "total_executed": sum(1 for r in results if r.executed),
-                "total_errors": sum(1 for r in results if r.outcome == "error"),
-                "total_lossy": sum(1 for r in results if r.outcome == "lossy"),
-                "results": results,
-            })()
+            summary = type(
+                "Summary",
+                (),
+                {
+                    "total_cases": len(results),
+                    "total_executed": sum(1 for r in results if r.executed),
+                    "total_errors": sum(1 for r in results if r.outcome == "error"),
+                    "total_lossy": sum(1 for r in results if r.outcome == "lossy"),
+                    "results": results,
+                },
+            )()
         else:
             summary = run_bench(
                 vectors=vectors,

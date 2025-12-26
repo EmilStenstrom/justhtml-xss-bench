@@ -70,7 +70,9 @@ def _get_commit(repo_dir: Path) -> str:
     return cp.stdout.strip()
 
 
-def _build_new_vectors(*, repo_dir: Path, against_paths: Iterable[str | Path]) -> tuple[str, dict[str, int], list[dict]]:
+def _build_new_vectors(
+    *, repo_dir: Path, against_paths: Iterable[str | Path]
+) -> tuple[str, dict[str, int], list[dict]]:
     # Existing tested vectors in this repo.
     existing: set[tuple[str, str]] = set()
     for v in load_vectors(against_paths):
@@ -132,9 +134,9 @@ def _build_new_vectors(*, repo_dir: Path, against_paths: Iterable[str | Path]) -
                         ),
                         "payload_html": code,
                         "payload_context": payload_context,
-                            # PortSwigger entries are attack payloads; by default we
-                            # expect sanitization to remove all markup.
-                            "expected_tags": [],
+                        # PortSwigger entries are attack payloads; by default we
+                        # expect sanitization to remove all markup.
+                        "expected_tags": [],
                     }
                 )
 

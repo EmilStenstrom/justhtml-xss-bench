@@ -70,10 +70,7 @@ def _filter_navigation_urls_for_execution(
 
 def _looks_like_navigation_context_destroyed(exc: Exception) -> bool:
     msg = str(exc)
-    return (
-        "Execution context was destroyed" in msg
-        or "most likely because of a navigation" in msg
-    )
+    return "Execution context was destroyed" in msg or "most likely because of a navigation" in msg
 
 
 @dataclass(frozen=True, slots=True)
@@ -225,12 +222,7 @@ _ONERROR_ATTR_TEMPLATE = """<!doctype html>
 
 @lru_cache(maxsize=None)
 def _read_js_asset_text(name: str) -> str:
-    return (
-        importlib.resources.files("xssbench")
-        .joinpath("js")
-        .joinpath(name)
-        .read_text(encoding="utf-8")
-    )
+    return importlib.resources.files("xssbench").joinpath("js").joinpath(name).read_text(encoding="utf-8")
 
 
 def _script_tag(js: str) -> str:
@@ -266,9 +258,7 @@ class BrowserHarness:
             sync_playwright = sync_api.sync_playwright
             self._timeout_error = sync_api.TimeoutError
         except Exception as exc:  # pragma: no cover
-            raise RuntimeError(
-                "Playwright is not installed. Install with: pip install -e '.[test]'"
-            ) from exc
+            raise RuntimeError("Playwright is not installed. Install with: pip install -e '.[test]'") from exc
 
         self._pw_cm = sync_playwright()
         self._pw = self._pw_cm.__enter__()
@@ -695,9 +685,7 @@ class AsyncBrowserHarness:
             async_playwright = async_api.async_playwright
             self._timeout_error = async_api.TimeoutError
         except Exception as exc:  # pragma: no cover
-            raise RuntimeError(
-                "Playwright is not installed. Install with: pip install -e '.[test]'"
-            ) from exc
+            raise RuntimeError("Playwright is not installed. Install with: pip install -e '.[test]'") from exc
 
         self._pw_cm = async_playwright()
         self._pw = await self._pw_cm.__aenter__()
@@ -911,9 +899,11 @@ class AsyncBrowserHarness:
         async def _hook_details() -> str:
             try:
                 return str(
-                    (await self._page.evaluate(
-                        "() => (window.__xssbench && window.__xssbench.executed) ? String(window.__xssbench.details || '') : ''"
-                    ))
+                    (
+                        await self._page.evaluate(
+                            "() => (window.__xssbench && window.__xssbench.executed) ? String(window.__xssbench.details || '') : ''"
+                        )
+                    )
                     or ""
                 )
             except Exception:
@@ -966,9 +956,11 @@ class AsyncBrowserHarness:
         if payload_context == "href":
             try:
                 expected_href_click_url = str(
-                    (await self._page.evaluate(
-                        "() => { const a = document.getElementById('xssbench-link'); return a ? String(a.href || '') : ''; }"
-                    ))
+                    (
+                        await self._page.evaluate(
+                            "() => { const a = document.getElementById('xssbench-link'); return a ? String(a.href || '') : ''; }"
+                        )
+                    )
                     or ""
                 )
             except Exception:
@@ -1016,10 +1008,7 @@ class AsyncBrowserHarness:
                     try:
                         resolved_href = ""
                         try:
-                            resolved_href = str(
-                                (await self._page.evaluate("(el) => String(el.href || '')", h))
-                                or ""
-                            )
+                            resolved_href = str((await self._page.evaluate("(el) => String(el.href || '')", h)) or "")
                         except Exception:
                             resolved_href = (await h.get_attribute("href")) or ""
                         normalized = resolved_href.strip().lower()
