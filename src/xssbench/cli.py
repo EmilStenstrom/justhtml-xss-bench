@@ -198,6 +198,8 @@ def _queue_worker_main(
                                             run_payload_context=vector.payload_context,
                                             outcome="skip",
                                             executed=False,
+                                            lossy=False,
+                                            lossy_details="",
                                             details=(
                                                 f"Skipped: {sanitizer.name} does not support context {vector.payload_context}"
                                             ),
@@ -224,6 +226,8 @@ def _queue_worker_main(
                                             run_payload_context=vector.payload_context,
                                             outcome="error",
                                             executed=False,
+                                            lossy=False,
+                                            lossy_details="",
                                             details=f"Sanitizer error: {exc!r}",
                                             sanitizer_input_html="",
                                             sanitized_html="",
@@ -232,54 +236,27 @@ def _queue_worker_main(
                                     )
                                     continue
 
+                                lossy = False
+                                lossy_details = ""
                                 if _expected_tags_allowed_for_context(vector.payload_context):
                                     if len(vector.expected_tags) == 0:
                                         unexpected = _unexpected_tags_when_none_expected(sanitized_html=sanitized_html)
                                         if unexpected:
-                                            part.append(
-                                                BenchCaseResult(
-                                                    sanitizer=sanitizer.name,
-                                                    browser=browser,
-                                                    vector_id=vector.id,
-                                                    payload_context=vector.payload_context,
-                                                    run_payload_context=payload_context_to_run,
-                                                    outcome="lossy",
-                                                    executed=False,
-                                                    details=(
-                                                        "Expected no tags after sanitization, but found: "
-                                                        + ", ".join(unexpected[:20])
-                                                    ),
-                                                    sanitizer_input_html=sanitizer_input_html,
-                                                    sanitized_html=sanitized_html,
-                                                    rendered_html="",
-                                                )
+                                            lossy = True
+                                            lossy_details = (
+                                                "Expected no tags after sanitization, but found: "
+                                                + ", ".join(unexpected[:20])
                                             )
-                                            continue
                                     else:
                                         missing_tags = _missing_expected_tags(
                                             expected_tags=vector.expected_tags,
                                             sanitized_html=sanitized_html,
                                         )
                                         if missing_tags:
-                                            part.append(
-                                                BenchCaseResult(
-                                                    sanitizer=sanitizer.name,
-                                                    browser=browser,
-                                                    vector_id=vector.id,
-                                                    payload_context=vector.payload_context,
-                                                    run_payload_context=payload_context_to_run,
-                                                    outcome="lossy",
-                                                    executed=False,
-                                                    details=(
-                                                        "Missing expected tags after sanitization: "
-                                                        + ", ".join(missing_tags)
-                                                    ),
-                                                    sanitizer_input_html=sanitizer_input_html,
-                                                    sanitized_html=sanitized_html,
-                                                    rendered_html="",
-                                                )
+                                            lossy = True
+                                            lossy_details = "Missing expected tags after sanitization: " + ", ".join(
+                                                missing_tags
                                             )
-                                            continue
 
                                 try:
                                     rendered_html = render_html_document(
@@ -306,6 +283,8 @@ def _queue_worker_main(
                                             run_payload_context=payload_context_to_run,
                                             outcome="error",
                                             executed=False,
+                                            lossy=lossy,
+                                            lossy_details=lossy_details,
                                             details=f"Harness error: {exc}",
                                             sanitizer_input_html=sanitizer_input_html,
                                             sanitized_html=sanitized_html,
@@ -330,6 +309,8 @@ def _queue_worker_main(
                                         run_payload_context=payload_context_to_run,
                                         outcome=outcome,
                                         executed=executed,
+                                        lossy=lossy,
+                                        lossy_details=lossy_details,
                                         details=vector_result.details,
                                         sanitizer_input_html=sanitizer_input_html,
                                         sanitized_html=sanitized_html,
@@ -499,13 +480,13 @@ def _print_table(summary) -> None:
         per[key]["xss"] += 1 if r.outcome == "xss" else 0
         per[key]["external"] += 1 if r.outcome == "external" else 0
         per[key]["errors"] += 1 if r.outcome == "error" else 0
-        per[key]["lossy"] += 1 if r.outcome == "lossy" else 0
+        per[key]["lossy"] += 1 if getattr(r, "lossy", False) else 0
         per[key]["skipped"] += 1 if r.outcome == "skip" else 0
 
     xss = [r for r in summary.results if r.outcome == "xss"]
     external = [r for r in summary.results if r.outcome == "external"]
     errors = [r for r in summary.results if r.outcome == "error"]
-    lossy = [r for r in summary.results if r.outcome == "lossy"]
+    lossy = [r for r in summary.results if getattr(r, "lossy", False)]
 
     # Put detailed output first; print the summary table last.
     if xss:
@@ -544,7 +525,8 @@ def _print_table(summary) -> None:
             print("")
         print("Lossy (expected tags stripped):")
         for r in lossy:
-            print(f"- {r.sanitizer} / {r.browser} / {r.vector_id} ({r.payload_context}): {r.details}")
+            msg = getattr(r, "lossy_details", "") or "(lossy)"
+            print(f"- {r.sanitizer} / {r.browser} / {r.vector_id} ({r.payload_context}): {msg}")
             if getattr(r, "sanitizer_input_html", ""):
                 print(f"  sanitizer_input_html={_repr_truncated(getattr(r, 'sanitizer_input_html'))}")
             # Always print sanitized_html for lossy cases, even if it's empty.
@@ -628,7 +610,7 @@ def main(argv: list[str] | None = None) -> int:
             if args.progress_every == 1:
                 if result.outcome == "error":
                     ch = "E"
-                elif result.outcome == "lossy":
+                elif getattr(result, "lossy", False):
                     ch = "L"
                 elif result.executed:
                     ch = "X"
@@ -899,7 +881,7 @@ def main(argv: list[str] | None = None) -> int:
                     "total_executed": sum(1 for r in results if r.executed),
                     "total_external": sum(1 for r in results if r.outcome == "external"),
                     "total_errors": sum(1 for r in results if r.outcome == "error"),
-                    "total_lossy": sum(1 for r in results if r.outcome == "lossy"),
+                    "total_lossy": sum(1 for r in results if getattr(r, "lossy", False)),
                     "results": results,
                 },
             )()
@@ -962,6 +944,8 @@ def main(argv: list[str] | None = None) -> int:
                     "run_payload_context": getattr(r, "run_payload_context", r.payload_context),
                     "outcome": r.outcome,
                     "executed": r.executed,
+                    "lossy": getattr(r, "lossy", False),
+                    "lossy_details": getattr(r, "lossy_details", ""),
                     "details": r.details,
                     "sanitizer_input_html": getattr(r, "sanitizer_input_html", ""),
                     "sanitized_html": r.sanitized_html,

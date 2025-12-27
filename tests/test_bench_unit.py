@@ -305,8 +305,9 @@ def test_expected_tags_require_multiple_matches_for_duplicates() -> None:
 
     summary = run_bench(vectors=vectors, sanitizers=[sanitizer], runner=fake_runner)
     assert summary.total_lossy == 1
-    assert summary.results[0].outcome == "lossy"
-    assert "div[id]" in summary.results[0].details
+    assert summary.results[0].outcome == "pass"
+    assert summary.results[0].lossy is True
+    assert "div[id]" in summary.results[0].lossy_details
 
 
 def test_run_bench_skips_href_without_attribute_cleaning_support() -> None:
@@ -569,7 +570,7 @@ def test_run_bench_wraps_onerror_attr_payload_before_sanitizing() -> None:
     assert seen_payload_contexts == ["html"]
 
 
-def test_run_bench_marks_missing_expected_tags_as_lossy_and_skips_runner() -> None:
+def test_run_bench_marks_missing_expected_tags_as_lossy_but_still_runs_runner() -> None:
     vectors = [
         Vector(
             id="v1",
@@ -594,8 +595,10 @@ def test_run_bench_marks_missing_expected_tags_as_lossy_and_skips_runner() -> No
     assert summary.total_executed == 0
     assert summary.total_errors == 0
     assert summary.total_lossy == 1
-    assert called["n"] == 0
-    assert summary.results[0].outcome == "lossy"
+    assert called["n"] == 1
+    assert summary.results[0].outcome == "pass"
+    assert summary.results[0].lossy is True
+    assert "Missing expected tags" in summary.results[0].lossy_details
 
 
 def test_run_bench_empty_expected_tags_means_no_tags_allowed() -> None:
@@ -621,8 +624,10 @@ def test_run_bench_empty_expected_tags_means_no_tags_allowed() -> None:
 
     assert summary.total_cases == 1
     assert summary.total_lossy == 1
-    assert called["n"] == 0
-    assert summary.results[0].outcome == "lossy"
+    assert called["n"] == 1
+    assert summary.results[0].outcome == "pass"
+    assert summary.results[0].lossy is True
+    assert "Expected no tags" in summary.results[0].lossy_details
 
 
 def test_run_bench_expected_tags_exact_matches_attrs() -> None:
@@ -684,9 +689,10 @@ def test_run_bench_expected_tags_exact_fails_on_extra_tags() -> None:
 
     assert summary.total_cases == 1
     assert summary.total_lossy == 1
-    assert called["n"] == 0
-    assert summary.results[0].outcome == "lossy"
-    assert "unexpected" in summary.results[0].details
+    assert called["n"] == 1
+    assert summary.results[0].outcome == "pass"
+    assert summary.results[0].lossy is True
+    assert "unexpected" in summary.results[0].lossy_details
 
 
 def test_run_bench_bare_tag_requires_attribute_free_element() -> None:
@@ -715,8 +721,9 @@ def test_run_bench_bare_tag_requires_attribute_free_element() -> None:
     summary = run_bench(vectors=vectors, sanitizers=[sanitizer], runner=fake_runner)
     assert summary.total_cases == 1
     assert summary.total_lossy == 1
-    assert called["n"] == 0
-    assert summary.results[0].outcome == "lossy"
+    assert called["n"] == 1
+    assert summary.results[0].outcome == "pass"
+    assert summary.results[0].lossy is True
 
     sanitizer2 = Sanitizer(
         name="s2",
@@ -727,3 +734,29 @@ def test_run_bench_bare_tag_requires_attribute_free_element() -> None:
     assert summary2.total_cases == 1
     assert summary2.total_lossy == 0
     assert summary2.results[0].outcome == "pass"
+
+
+def test_run_bench_can_be_both_lossy_and_xss() -> None:
+    vectors = [
+        Vector(
+            id="v1",
+            description="",
+            payload_html="<b>expected</b>",
+            payload_context="html",
+            expected_tags=(ExpectedTag("b"),),
+        ),
+    ]
+
+    sanitizer = Sanitizer(name="noop", description="", sanitize=lambda _html: "<img src=x onerror=1>")
+
+    def fake_runner(*, sanitized_html: str, **_kwargs):
+        if "onerror" in sanitized_html:
+            return type("VR", (), {"executed": True, "details": "hit"})()
+        return type("VR", (), {"executed": False, "details": "no"})()
+
+    summary = run_bench(vectors=vectors, sanitizers=[sanitizer], runner=fake_runner)
+    assert summary.total_cases == 1
+    assert summary.total_lossy == 1
+    assert summary.total_executed == 1
+    assert summary.results[0].outcome == "xss"
+    assert summary.results[0].lossy is True
