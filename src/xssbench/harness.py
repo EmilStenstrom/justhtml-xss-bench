@@ -368,6 +368,15 @@ class BrowserHarness:
 
         def _route(route) -> None:
             req = route.request
+            base = urlsplit(self._base_url)
+            req_parts = urlsplit(req.url)
+            is_http = req_parts.scheme in {"http", "https"}
+            is_same_origin = (
+                is_http
+                and bool(req_parts.netloc)
+                and req_parts.scheme == base.scheme
+                and req_parts.netloc == base.netloc
+            )
             # Serve our synthetic document at a stable URL so scheme-relative URLs (//...) resolve.
             if req.resource_type == "document" and req.url == self._base_url:
                 route.fulfill(status=200, content_type="text/html", body=self._current_html)
@@ -385,7 +394,11 @@ class BrowserHarness:
 
             # Record other external http(s) request attempts (images, stylesheets, XHR/fetch, fonts, etc).
             # This is useful as a strong "risk" signal even when it isn't immediate JS execution.
-            if req.resource_type not in {"document", "script"} and req.url.startswith(("http://", "https://")):
+            if (
+                req.resource_type not in {"document", "script"}
+                and req.url.startswith(("http://", "https://"))
+                and not is_same_origin
+            ):
                 try:
                     rtype = str(getattr(req, "resource_type", "") or "")
                 except Exception:
@@ -438,6 +451,7 @@ class BrowserHarness:
             raise ValueError(f"Unknown payload_context: {payload_context!r}")
 
         expected_href_click_url: str | None = None
+        first_external_network: tuple[str, str] | None = None
 
         def _execution_navigation_urls() -> list[str]:
             return _filter_navigation_urls_for_execution(
@@ -562,12 +576,7 @@ class BrowserHarness:
             )
 
         if self._external_network_requests:
-            rtype, url = self._external_network_requests[0]
-            return VectorResult(
-                executed=False,
-                details=f"External fetch: {rtype}:{url}; payload={payload_html!r}",
-                signal="external",
-            )
+            first_external_network = self._external_network_requests[0]
 
         if payload_context == "href":
             try:
@@ -688,6 +697,14 @@ class BrowserHarness:
             return VectorResult(
                 executed=True,
                 details=f"Executed: {details}; payload={payload_html!r}",
+            )
+
+        if first_external_network is not None:
+            rtype, url = first_external_network
+            return VectorResult(
+                executed=False,
+                details=f"External fetch: {rtype}:{url}; payload={payload_html!r}",
+                signal="external",
             )
 
         return VectorResult(executed=False, details="No execution detected")
@@ -820,6 +837,15 @@ class AsyncBrowserHarness:
 
         async def _route(route) -> None:
             req = route.request
+            base = urlsplit(self._base_url)
+            req_parts = urlsplit(req.url)
+            is_http = req_parts.scheme in {"http", "https"}
+            is_same_origin = (
+                is_http
+                and bool(req_parts.netloc)
+                and req_parts.scheme == base.scheme
+                and req_parts.netloc == base.netloc
+            )
             if req.resource_type == "document" and req.url == self._base_url:
                 await route.fulfill(status=200, content_type="text/html", body=self._current_html)
                 return
@@ -830,7 +856,11 @@ class AsyncBrowserHarness:
             if req.resource_type == "script" and req.url.startswith(("http://", "https://")):
                 self._external_script_requests.append(req.url)
 
-            if req.resource_type not in {"document", "script"} and req.url.startswith(("http://", "https://")):
+            if (
+                req.resource_type not in {"document", "script"}
+                and req.url.startswith(("http://", "https://"))
+                and not is_same_origin
+            ):
                 try:
                     rtype = str(getattr(req, "resource_type", "") or "")
                 except Exception:
@@ -867,6 +897,8 @@ class AsyncBrowserHarness:
         self._navigation_requests.clear()
         self._dialog_events.clear()
         self._base_navigation_count = 0
+
+        first_external_network: tuple[str, str] | None = None
 
         template = {
             "html": _HTML_TEMPLATE,
@@ -1000,12 +1032,7 @@ class AsyncBrowserHarness:
             )
 
         if self._external_network_requests:
-            rtype, url = self._external_network_requests[0]
-            return VectorResult(
-                executed=False,
-                details=f"External fetch: {rtype}:{url}; payload={payload_html!r}",
-                signal="external",
-            )
+            first_external_network = self._external_network_requests[0]
 
         if payload_context == "href":
             try:
@@ -1081,13 +1108,6 @@ class AsyncBrowserHarness:
                 details=f"Executed: navigation:{urls}; payload={payload_html!r}",
             )
 
-        if self._external_network_requests:
-            rtype, url = self._external_network_requests[0]
-            return VectorResult(
-                executed=True,
-                details=f"Executed: external-network:{rtype}:{url}; payload={payload_html!r}",
-            )
-
         if timeout_ms > 0:
             try:
                 await self._page.wait_for_function(
@@ -1130,6 +1150,14 @@ class AsyncBrowserHarness:
             return VectorResult(
                 executed=True,
                 details=f"Executed: {details}; payload={payload_html!r}",
+            )
+
+        if first_external_network is not None:
+            rtype, url = first_external_network
+            return VectorResult(
+                executed=False,
+                details=f"External fetch: {rtype}:{url}; payload={payload_html!r}",
+                signal="external",
             )
 
         return VectorResult(executed=False, details="No execution detected")
