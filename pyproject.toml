@@ -24,6 +24,8 @@ dev = [
 # Optional: install common sanitizer libraries to benchmark them.
 sanitizers = [
   "bleach>=6.1",
+  "tinycss2>=1.3.0",
+  "justhtml>=0.18.0",
   "nh3>=0.2.20",
   "lxml-html-clean>=0.4.0",
 ]

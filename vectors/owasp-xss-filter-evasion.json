@@ -159,7 +159,7 @@
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / Embedded Newline to Break Up XSS / Example 2: Break Up JavaScript Directive with Null",
 			"payload_html": "perl -e 'print \"<IMG SRC=java\\0script:alert(\\\"XSS\\\")>\";' > out",
 			"payload_context": "html",
-			"expected_tags": ["img[src]"]
+			"expected_tags": ["img"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-embedded-newline-to-break-up-xss-example-3--a6c621abc6",
@@ -513,7 +513,7 @@
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / XML Data Island with CDATA Obfuscation",
 			"payload_html": "<XML ID=\"xss\"><I><B><IMG SRC=\"javas<!-- -->cript:alert('XSS')\"></B></I></XML>\n<SPAN DATASRC=\"#xss\" DATAFLD=\"B\" DATAFORMATAS=\"HTML\"></SPAN>",
 			"payload_context": "html",
-			"expected_tags": ["i", "b", "img[src]", "span"]
+			"expected_tags": ["i", "b", "img", "span"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-locally-hosted-xml-with-embedded-javascript-43a1b85afb",

@@ -37,7 +37,11 @@ def test_smoke_no_execution(vector: dict[str, str]) -> None:
     except RuntimeError as exc:
         pytest.skip(str(exc))
 
-    assert result.executed is True, result.details
+    if vector["id"] == "css-background-external":
+        assert result.signal == "external", result.details
+        assert result.executed is False, result.details
+    else:
+        assert result.executed is True, result.details
 
 
 def test_external_script_fetch_counts_as_executed() -> None:
@@ -55,6 +59,27 @@ def test_external_script_fetch_counts_as_executed() -> None:
         pytest.skip(str(exc))
 
     assert result.executed is True
+
+
+def test_css_background_image_external_fetch_counts_as_external_signal() -> None:
+    # Ensure the element has non-zero size so browsers actually attempt to
+    # fetch/paint the background image.
+    payload_html = "<div style=\"width:10px;height:10px;background-image:url('http://google.com/x.png')\">x</div>"
+    sanitized_html = noop(payload_html)
+
+    try:
+        result = run_vector(
+            payload_html=payload_html,
+            sanitized_html=sanitized_html,
+            payload_context="html",
+            timeout_ms=2500,
+        )
+    except RuntimeError as exc:
+        # Playwright missing / browser engine not installed / missing OS deps.
+        pytest.skip(str(exc))
+
+    assert result.signal == "external", result.details
+    assert result.executed is False, result.details
 
 
 def test_lxml_html_clean_does_not_add_wrapper_div() -> None:

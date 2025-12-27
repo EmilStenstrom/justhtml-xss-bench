@@ -265,12 +265,12 @@ def test_expected_tags_are_ordered_and_match_distinct_elements_in_order() -> Non
         Vector(
             id="v1",
             description="",
-            payload_html='<div id="a"><div id="b"><div style="color:red">X</div></div></div>',
+            payload_html='<div id="a"><div id="b"><div class="c">X</div></div></div>',
             payload_context="html",
             expected_tags=(
                 ExpectedTag("div", frozenset({"id"})),
                 ExpectedTag("div", frozenset({"id"})),
-                ExpectedTag("div", frozenset({"style"})),
+                ExpectedTag("div", frozenset({"class"})),
             ),
         )
     ]

@@ -46468,7 +46468,7 @@
       "payload_html": "<img src=`xx:xx`onerror=alert(1)>",
       "payload_context": "html",
       "expected_tags": [
-        "img[src]"
+        "img"
       ]
     },
     {
@@ -46696,7 +46696,7 @@
       "payload_html": "<IMG SRC=`javascript:alert(\"RSnake says, 'XSS'\")`>",
       "payload_context": "html",
       "expected_tags": [
-        "img[src]"
+        "img"
       ]
     },
     {
@@ -47320,7 +47320,7 @@
       "payload_html": "<div style=content:url(data:image/svg+xml,%3Csvg/%3E);visibility:hidden onload=alert(41)></div>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div[style]"
+        "div"
       ]
     },
     {
@@ -48863,7 +48863,7 @@
       "payload_html": "<div style=xss:expression(alert(1))>",
       "payload_context": "html",
       "expected_tags": [
-        "div[style]"
+        "div"
       ]
     },
     {
@@ -48872,7 +48872,7 @@
       "payload_html": "<div style=xss:expression(1)-alert(1)>",
       "payload_context": "html",
       "expected_tags": [
-        "div[style]"
+        "div"
       ]
     },
     {
@@ -48881,7 +48881,7 @@
       "payload_html": "<div style=xss:expressio\\6e(alert(1))>",
       "payload_context": "html",
       "expected_tags": [
-        "div[style]"
+        "div"
       ]
     },
     {
@@ -48890,7 +48890,7 @@
       "payload_html": "<div style=xss:expressio\\006e(alert(1))>",
       "payload_context": "html",
       "expected_tags": [
-        "div[style]"
+        "div"
       ]
     },
     {
@@ -48899,7 +48899,7 @@
       "payload_html": "<div style=xss:expressio\\00006e(alert(1))>",
       "payload_context": "html",
       "expected_tags": [
-        "div[style]"
+        "div"
       ]
     }
   ]

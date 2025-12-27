@@ -68,6 +68,46 @@ _TABLE_CELL_ATTRS: frozenset[str] = frozenset({"colspan", "rowspan"})
 _URL_PROTOCOLS: tuple[str, ...] = ("http", "https", "mailto", "tel")
 
 
+# Shared CSS allowlist (inline style sanitization)
+#
+# Intent: allow the set of properties you can reasonably expect from WYSIWYG
+# editors and rich-text content (alignment, typography, spacing, borders), plus
+# background/background-image for compatibility with common content.
+#
+# Note: `justhtml` will *drop the entire style attribute* if, after sanitization,
+# no allowed properties remain. Keeping this list reasonably broad avoids
+# unnecessary `lossy` results for style-bearing vectors.
+DEFAULT_ALLOWED_CSS_PROPERTIES: tuple[str, ...] = (
+    # Typography
+    "color",
+    "font",
+    "font-family",
+    "font-size",
+    "font-style",
+    "font-weight",
+    "line-height",
+    "letter-spacing",
+    "text-align",
+    "text-decoration",
+    "text-indent",
+    "text-transform",
+    "white-space",
+    "vertical-align",
+    # Backgrounds
+    "background",
+    "background-color",
+    "background-image",
+)
+
+
+# When supported by the sanitizer, rewrite image src URLs to a same-origin
+# endpoint to avoid making external network requests during benchmarking.
+#
+# The harness treats requests to http://xssbench.local/ as same-origin and does
+# not classify them as external.
+_IMAGE_SRC_PROXY_URL: str = "/img-proxy"
+
+
 def allowed_url_protocols() -> tuple[str, ...]:
     return _URL_PROTOCOLS
 
@@ -122,7 +162,10 @@ def _maybe_bleach() -> Sanitizer | None:
     try:
         from bleach.css_sanitizer import CSSSanitizer  # type: ignore
 
-        css_sanitizer = CSSSanitizer()
+        # Align Bleach's inline CSS sanitization with the shared policy.
+        # If tinycss2 isn't installed, this import fails and we fall back to not
+        # sanitizing CSS (Bleach will still keep/drop `style` based on attrs).
+        css_sanitizer = CSSSanitizer(allowed_css_properties=set(DEFAULT_ALLOWED_CSS_PROPERTIES))
     except Exception:
         css_sanitizer = None
 
@@ -188,6 +231,7 @@ def _maybe_nh3() -> Sanitizer | None:
             attributes=allowed_attributes,
             url_schemes=set(_URL_PROTOCOLS),
             link_rel=None,  # Disable automatic rel management.
+            filter_style_properties=set(DEFAULT_ALLOWED_CSS_PROPERTIES),
         )
 
     return Sanitizer(
@@ -265,6 +309,77 @@ def _maybe_lxml_html_clean() -> Sanitizer | None:
     )
 
 
+def _maybe_justhtml() -> Sanitizer | None:
+    """Adapter for the `justhtml` project.
+
+    Configure `justhtml`'s sanitizer to match the shared allowlist policy used by
+    the other cleaners in this benchmark.
+    """
+
+    try:
+        from justhtml import JustHTML  # type: ignore
+        from justhtml.context import FragmentContext  # type: ignore
+        from justhtml.sanitize import SanitizationPolicy, UrlRule  # type: ignore
+    except Exception:
+        return None
+
+    fragment_context = FragmentContext("div")
+
+    # Configure a policy that mirrors the shared allowlist in this module.
+    # Note: `justhtml` merges per-tag allowlists with the global "*" allowlist.
+    policy = SanitizationPolicy(
+        allowed_tags=set(DEFAULT_ALLOWED_TAGS),
+        allowed_attributes={
+            "*": set(_GLOBAL_ATTRS),
+            "a": set(_A_ATTRS),
+            "img": set(_IMG_ATTRS),
+            "th": set(_TABLE_CELL_ATTRS),
+            "td": set(_TABLE_CELL_ATTRS),
+        },
+        # justhtml drops `style="..."` unless at least one CSS property is allowlisted.
+        # Use the shared CSS allowlist to keep behavior aligned with other
+        # CSS-aware sanitizers.
+        allowed_css_properties=set(DEFAULT_ALLOWED_CSS_PROPERTIES),
+        url_rules={
+            ("a", "href"): UrlRule(
+                allow_relative=True,
+                allow_fragment=True,
+                allow_protocol_relative=True,
+                allowed_schemes=set(_URL_PROTOCOLS),
+                allowed_hosts=None,
+            ),
+            ("img", "src"): UrlRule(
+                allow_relative=True,
+                allow_fragment=True,
+                allow_protocol_relative=True,
+                # Keep image loads roughly aligned with other cleaners.
+                allowed_schemes={"http", "https"},
+                allowed_hosts=None,
+                proxy_url=_IMAGE_SRC_PROXY_URL,
+                proxy_param="url",
+            ),
+        },
+        # Other defaults (dropping comments/doctype/foreign namespaces, stripping
+        # disallowed tags, dropping script/style content) match the spirit of the
+        # benchmark policy.
+    )
+
+    def _sanitize(html: str) -> str:
+        if not html:
+            return ""
+        # Parse as a fragment to avoid adding document/body wrappers.
+        doc = JustHTML(html, fragment_context=fragment_context)
+        # Keep output stable for the harness/expected_tags checks.
+        return doc.to_html(pretty=False, safe=True, policy=policy)
+
+    return Sanitizer(
+        name="justhtml",
+        description="justhtml sanitizer configured to shared allowlist policy",
+        sanitize=_sanitize,
+        supported_contexts={"html", "html_head", "html_outer"},
+    )
+
+
 def available_sanitizers() -> dict[str, Sanitizer]:
     """Return all sanitizers available in the current environment.
 
@@ -293,6 +408,7 @@ def available_sanitizers() -> dict[str, Sanitizer]:
         _maybe_bleach(),
         _maybe_nh3(),
         _maybe_lxml_html_clean(),
+        _maybe_justhtml(),
     ):
         if maybe is not None:
             sanitizers[maybe.name] = maybe
@@ -310,6 +426,7 @@ def default_sanitizers() -> dict[str, Sanitizer]:
     all_sanitizers = available_sanitizers()
     prefer: list[str] = [
         "noop",
+        "justhtml",
         "bleach",
         "nh3",
         "lxml_html_clean",
