@@ -77,6 +77,10 @@ def _looks_like_navigation_context_destroyed(exc: Exception) -> bool:
 class VectorResult:
     executed: bool
     details: str
+    # Optional classification hint for callers.
+    # - "none": no execution/risk detected
+    # - "external": non-script external network request attempt detected
+    signal: str = "none"
 
 
 BrowserName = Literal["chromium", "firefox", "webkit"]
@@ -246,6 +250,7 @@ class BrowserHarness:
         self._page: Any | None = None
         self._timeout_error: type[Exception] | None = None
         self._external_script_requests: list[str] = []
+        self._external_network_requests: list[tuple[str, str]] = []
         self._navigation_requests: list[str] = []
         self._dialog_events: list[str] = []
         self._base_navigation_count: int = 0
@@ -378,6 +383,15 @@ class BrowserHarness:
             if req.resource_type == "script" and req.url.startswith(("http://", "https://")):
                 self._external_script_requests.append(req.url)
 
+            # Record other external http(s) request attempts (images, stylesheets, XHR/fetch, fonts, etc).
+            # This is useful as a strong "risk" signal even when it isn't immediate JS execution.
+            if req.resource_type not in {"document", "script"} and req.url.startswith(("http://", "https://")):
+                try:
+                    rtype = str(getattr(req, "resource_type", "") or "")
+                except Exception:
+                    rtype = ""
+                self._external_network_requests.append((rtype, req.url))
+
             route.abort()
 
         self._page.route("**/*", _route)
@@ -404,6 +418,7 @@ class BrowserHarness:
             raise RuntimeError("Harness not initialized")
 
         self._external_script_requests.clear()
+        self._external_network_requests.clear()
         self._navigation_requests.clear()
         self._dialog_events.clear()
         self._base_navigation_count = 0
@@ -462,6 +477,13 @@ class BrowserHarness:
                     return VectorResult(
                         executed=True,
                         details=f"Executed: external-script:{urls}; payload={payload_html!r}",
+                    )
+                if self._external_network_requests:
+                    rtype, url = self._external_network_requests[0]
+                    return VectorResult(
+                        executed=False,
+                        details=f"External fetch: {rtype}:{url}; payload={payload_html!r}",
+                        signal="external",
                     )
                 if self._dialog_events:
                     details = self._dialog_events[0]
@@ -537,6 +559,14 @@ class BrowserHarness:
             return VectorResult(
                 executed=True,
                 details=f"Executed: external-script:{urls}; payload={payload_html!r}",
+            )
+
+        if self._external_network_requests:
+            rtype, url = self._external_network_requests[0]
+            return VectorResult(
+                executed=False,
+                details=f"External fetch: {rtype}:{url}; payload={payload_html!r}",
+                signal="external",
             )
 
         if payload_context == "href":
@@ -673,6 +703,7 @@ class AsyncBrowserHarness:
         self._page: Any | None = None
         self._timeout_error: type[Exception] | None = None
         self._external_script_requests: list[str] = []
+        self._external_network_requests: list[tuple[str, str]] = []
         self._navigation_requests: list[str] = []
         self._dialog_events: list[str] = []
         self._base_navigation_count: int = 0
@@ -799,6 +830,13 @@ class AsyncBrowserHarness:
             if req.resource_type == "script" and req.url.startswith(("http://", "https://")):
                 self._external_script_requests.append(req.url)
 
+            if req.resource_type not in {"document", "script"} and req.url.startswith(("http://", "https://")):
+                try:
+                    rtype = str(getattr(req, "resource_type", "") or "")
+                except Exception:
+                    rtype = ""
+                self._external_network_requests.append((rtype, req.url))
+
             await route.abort()
 
         await self._page.route("**/*", _route)
@@ -825,6 +863,7 @@ class AsyncBrowserHarness:
             raise RuntimeError("Harness not initialized")
 
         self._external_script_requests.clear()
+        self._external_network_requests.clear()
         self._navigation_requests.clear()
         self._dialog_events.clear()
         self._base_navigation_count = 0
@@ -877,6 +916,13 @@ class AsyncBrowserHarness:
                     return VectorResult(
                         executed=True,
                         details=f"Executed: external-script:{urls}; payload={payload_html!r}",
+                    )
+                if self._external_network_requests:
+                    rtype, url = self._external_network_requests[0]
+                    return VectorResult(
+                        executed=False,
+                        details=f"External fetch: {rtype}:{url}; payload={payload_html!r}",
+                        signal="external",
                     )
                 if self._dialog_events:
                     details = self._dialog_events[0]
@@ -953,6 +999,14 @@ class AsyncBrowserHarness:
                 details=f"Executed: external-script:{urls}; payload={payload_html!r}",
             )
 
+        if self._external_network_requests:
+            rtype, url = self._external_network_requests[0]
+            return VectorResult(
+                executed=False,
+                details=f"External fetch: {rtype}:{url}; payload={payload_html!r}",
+                signal="external",
+            )
+
         if payload_context == "href":
             try:
                 expected_href_click_url = str(
@@ -1027,6 +1081,13 @@ class AsyncBrowserHarness:
                 details=f"Executed: navigation:{urls}; payload={payload_html!r}",
             )
 
+        if self._external_network_requests:
+            rtype, url = self._external_network_requests[0]
+            return VectorResult(
+                executed=True,
+                details=f"Executed: external-network:{rtype}:{url}; payload={payload_html!r}",
+            )
+
         if timeout_ms > 0:
             try:
                 await self._page.wait_for_function(
@@ -1042,6 +1103,13 @@ class AsyncBrowserHarness:
                     return VectorResult(
                         executed=True,
                         details=f"Executed: navigation:{urls}; payload={payload_html!r}",
+                    )
+                if self._external_network_requests:
+                    rtype, url = self._external_network_requests[0]
+                    return VectorResult(
+                        executed=False,
+                        details=f"External fetch: {rtype}:{url}; payload={payload_html!r}",
+                        signal="external",
                     )
                 if _looks_like_navigation_context_destroyed(exc):
                     return VectorResult(

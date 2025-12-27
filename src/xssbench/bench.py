@@ -44,7 +44,7 @@ class BenchCaseResult:
     vector_id: str
     payload_context: PayloadContext
     run_payload_context: PayloadContext
-    outcome: str  # 'pass' | 'xss' | 'lossy' | 'skip' | 'error'
+    outcome: str  # 'pass' | 'xss' | 'external' | 'lossy' | 'skip' | 'error'
     executed: bool
     details: str
     sanitizer_input_html: str
@@ -56,6 +56,7 @@ class BenchCaseResult:
 class BenchSummary:
     total_cases: int
     total_executed: int
+    total_external: int
     total_errors: int
     total_lossy: int
     results: list[BenchCaseResult]
@@ -79,6 +80,9 @@ class _TagCollector:
                         if name:
                             s.add(str(name).lower())
                     self._outer.attr_sets_by_tag.setdefault(t, []).append(s)
+                    self._outer.elements.append((t, s))
+                else:
+                    self._outer.elements.append((t, set()))
 
             def handle_startendtag(self, tag: str, attrs) -> None:  # type: ignore[override]
                 t = tag.lower()
@@ -89,9 +93,13 @@ class _TagCollector:
                         if name:
                             s.add(str(name).lower())
                     self._outer.attr_sets_by_tag.setdefault(t, []).append(s)
+                    self._outer.elements.append((t, s))
+                else:
+                    self._outer.elements.append((t, set()))
 
         self.tags: set[str] = set()
         self.attr_sets_by_tag: dict[str, list[set[str]]] = {}
+        self.elements: list[tuple[str, set[str]]] = []
         self._parser = _P(self)
 
     def feed(self, html: str) -> set[str]:
@@ -184,31 +192,46 @@ def _missing_expected_tags(*, expected_tags: Iterable[ExpectedTag], sanitized_ht
         return []
 
     collector = _TagCollector()
-    tags = collector.feed(sanitized_html)
-    attr_sets_by_tag = collector.attr_sets_by_tag
+    collector.feed(sanitized_html)
+    elements = collector.elements
 
-    missing: list[str] = []
-    for exp in expected_list:
-        if exp.tag not in tags:
-            if exp.attrs:
-                missing.append(f"{exp.tag}[{', '.join(sorted(exp.attrs))}]")
-            else:
-                missing.append(exp.tag)
-            continue
-        per_el = attr_sets_by_tag.get(exp.tag, [])
-        # If we somehow saw a tag but didn't capture attrs, treat as empty attrs.
-        if not per_el:
-            per_el = [set()]
+    def _fmt(exp: ExpectedTag) -> str:
         if exp.attrs:
-            ok = any(all(a in s for a in exp.attrs) for s in per_el)
-            if not ok:
-                missing.append(f"{exp.tag}[{', '.join(sorted(exp.attrs))}]")
-        else:
-            # Bare tag means: the tag must survive *without any attributes*.
-            ok = any(len(s) == 0 for s in per_el)
-            if not ok:
-                missing.append(exp.tag)
-    return missing
+            return f"{exp.tag}[{', '.join(sorted(exp.attrs))}]"
+        return exp.tag
+
+    def _fmt_el(tag: str, attrs: set[str]) -> str:
+        if attrs:
+            return f"{tag}[{', '.join(sorted(attrs))}]"
+        return tag
+
+    def _matches(exp: ExpectedTag, tag: str, attrs: set[str]) -> bool:
+        if tag != exp.tag:
+            return False
+        if exp.attrs:
+            return all(a in attrs for a in exp.attrs)
+        # Bare tag means: must be attribute-free.
+        return len(attrs) == 0
+
+    # Exact mode (default): the sanitized output must contain exactly the
+    # expected tags, in that order (no extras, and no skipping/re-using).
+    mismatches: list[str] = []
+    common = min(len(expected_list), len(elements))
+    for idx in range(common):
+        exp = expected_list[idx]
+        tag, attrs = elements[idx]
+        if not _matches(exp, tag, attrs):
+            mismatches.append(f"pos {idx + 1}: expected {_fmt(exp)} got {_fmt_el(tag, attrs)}")
+
+    if len(expected_list) > len(elements):
+        for idx in range(common, len(expected_list)):
+            mismatches.append(f"pos {idx + 1}: missing {_fmt(expected_list[idx])}")
+    elif len(elements) > len(expected_list):
+        for idx in range(common, len(elements)):
+            tag, attrs = elements[idx]
+            mismatches.append(f"pos {idx + 1}: unexpected {_fmt_el(tag, attrs)}")
+
+    return mismatches
 
 
 def _unexpected_tags_when_none_expected(*, sanitized_html: str) -> list[str]:
@@ -278,6 +301,11 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
 
             raw_context = item.get("payload_context")
             raw_expected_tags = item.get("expected_tags")
+
+            if "expected_tags_ordered" in item:
+                raise ValueError(
+                    f"expected_tags_ordered is no longer supported; expected_tags are always ordered: {path}"
+                )
             if raw_context is None:
                 contexts: list[str] = ["html"]
             elif isinstance(raw_context, str):
@@ -586,7 +614,13 @@ def run_bench(
                                 progress(case_index, total_planned, result)
                             continue
 
-                        outcome = "xss" if vector_result.executed else "pass"
+                        signal = str(getattr(vector_result, "signal", "") or "")
+                        if signal == "external":
+                            outcome = "external"
+                            executed = False
+                        else:
+                            outcome = "xss" if vector_result.executed else "pass"
+                            executed = bool(vector_result.executed)
                         result = BenchCaseResult(
                             sanitizer=sanitizer.name,
                             browser=browser,
@@ -594,7 +628,7 @@ def run_bench(
                             payload_context=vector.payload_context,
                             run_payload_context=payload_context_to_run,
                             outcome=outcome,
-                            executed=vector_result.executed,
+                            executed=executed,
                             details=vector_result.details,
                             sanitizer_input_html=sanitizer_input_html,
                             sanitized_html=sanitized_html,
@@ -607,11 +641,13 @@ def run_bench(
                         if fail_fast and result.outcome == "xss":
                             total_cases = len(results)
                             total_executed = sum(1 for r in results if r.executed)
+                            total_external = sum(1 for r in results if r.outcome == "external")
                             total_errors = sum(1 for r in results if r.outcome == "error")
                             total_lossy = sum(1 for r in results if r.outcome == "lossy")
                             return BenchSummary(
                                 total_cases=total_cases,
                                 total_executed=total_executed,
+                                total_external=total_external,
                                 total_errors=total_errors,
                                 total_lossy=total_lossy,
                                 results=results,
@@ -619,12 +655,14 @@ def run_bench(
 
         total_cases = len(results)
         total_executed = sum(1 for r in results if r.executed)
+        total_external = sum(1 for r in results if r.outcome == "external")
         total_errors = sum(1 for r in results if r.outcome == "error")
         total_lossy = sum(1 for r in results if r.outcome == "lossy")
 
         return BenchSummary(
             total_cases=total_cases,
             total_executed=total_executed,
+            total_external=total_external,
             total_errors=total_errors,
             total_lossy=total_lossy,
             results=results,
@@ -788,7 +826,13 @@ def run_bench(
                         progress(case_index, total_planned, result)
                     continue
 
-                outcome = "xss" if vector_result.executed else "pass"
+                signal = str(getattr(vector_result, "signal", "") or "")
+                if signal == "external":
+                    outcome = "external"
+                    executed = False
+                else:
+                    outcome = "xss" if vector_result.executed else "pass"
+                    executed = bool(vector_result.executed)
 
                 result = BenchCaseResult(
                     sanitizer=sanitizer.name,
@@ -797,7 +841,7 @@ def run_bench(
                     payload_context=vector.payload_context,
                     run_payload_context=payload_context_to_run,
                     outcome=outcome,
-                    executed=vector_result.executed,
+                    executed=executed,
                     details=vector_result.details,
                     sanitizer_input_html=sanitizer_input_html,
                     sanitized_html=sanitized_html,
@@ -810,11 +854,13 @@ def run_bench(
                 if fail_fast and result.outcome == "xss":
                     total_cases = len(results)
                     total_executed = sum(1 for r in results if r.executed)
+                    total_external = sum(1 for r in results if r.outcome == "external")
                     total_errors = sum(1 for r in results if r.outcome == "error")
                     total_lossy = sum(1 for r in results if r.outcome == "lossy")
                     return BenchSummary(
                         total_cases=total_cases,
                         total_executed=total_executed,
+                        total_external=total_external,
                         total_errors=total_errors,
                         total_lossy=total_lossy,
                         results=results,
@@ -822,12 +868,14 @@ def run_bench(
 
     total_cases = len(results)
     total_executed = sum(1 for r in results if r.executed)
+    total_external = sum(1 for r in results if r.outcome == "external")
     total_errors = sum(1 for r in results if r.outcome == "error")
     total_lossy = sum(1 for r in results if r.outcome == "lossy")
 
     return BenchSummary(
         total_cases=total_cases,
         total_executed=total_executed,
+        total_external=total_external,
         total_errors=total_errors,
         total_lossy=total_lossy,
         results=results,

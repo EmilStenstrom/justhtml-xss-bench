@@ -314,7 +314,13 @@ def _queue_worker_main(
                                     )
                                     continue
 
-                                outcome = "xss" if vector_result.executed else "pass"
+                                signal = str(getattr(vector_result, "signal", "") or "")
+                                if signal == "external":
+                                    outcome = "external"
+                                    executed = False
+                                else:
+                                    outcome = "xss" if vector_result.executed else "pass"
+                                    executed = bool(vector_result.executed)
                                 part.append(
                                     BenchCaseResult(
                                         sanitizer=sanitizer.name,
@@ -323,7 +329,7 @@ def _queue_worker_main(
                                         payload_context=vector.payload_context,
                                         run_payload_context=payload_context_to_run,
                                         outcome=outcome,
-                                        executed=vector_result.executed,
+                                        executed=executed,
                                         details=vector_result.details,
                                         sanitizer_input_html=sanitizer_input_html,
                                         sanitized_html=sanitized_html,
@@ -488,14 +494,16 @@ def _print_table(summary) -> None:
     per = {}
     for r in summary.results:
         key = (r.sanitizer, r.browser)
-        per.setdefault(key, {"total": 0, "executed": 0, "errors": 0, "lossy": 0, "skipped": 0})
+        per.setdefault(key, {"total": 0, "xss": 0, "external": 0, "errors": 0, "lossy": 0, "skipped": 0})
         per[key]["total"] += 1
-        per[key]["executed"] += 1 if r.executed else 0
+        per[key]["xss"] += 1 if r.outcome == "xss" else 0
+        per[key]["external"] += 1 if r.outcome == "external" else 0
         per[key]["errors"] += 1 if r.outcome == "error" else 0
         per[key]["lossy"] += 1 if r.outcome == "lossy" else 0
         per[key]["skipped"] += 1 if r.outcome == "skip" else 0
 
     xss = [r for r in summary.results if r.outcome == "xss"]
+    external = [r for r in summary.results if r.outcome == "external"]
     errors = [r for r in summary.results if r.outcome == "error"]
     lossy = [r for r in summary.results if r.outcome == "lossy"]
 
@@ -509,8 +517,19 @@ def _print_table(summary) -> None:
             if r.sanitized_html:
                 print(f"  sanitized_html={_repr_truncated(r.sanitized_html)}")
 
-    if errors:
+    if external:
         if xss:
+            print("")
+        print("External fetches (non-script):")
+        for r in external:
+            print(f"- {r.sanitizer} / {r.browser} / {r.vector_id} ({r.payload_context}): {r.details}")
+            if getattr(r, "sanitizer_input_html", ""):
+                print(f"  sanitizer_input_html={_repr_truncated(getattr(r, 'sanitizer_input_html'))}")
+            if r.sanitized_html:
+                print(f"  sanitized_html={_repr_truncated(r.sanitized_html)}")
+
+    if errors:
+        if xss or external:
             print("")
         print("Errors:")
         for r in errors:
@@ -521,7 +540,7 @@ def _print_table(summary) -> None:
                 print(f"  sanitized_html={_repr_truncated(r.sanitized_html)}")
 
     if lossy:
-        if xss or errors:
+        if xss or external or errors:
             print("")
         print("Lossy (expected tags stripped):")
         for r in lossy:
@@ -532,18 +551,16 @@ def _print_table(summary) -> None:
             # An empty string is often the most important signal when debugging.
             print(f"  sanitized_html={_repr_truncated(getattr(r, 'sanitized_html', ''))}")
 
-    if xss or errors or lossy:
+    if xss or external or errors or lossy:
         print("")
 
-    header = (
-        f"{'sanitizer':<22}  {'browser':<8}  {'xss':>6}  {'lossy':>6}  {'errors':>6}  {'skipped':>7}  {'total':>5}"
-    )
+    header = f"{'sanitizer':<22}  {'browser':<8}  {'xss':>6}  {'external':>9}  {'lossy':>6}  {'errors':>6}  {'skipped':>7}  {'total':>5}"
     print(header)
     print("-" * len(header))
     for name, browser in sorted(per.keys()):
         row = per[(name, browser)]
         print(
-            f"{name:<22}  {browser:<8}  {row['executed']:>6}  {row['lossy']:>6}  {row['errors']:>6}  {row['skipped']:>7}  {row['total']:>5}"
+            f"{name:<22}  {browser:<8}  {row['xss']:>6}  {row['external']:>9}  {row['lossy']:>6}  {row['errors']:>6}  {row['skipped']:>7}  {row['total']:>5}"
         )
 
 
@@ -880,6 +897,7 @@ def main(argv: list[str] | None = None) -> int:
                 {
                     "total_cases": len(results),
                     "total_executed": sum(1 for r in results if r.executed),
+                    "total_external": sum(1 for r in results if r.outcome == "external"),
                     "total_errors": sum(1 for r in results if r.outcome == "error"),
                     "total_lossy": sum(1 for r in results if r.outcome == "lossy"),
                     "results": results,
@@ -932,6 +950,7 @@ def main(argv: list[str] | None = None) -> int:
         payload = {
             "total_cases": summary.total_cases,
             "total_executed": summary.total_executed,
+            "total_external": getattr(summary, "total_external", 0),
             "total_errors": summary.total_errors,
             "total_lossy": getattr(summary, "total_lossy", 0),
             "results": [

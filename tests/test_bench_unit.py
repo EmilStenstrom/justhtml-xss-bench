@@ -260,6 +260,55 @@ def test_run_bench_fail_fast_stops_after_first_xss() -> None:
     assert calls == ["<img src=x onerror=1>"]
 
 
+def test_expected_tags_are_ordered_and_match_distinct_elements_in_order() -> None:
+    vectors = [
+        Vector(
+            id="v1",
+            description="",
+            payload_html='<div id="a"><div id="b"><div style="color:red">X</div></div></div>',
+            payload_context="html",
+            expected_tags=(
+                ExpectedTag("div", frozenset({"id"})),
+                ExpectedTag("div", frozenset({"id"})),
+                ExpectedTag("div", frozenset({"style"})),
+            ),
+        )
+    ]
+
+    sanitizer = Sanitizer(name="noop", description="", sanitize=lambda html: html)
+
+    def fake_runner(*_args, **_kwargs):
+        return type("VR", (), {"executed": False, "details": "no"})()
+
+    summary = run_bench(vectors=vectors, sanitizers=[sanitizer], runner=fake_runner)
+    assert summary.total_lossy == 0
+
+
+def test_expected_tags_require_multiple_matches_for_duplicates() -> None:
+    vectors = [
+        Vector(
+            id="v1",
+            description="",
+            payload_html='<div id="a"><div style="color:red">X</div></div>',
+            payload_context="html",
+            expected_tags=(
+                ExpectedTag("div", frozenset({"id"})),
+                ExpectedTag("div", frozenset({"id"})),
+            ),
+        )
+    ]
+
+    sanitizer = Sanitizer(name="noop", description="", sanitize=lambda html: html)
+
+    def fake_runner(*_args, **_kwargs):
+        return type("VR", (), {"executed": False, "details": "no"})()
+
+    summary = run_bench(vectors=vectors, sanitizers=[sanitizer], runner=fake_runner)
+    assert summary.total_lossy == 1
+    assert summary.results[0].outcome == "lossy"
+    assert "div[id]" in summary.results[0].details
+
+
 def test_run_bench_skips_href_without_attribute_cleaning_support() -> None:
     from xssbench.bench import run_bench, Vector
     from xssbench.sanitizers import Sanitizer
@@ -576,7 +625,7 @@ def test_run_bench_empty_expected_tags_means_no_tags_allowed() -> None:
     assert summary.results[0].outcome == "lossy"
 
 
-def test_run_bench_attribute_requirements_require_at_least_one_element() -> None:
+def test_run_bench_expected_tags_exact_matches_attrs() -> None:
     vectors = [
         Vector(
             id="v1",
@@ -587,11 +636,11 @@ def test_run_bench_attribute_requirements_require_at_least_one_element() -> None
         ),
     ]
 
-    # Sanitizer returns two <a> tags; only one keeps href -> should be lossy.
+    # Exact semantics: the first surviving element must match the expectation.
     sanitizer = Sanitizer(
         name="s",
         description="",
-        sanitize=lambda _html: "<a>x</a><a href='#'>y</a>",
+        sanitize=lambda _html: "<a href='#'>y</a>",
     )
 
     called = {"n": 0}
@@ -606,6 +655,38 @@ def test_run_bench_attribute_requirements_require_at_least_one_element() -> None
     assert summary.total_lossy == 0
     assert called["n"] == 1
     assert summary.results[0].outcome == "pass"
+
+
+def test_run_bench_expected_tags_exact_fails_on_extra_tags() -> None:
+    vectors = [
+        Vector(
+            id="v1",
+            description="",
+            payload_html="<b>ok</b>",
+            payload_context="html",
+            expected_tags=(ExpectedTag("b"),),
+        ),
+    ]
+
+    sanitizer = Sanitizer(
+        name="s",
+        description="",
+        sanitize=lambda _html: "<b>ok</b><i>extra</i>",
+    )
+
+    called = {"n": 0}
+
+    def fake_runner(**_kwargs):
+        called["n"] += 1
+        return type("VR", (), {"executed": False, "details": "no"})()
+
+    summary = run_bench(vectors=vectors, sanitizers=[sanitizer], runner=fake_runner)
+
+    assert summary.total_cases == 1
+    assert summary.total_lossy == 1
+    assert called["n"] == 0
+    assert summary.results[0].outcome == "lossy"
+    assert "unexpected" in summary.results[0].details
 
 
 def test_run_bench_bare_tag_requires_attribute_free_element() -> None:

@@ -218,7 +218,9 @@ def _maybe_lxml_html_clean() -> Sanitizer | None:
         scripts=True,
         javascript=True,
         comments=True,
-        style=True,
+        # Keep inline `style="..."` attributes (they are allowlisted by the shared policy).
+        # Tags like <style> are still removed since they are not in allow_tags.
+        style=False,
         processing_instructions=True,
         # Do not turn fragments into full documents / add <body> wrappers.
         page_structure=False,

@@ -66,7 +66,7 @@
       "payload_html": "<image/src/onerror=prompt(8)>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[src]"
       ]
     },
     {
@@ -793,6 +793,9 @@
       "payload_html": "<body onscroll=alert(1)><br><br><br><br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
+        "br",
+        "br",
         "br"
       ]
     },
@@ -802,6 +805,15 @@
       "payload_html": "<br><br><br><br><br><br><br><br><br><br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
+        "br",
+        "br",
+        "br",
+        "br",
+        "br",
+        "br",
+        "br",
+        "br",
         "br"
       ]
     },
@@ -811,6 +823,11 @@
       "payload_html": "<br><br><br><br><br><br><x id=x>#x",
       "payload_context": "html",
       "expected_tags": [
+        "br",
+        "br",
+        "br",
+        "br",
+        "br",
         "br"
       ]
     },
@@ -5583,7 +5600,8 @@
       "payload_html": "<body onscroll=alert(1)><div style=height:1000px></div><div id=x></div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[style]",
+        "div[id]"
       ]
     },
     {
@@ -5606,6 +5624,7 @@
       "payload_html": "<br draggable=\"true\" ondrag=\"alert(1)\">test</br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
         "br"
       ]
     },
@@ -5615,6 +5634,7 @@
       "payload_html": "<br draggable=\"true\" ondragend=\"alert(1)\">test</br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
         "br"
       ]
     },
@@ -5624,6 +5644,7 @@
       "payload_html": "<br draggable=\"true\" ondragenter=\"alert(1)\">test</br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
         "br"
       ]
     },
@@ -5633,6 +5654,7 @@
       "payload_html": "<br draggable=\"true\" ondragleave=\"alert(1)\">test</br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
         "br"
       ]
     },
@@ -5642,6 +5664,7 @@
       "payload_html": "<br draggable=\"true\" ondragstart=\"alert(1)\">test</br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
         "br"
       ]
     },
@@ -5651,7 +5674,8 @@
       "payload_html": "<br id=x tabindex=1 onactivate=alert(1)></br>",
       "payload_context": "html",
       "expected_tags": [
-        "br[id]"
+        "br[id]",
+        "br"
       ]
     },
     {
@@ -5660,7 +5684,8 @@
       "payload_html": "<br id=x tabindex=1 onbeforeactivate=alert(1)></br>",
       "payload_context": "html",
       "expected_tags": [
-        "br[id]"
+        "br[id]",
+        "br"
       ]
     },
     {
@@ -5679,7 +5704,8 @@
       "payload_html": "<br id=x tabindex=1 ondeactivate=alert(1)></br><input id=y autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "br[id]"
+        "br[id]",
+        "br"
       ]
     },
     {
@@ -5688,7 +5714,8 @@
       "payload_html": "<br id=x tabindex=1 onfocus=alert(1)></br>",
       "payload_context": "html",
       "expected_tags": [
-        "br[id]"
+        "br[id]",
+        "br"
       ]
     },
     {
@@ -5697,7 +5724,8 @@
       "payload_html": "<br id=x tabindex=1 onfocusin=alert(1)></br>",
       "payload_context": "html",
       "expected_tags": [
-        "br[id]"
+        "br[id]",
+        "br"
       ]
     },
     {
@@ -5706,6 +5734,7 @@
       "payload_html": "<br onbeforecopy=\"alert(1)\" contenteditable>test</br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
         "br"
       ]
     },
@@ -5715,6 +5744,7 @@
       "payload_html": "<br onbeforecut=\"alert(1)\" contenteditable>test</br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
         "br"
       ]
     },
@@ -5724,6 +5754,7 @@
       "payload_html": "<br onbeforepaste=\"alert(1)\" contenteditable>test</br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
         "br"
       ]
     },
@@ -5733,7 +5764,8 @@
       "payload_html": "<br onblur=alert(1) tabindex=1 id=x></br><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "br[id]"
+        "br[id]",
+        "br"
       ]
     },
     {
@@ -5742,6 +5774,7 @@
       "payload_html": "<br onclick=\"alert(1)\">test</br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
         "br"
       ]
     },
@@ -5751,6 +5784,7 @@
       "payload_html": "<br oncontextmenu=\"alert(1)\">test</br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
         "br"
       ]
     },
@@ -5760,6 +5794,7 @@
       "payload_html": "<br oncopy=\"alert(1)\" contenteditable>test</br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
         "br"
       ]
     },
@@ -5769,6 +5804,7 @@
       "payload_html": "<br oncut=\"alert(1)\" contenteditable>test</br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
         "br"
       ]
     },
@@ -5778,6 +5814,7 @@
       "payload_html": "<br ondblclick=\"alert(1)\">test</br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
         "br"
       ]
     },
@@ -5787,7 +5824,8 @@
       "payload_html": "<br onfocusout=alert(1) tabindex=1 id=x></br><input autofocus>",
       "payload_context": "html",
       "expected_tags": [
-        "br[id]"
+        "br[id]",
+        "br"
       ]
     },
     {
@@ -5796,6 +5834,7 @@
       "payload_html": "<br onkeydown=\"alert(1)\" contenteditable>test</br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
         "br"
       ]
     },
@@ -5805,6 +5844,7 @@
       "payload_html": "<br onkeypress=\"alert(1)\" contenteditable>test</br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
         "br"
       ]
     },
@@ -5814,6 +5854,7 @@
       "payload_html": "<br onkeyup=\"alert(1)\" contenteditable>test</br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
         "br"
       ]
     },
@@ -5823,6 +5864,7 @@
       "payload_html": "<br onmousedown=\"alert(1)\">test</br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
         "br"
       ]
     },
@@ -5832,6 +5874,7 @@
       "payload_html": "<br onmouseenter=\"alert(1)\">test</br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
         "br"
       ]
     },
@@ -5841,6 +5884,7 @@
       "payload_html": "<br onmouseleave=\"alert(1)\">test</br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
         "br"
       ]
     },
@@ -5850,6 +5894,7 @@
       "payload_html": "<br onmousemove=\"alert(1)\">test</br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
         "br"
       ]
     },
@@ -5859,6 +5904,7 @@
       "payload_html": "<br onmouseout=\"alert(1)\">test</br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
         "br"
       ]
     },
@@ -5868,6 +5914,7 @@
       "payload_html": "<br onmouseover=\"alert(1)\">test</br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
         "br"
       ]
     },
@@ -5877,6 +5924,7 @@
       "payload_html": "<br onmouseup=\"alert(1)\">test</br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
         "br"
       ]
     },
@@ -5886,6 +5934,7 @@
       "payload_html": "<br onpaste=\"alert(1)\" contenteditable>test</br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
         "br"
       ]
     },
@@ -10347,6 +10396,7 @@
       "payload_context": "html",
       "expected_tags": [
         "div",
+        "br",
         "br"
       ]
     },
@@ -10357,6 +10407,7 @@
       "payload_context": "html",
       "expected_tags": [
         "div",
+        "br",
         "br"
       ]
     },
@@ -10692,6 +10743,7 @@
       "payload_html": "<div draggable=\"true\" contenteditable>drag me</div><div ondragover=alert(1) contenteditable>drop here</div>",
       "payload_context": "html",
       "expected_tags": [
+        "div",
         "div"
       ]
     },
@@ -10701,6 +10753,7 @@
       "payload_html": "<div draggable=\"true\" contenteditable>drag me</div><div ondrop=alert(1) contenteditable>drop here</div>",
       "payload_context": "html",
       "expected_tags": [
+        "div",
         "div"
       ]
     },
@@ -11096,7 +11149,8 @@
       "payload_html": "<div draggable=\"true\" contenteditable>drag me</div><image ondragover=alert(1) contenteditable>drop here</image>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div",
+        "img"
       ]
     },
     {
@@ -11105,7 +11159,8 @@
       "payload_html": "<div draggable=\"true\" contenteditable>drag me</div><image ondrop=alert(1) contenteditable>drop here</image>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div",
+        "img"
       ]
     },
     {
@@ -32000,7 +32055,8 @@
       "payload_html": "<style>:target {color: red;}</style><br id=x style=\"transition:color 10s\" ontransitioncancel=alert(1)></br>",
       "payload_context": "html",
       "expected_tags": [
-        "br[id, style]"
+        "br[id, style]",
+        "br"
       ]
     },
     {
@@ -33035,7 +33091,8 @@
       "payload_html": "<style>:target {color:red;}</style><br id=x style=\"transition:color 1s\" ontransitionend=alert(1)></br>",
       "payload_context": "html",
       "expected_tags": [
-        "br[id, style]"
+        "br[id, style]",
+        "br"
       ]
     },
     {
@@ -34070,7 +34127,8 @@
       "payload_html": "<style>:target {transform: rotate(180deg);}</style><br id=x style=\"transition:transform 2s\" ontransitionrun=alert(1)></br>",
       "payload_context": "html",
       "expected_tags": [
-        "br[id, style]"
+        "br[id, style]",
+        "br"
       ]
     },
     {
@@ -35119,7 +35177,8 @@
       "payload_html": "<style>@keyframes slidein {}</style><br style=\"animation-duration:1s;animation-name:slidein;animation-iteration-count:2\" onanimationiteration=\"alert(1)\"></br>",
       "payload_context": "html",
       "expected_tags": [
-        "br[style]"
+        "br[style]",
+        "br"
       ]
     },
     {
@@ -35420,7 +35479,7 @@
       "payload_html": "<style>@keyframes slidein {}</style><image style=\"animation-duration:1s;animation-name:slidein;animation-iteration-count:2\" onanimationiteration=\"alert(1)\"></image>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[style]"
       ]
     },
     {
@@ -36161,7 +36220,8 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><br id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></br>",
       "payload_context": "html",
       "expected_tags": [
-        "br[id, style]"
+        "br[id, style]",
+        "br"
       ]
     },
     {
@@ -37335,7 +37395,8 @@
       "payload_html": "<style>@keyframes x{}</style><br style=\"animation-name:x\" onanimationend=\"alert(1)\"></br>",
       "payload_context": "html",
       "expected_tags": [
-        "br[style]"
+        "br[style]",
+        "br"
       ]
     },
     {
@@ -37344,7 +37405,8 @@
       "payload_html": "<style>@keyframes x{}</style><br style=\"animation-name:x\" onanimationstart=\"alert(1)\"></br>",
       "payload_context": "html",
       "expected_tags": [
-        "br[style]"
+        "br[style]",
+        "br"
       ]
     },
     {
@@ -37937,7 +37999,7 @@
       "payload_html": "<style>@keyframes x{}</style><image style=\"animation-name:x\" onanimationend=\"alert(1)\"></image>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[style]"
       ]
     },
     {
@@ -37946,7 +38008,7 @@
       "payload_html": "<style>@keyframes x{}</style><image style=\"animation-name:x\" onanimationstart=\"alert(1)\"></image>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[style]"
       ]
     },
     {
@@ -40344,6 +40406,7 @@
       "payload_html": "<svg><br onload=alert(1)></br>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
         "br"
       ]
     },
@@ -47123,8 +47186,43 @@
       "payload_context": "html",
       "expected_tags": [
         "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
         "a[style]",
-        "br"
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "br",
+        "br",
+        "br",
+        "br",
+        "br",
+        "br",
+        "br",
+        "br",
+        "br",
+        "br",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]"
       ]
     },
     {
@@ -47143,8 +47241,22 @@
       "payload_context": "html",
       "expected_tags": [
         "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
         "table",
+        "div[id]",
+        "a[style]",
+        "a[style]",
         "a",
+        "div[id]",
+        "div[id]",
+        "a[href]",
+        "div[id]",
+        "a[style]",
+        "div[id]",
+        "img[src]",
+        "div[id]",
         "img[src]"
       ]
     },
@@ -47264,7 +47376,17 @@
       "payload_html": "<div id=\"44\"><style>*[{}@import'test.css?]{color: green;}</style>X//[\"'`-->]]>]</div><div id=\"45\"><div style=\"font-family:'foo[a];color:red;';\">XXX</div>//[\"'`-->]]>]</div><div id=\"46\"><div style=\"font-family:foo}color=red;\">XXX</div>//[\"'`-->]]>]</div><div id=\"47\"><svg xmlns=\"http://www.w3.org/2000/svg\"><script>alert(47)</script></svg>//[\"'`-->]]>]</div><div id=\"48\"><SCRIPT FOR=document EVENT=onreadystatechange>alert(48)</SCRIPT>//[\"'`-->]]>]</div><div id=\"49\"><OBJECT CLASSID=\"clsid:333C7BC4-460F-11D0-BC04-0080C7055A83\"><PARAM NAME=\"DataURL\" VALUE=\"javascript:alert(49)\"></OBJECT>//[\"'`-->]]>]</div><div id=\"50\"><object data=\"data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==\"></object>//[\"'`-->]]>]</div><div id=\"51\"><embed src=\"data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==\"></embed>//[\"'`-->]]>]</div><div id=\"52\"><x style=\"behavior:url(test.sct)\">//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]",
+        "div[id]",
+        "div[style]",
+        "div[id]",
+        "div[style]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]"
       ]
     },
     {
@@ -47289,8 +47411,18 @@
       "payload_html": "<div id=\"54\"><script>[{'a':Object.prototype.__defineSetter__('b',function(){alert(arguments[0])}),'b':['secret']}]</script>//[\"'`-->]]>]</div><div id=\"55\"><video><source onerror=\"alert(55)\">//[\"'`-->]]>]</div><div id=\"56\"><video onerror=\"alert(56)\"><source></source></video>//[\"'`-->]]>]</div><div id=\"57\"><b <script>alert(57)//</script>0</script></b>//[\"'`-->]]>]</div><div id=\"58\"><b><script<b></b><alert(58)</script </b></b>//[\"'`-->]]>]</div><div id=\"59\"><div id=\"div1\"><input value=\"``onmouseover=alert(59)\"></div> <div id=\"div2\"></div><script>document.getElementById(\"div2\").innerHTML = document.getElementById(\"div1\").innerHTML;</script>//[\"'`-->]]>]</div><div id=\"60\"><div style=\"[a]color[b]:[c]red\">XXX</div>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div",
-        "b"
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "b",
+        "div[id]",
+        "b",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[style]"
       ]
     },
     {
@@ -47299,7 +47431,8 @@
       "payload_html": "<div id=\"61\"><div  style=\"\\63&#9\\06f&#10\\0006c&#12\\00006F&#13\\R:\\000072 Ed;color\\0\\bla:yellow\\0\\bla;col\\0\\00 \\&#xA0or:blue;\">XXX</div>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]",
+        "div[style]"
       ]
     },
     {
@@ -47379,6 +47512,7 @@
       "payload_html": "<div id=\"64\"><!DOCTYPE x[<!ENTITY x SYSTEM \"http://html5sec.org/test.xxe\">]><y>&x;</y>//[\"'`-->]]>]</div><div id=\"65\"><svg onload=\"javascript:alert(65)\" xmlns=\"http://www.w3.org/2000/svg\"></svg>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
+        "div[id]",
         "div[id]"
       ]
     },
@@ -47431,7 +47565,22 @@
       "payload_context": "html",
       "expected_tags": [
         "div[id]",
-        "img"
+        "div[id]",
+        "div[style]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "a",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "img",
+        "div[id]",
+        "div[id]",
+        "div[id]",
+        "div[id]"
       ]
     },
     {
@@ -47449,6 +47598,8 @@
       "payload_html": "<div id=\"84\"><x xmlns:ev=\"http://www.w3.org/2001/xml-events\" ev:event=\"load\" ev:handler=\"javascript:alert(84)//#x\"/>//[\"'`-->]]>]</div><div id=\"85\"><x xmlns:ev=\"http://www.w3.org/2001/xml-events\" ev:event=\"load\" ev:handler=\"test.evt#x\"/>//[\"'`-->]]>]</div><div id=\"86\"><body oninput=alert(86)><input autofocus>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
+        "div[id]",
+        "div[id]",
         "div[id]"
       ]
     },
@@ -47644,7 +47795,10 @@
       "payload_html": "<div id=\"92\"><div style=\"background:url(http://foo.f/f oo/;color:red/*/foo.jpg);\">X</div>//[\"'`-->]]>]</div><div id=\"93\"><div style=\"list-style:url(http://foo.f)\\20url(javascript:alert(93));\">X</div>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]",
+        "div[style]",
+        "div[id]",
+        "div[style]"
       ]
     },
     {
@@ -47749,7 +47903,9 @@
       "payload_html": "<div id=\"98\"><div id=d><div style=\"font-family:'sans\\27\\2F\\2A\\22\\2A\\2F\\3B color\\3Ared\\3B'\">X</div></div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]",
+        "div[id]",
+        "div[style]"
       ]
     },
     {
@@ -47810,8 +47966,11 @@
       "payload_context": "html",
       "expected_tags": [
         "div[id]",
+        "div[id]",
+        "a[href]",
+        "div[id]",
         "img[src]",
-        "a[href]"
+        "div[id]"
       ]
     },
     {
@@ -47837,7 +47996,9 @@
       "payload_context": "html",
       "expected_tags": [
         "div[id]",
-        "img[src]"
+        "div[id]",
+        "img[src]",
+        "div[id]"
       ]
     },
     {
@@ -47931,7 +48092,10 @@
       "payload_html": "<div id=\"111\"><div style=\"background:url(/f#[a]oo/;color:red/*/foo.jpg);\">X</div>//[\"'`-->]]>]</div><div id=\"112\"><div style=\"font-family:foo{bar;background:url(http://foo.f/oo};color:red/*/foo.jpg);\">X</div>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div"
+        "div[id]",
+        "div[style]",
+        "div[id]",
+        "div[style]"
       ]
     },
     {
@@ -47940,6 +48104,7 @@
       "payload_html": "<div id=\"113\"><div id=\"x\">XXX</div>",
       "payload_context": "html",
       "expected_tags": [
+        "div[id]",
         "div[id]"
       ]
     },
@@ -47981,6 +48146,7 @@
       "payload_html": "<div id=\"116\"><div id=\"x\">x</div>",
       "payload_context": "html",
       "expected_tags": [
+        "div[id]",
         "div[id]"
       ]
     },
@@ -48035,6 +48201,7 @@
       "payload_html": "<div id=\"118\"><div draggable=\"true\" ondragstart=\"event.dataTransfer.setData('text/plain','malicious code');\"><h1>Drop me</h1></div>",
       "payload_context": "html",
       "expected_tags": [
+        "div[id]",
         "div",
         "h1"
       ]
@@ -48282,7 +48449,7 @@
       "payload_html": "<image style='filter:url(\"data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22><script>parent.alert(129)</script></svg>\")'>",
       "payload_context": "html",
       "expected_tags": [
-        "img"
+        "img[style]"
       ]
     },
     {
@@ -48339,6 +48506,8 @@
       "payload_context": "html",
       "expected_tags": [
         "br",
+        "hr",
+        "br",
         "hr"
       ]
     },
@@ -48365,6 +48534,8 @@
       "payload_html": "<br/><hr/>feed:feed:javAscript:javAscript:feed:alert('Top Page Location: '+document.location+' Host Page Cookies: '+document.cookie);//<br/><hr/>",
       "payload_context": "html",
       "expected_tags": [
+        "br",
+        "hr",
         "br",
         "hr"
       ]
@@ -48654,6 +48825,7 @@
       "payload_html": "<div id=\"138\"><link rel=\"import\" href=\"test.svg\" />//[\"'`-->]]>]</div><div id=\"139\"><iframe srcdoc=\"&lt;img src&equals;x:x onerror&equals;alert&lpar;1&rpar;&gt;\" />//[\"'`-->]]>]</div>undefined",
       "payload_context": "html",
       "expected_tags": [
+        "div[id]",
         "div[id]"
       ]
     },

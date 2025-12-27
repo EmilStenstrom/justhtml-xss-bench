@@ -270,7 +270,7 @@
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / List-style-image",
 			"payload_html": "<STYLE>li {list-style-image: url(\"javascript:alert('XSS')\");}</STYLE><UL><LI>XSS</br>",
 			"payload_context": "html",
-			"expected_tags": ["ul", "li"]
+			"expected_tags": ["ul", "li", "br"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-vbscript-in-an-image-d373c2757c",
@@ -450,7 +450,7 @@
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / TABLE / TD",
 			"payload_html": "<TABLE><TD BACKGROUND=\"javascript:alert('XSS')\">",
 			"payload_context": "html",
-			"expected_tags": ["table", "td"]
+			"expected_tags": ["table", "tbody", "tr", "td"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-div-div-background-image-5a1e963454",

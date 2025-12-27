@@ -92,6 +92,10 @@ Each vector object has (at minimum):
 	If any of these tags are missing from the sanitized output, the benchmark marks the case as `lossy`.
 	If the list is empty (`[]`), the benchmark expects the sanitized output to contain no tags at all.
 
+	`expected_tags` is an ordered sequence describing the exact sanitized output.
+	The sanitized output must contain exactly those tags, in that order (same count, no extras).
+	Each entry is matched 1:1 against the corresponding surviving element.
+
 	Each entry may either be a bare tag name (tag must exist with no attributes)
 	or a tag with an attribute list:
 	- `"p"` (tag must exist; at least one surviving `<p>` must have no attributes)
