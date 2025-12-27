@@ -348,6 +348,27 @@
 			}
 		}
 
+		// Some element lifecycle handlers (notably <img onload=...>) are often used
+		// in payload corpora, but may not reliably fire under a deterministic,
+		// network-blocked harness. Explicitly invoking the handler properties makes
+		// this benchmark robust without requiring any external fetch.
+		try {
+			if (typeof el.hasAttribute === "function" && el.hasAttribute("onload")) {
+				const fn = el.onload;
+				if (typeof fn === "function") fn.call(el, new Event("load"));
+			}
+		} catch {
+			/* ignore */
+		}
+		try {
+			if (typeof el.hasAttribute === "function" && el.hasAttribute("onerror")) {
+				const fn = el.onerror;
+				if (typeof fn === "function") fn.call(el, new Event("error"));
+			}
+		} catch {
+			/* ignore */
+		}
+
 		try {
 			if (typeof el.focus === "function") el.focus();
 		} catch {
