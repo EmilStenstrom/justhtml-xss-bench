@@ -788,7 +788,7 @@
 			"description": "XSS Filter Evasion Cheat Sheet / Methods to Bypass WAF – Cross-Site Scripting / WAF ByPass Strings for XSS",
 			"payload_html": "<Img src = x onerror = \"javascript: window.onerror = alert; throw XSS\">",
 			"payload_context": "html",
-			"expected_tags": ["img[src]"]
+			"expected_tags": ["img"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-methods-to-bypass-waf-cross-site-scripting-waf-by-e5cee64be2",

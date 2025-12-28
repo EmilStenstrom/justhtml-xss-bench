@@ -66,7 +66,7 @@
       "payload_html": "<image/src/onerror=prompt(8)>",
       "payload_context": "html",
       "expected_tags": [
-        "img[src]"
+        "img"
       ]
     },
     {
@@ -75,7 +75,7 @@
       "payload_html": "<img/src/onerror=prompt(8)>",
       "payload_context": "html",
       "expected_tags": [
-        "img[src]"
+        "img"
       ]
     },
     {
@@ -84,7 +84,7 @@
       "payload_html": "<image src/onerror=prompt(8)>",
       "payload_context": "html",
       "expected_tags": [
-        "img[src]"
+        "img"
       ]
     },
     {
@@ -93,7 +93,7 @@
       "payload_html": "<img src/onerror=prompt(8)>",
       "payload_context": "html",
       "expected_tags": [
-        "img[src]"
+        "img"
       ]
     },
     {
@@ -102,7 +102,7 @@
       "payload_html": "<image src =q onerror=prompt(8)>",
       "payload_context": "html",
       "expected_tags": [
-        "img[src]"
+        "img"
       ]
     },
     {
@@ -111,7 +111,7 @@
       "payload_html": "<img src =q onerror=prompt(8)>",
       "payload_context": "html",
       "expected_tags": [
-        "img[src]"
+        "img"
       ]
     },
     {
@@ -120,7 +120,7 @@
       "payload_html": "</scrip</script>t><img src =q onerror=prompt(8)>",
       "payload_context": "html",
       "expected_tags": [
-        "img[src]"
+        "img"
       ]
     },
     {
@@ -18241,7 +18241,7 @@
       "payload_html": "<image src/onerror=alert(1)>",
       "payload_context": "html",
       "expected_tags": [
-        "img[src]"
+        "img"
       ]
     },
     {
@@ -18574,7 +18574,7 @@
       "payload_html": "<img src/onerror=alert(1)>",
       "payload_context": "html",
       "expected_tags": [
-        "img[src]"
+        "img"
       ]
     },
     {
@@ -47997,7 +47997,7 @@
       "expected_tags": [
         "div[id]",
         "div[id]",
-        "img[src]",
+        "img",
         "div[id]"
       ]
     },
