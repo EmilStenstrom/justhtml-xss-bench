@@ -28,6 +28,17 @@
 		return "";
 	};
 
+	const isDangerousDataUri = (value) => {
+		if (!value.startsWith("data:")) return false;
+		// Check for dangerous MIME types
+		if (value.startsWith("data:text/html")) return true;
+		if (value.startsWith("data:image/svg+xml")) return true;
+		if (value.startsWith("data:application/xhtml+xml")) return true;
+		if (value.startsWith("data:text/xml")) return true;
+		if (value.startsWith("data:application/xml")) return true;
+		return false;
+	};
+
 	const elements = document.querySelectorAll("*");
 	for (const el of elements) {
 		for (const attr of attrs) {
@@ -37,13 +48,16 @@
 				const schemeish = normalizeForScheme(raw);
 				// Primary check: raw attribute after trimming.
 				let isJavascript = schemeish.startsWith("javascript:");
+				let isData = isDangerousDataUri(schemeish);
+
 				// Secondary check: resolved property (more accurate for browser behavior).
-				if (!isJavascript) {
+				if (!isJavascript && !isData) {
 					const resolved = normalizeForScheme(resolvedValue(el, attr));
 					isJavascript = resolved.startsWith("javascript:");
+					isData = isDangerousDataUri(resolved);
 				}
 
-				if (isJavascript) {
+				if (isJavascript || isData) {
 					hits.push({
 						tag: (el.tagName || "").toLowerCase(),
 						attr,

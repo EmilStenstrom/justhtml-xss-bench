@@ -541,7 +541,7 @@ class BrowserHarness:
             return VectorResult(
                 executed=True,
                 details=(
-                    "Executed: javascript-url:"
+                    "Executed: dangerous-url:"
                     f"{first.get('tag')}[{first.get('attr')}]={first.get('value')}; payload={payload_html!r}"
                 ),
             )
@@ -997,7 +997,7 @@ class AsyncBrowserHarness:
             return VectorResult(
                 executed=True,
                 details=(
-                    "Executed: javascript-url:"
+                    "Executed: dangerous-url:"
                     f"{first.get('tag')}[{first.get('attr')}]={first.get('value')}; payload={payload_html!r}"
                 ),
             )
