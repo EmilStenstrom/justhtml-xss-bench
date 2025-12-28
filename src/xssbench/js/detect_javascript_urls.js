@@ -1,5 +1,13 @@
 () => {
-	const attrs = ["href", "src", "action", "formaction", "data"];
+	const attrs = [
+		"href",
+		"src",
+		"action",
+		"formaction",
+		"data",
+		"xlink:href",
+		"content",
+	];
 	const hits = [];
 
 	// Approximate what browsers do for scheme detection:
@@ -49,6 +57,18 @@
 				// Primary check: raw attribute after trimming.
 				let isJavascript = schemeish.startsWith("javascript:");
 				let isData = isDangerousDataUri(schemeish);
+
+				if (attr === "content") {
+					// Handle meta refresh: content="0;url=javascript:..."
+					if (/url\s*=\s*javascript:/i.test(schemeish)) {
+						isJavascript = true;
+					}
+					// Check for data URI in meta refresh
+					const match = schemeish.match(/url\s*=\s*(data:[^;"'\s]+)/i);
+					if (match && isDangerousDataUri(match[1])) {
+						isData = true;
+					}
+				}
 
 				// Secondary check: resolved property (more accurate for browser behavior).
 				if (!isJavascript && !isData) {
