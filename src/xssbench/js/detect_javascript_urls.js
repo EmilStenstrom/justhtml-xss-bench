@@ -7,6 +7,9 @@
 		"data",
 		"xlink:href",
 		"content",
+		"to",
+		"from",
+		"values",
 	];
 	const hits = [];
 
@@ -67,6 +70,16 @@
 					const match = schemeish.match(/url\s*=\s*(data:[^;"'\s]+)/i);
 					if (match && isDangerousDataUri(match[1])) {
 						isData = true;
+					}
+				}
+
+				if (attr === "values") {
+					// Handle SVG animation values list: values="...; javascript:..."
+					const parts = schemeish.split(";");
+					for (const part of parts) {
+						const p = part.trim();
+						if (p.startsWith("javascript:")) isJavascript = true;
+						if (isDangerousDataUri(p)) isData = true;
 					}
 				}
 
