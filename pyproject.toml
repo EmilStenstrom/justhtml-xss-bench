@@ -53,6 +53,12 @@ line-length = 119
 
 [tool.ruff.lint]
 select = ["ALL"]
+ignore = [
+  "D203",   # one-blank-line-before-class (conflicts with D211)
+  "D213",   # multi-line-summary-second-line (conflicts with D212)
+  "COM812", # missing-trailing-comma (conflicts with formatter)
+  "ISC001", # single-line-implicit-string-concatenation (conflicts with formatter)
+]
 
 [tool.ruff.lint.extend-per-file-ignores]
 "tests/**/*.py" = ["S101", "PT"]  # S101: allow assert, PT: we use unittest not pytest
