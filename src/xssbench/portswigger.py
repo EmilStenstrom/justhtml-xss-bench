@@ -71,11 +71,22 @@ def _get_commit(repo_dir: Path) -> str:
 
 
 def _build_new_vectors(
-    *, repo_dir: Path, against_paths: Iterable[str | Path]
+    *,
+    repo_dir: Path,
+    against_paths: Iterable[str | Path],
+    expectations: dict[str, list[str]],
 ) -> tuple[str, dict[str, int], list[dict]]:
     # Existing tested vectors in this repo.
     existing: set[tuple[str, str]] = set()
-    for v in load_vectors(against_paths):
+
+    # Filter out the file we are about to generate, and the expectations file.
+    filtered_paths = [
+        p
+        for p in against_paths
+        if Path(p).name not in ("portswigger-xss-cheatsheet-data.json", "portswigger-expectations.json")
+    ]
+
+    for v in load_vectors(filtered_paths):
         existing.add((v.payload_context, normalize_payload(v.payload_html)))
 
     # Extract candidates from PortSwigger's json/*.json
@@ -125,9 +136,18 @@ def _build_new_vectors(
 
                 new += 1
                 sha = hashlib.sha256(norm.encode("utf-8")).hexdigest()
+                vector_id = f"portswigger-{sha[:12]}"
+
+                # Allow looking up expectations by stable location ID (filename#key#index)
+                # so they survive payload updates.
+                stable_id = f"{path.name}#{top_key}#{tag_index}"
+                expected = expectations.get(vector_id)
+                if expected is None:
+                    expected = expectations.get(stable_id, [])
+
                 vectors.append(
                     {
-                        "id": f"portswigger-{sha[:12]}",
+                        "id": vector_id,
                         "description": (
                             f"PortSwigger xss-cheatsheet-data {path.name}#{top_key} "
                             f"tag_index={tag_index} tag={tag_entry.get('tag')!s}"
@@ -136,7 +156,7 @@ def _build_new_vectors(
                         "payload_context": payload_context,
                         # PortSwigger entries are attack payloads; by default we
                         # expect sanitization to remove all markup.
-                        "expected_tags": [],
+                        "expected_tags": expected,
                     }
                 )
 
@@ -173,7 +193,17 @@ def ensure_portswigger_vectors_file(
     vendor_dir = repo_root / ".xssbench" / "vendor"
     repo_dir = _ensure_repo_clone(vendor_dir=vendor_dir)
 
-    source_commit, counts, vectors = _build_new_vectors(repo_dir=repo_dir, against_paths=against_paths)
+    expectations_path = repo_root / "vectors" / "portswigger-expectations.json"
+    expectations: dict[str, list[str]] = {}
+    if expectations_path.exists():
+        try:
+            expectations = json.loads(expectations_path.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+
+    source_commit, counts, vectors = _build_new_vectors(
+        repo_dir=repo_dir, against_paths=against_paths, expectations=expectations
+    )
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -190,7 +220,7 @@ def ensure_portswigger_vectors_file(
     }
 
     out_path.write_text(
-        json.dumps(payload, indent=2, ensure_ascii=True, sort_keys=True) + "\n",
+        json.dumps(payload, indent=2, ensure_ascii=True, sort_keys=False) + "\n",
         encoding="utf-8",
     )
 

@@ -373,7 +373,7 @@ def _default_vector_globs() -> list[str]:
     for root in (Path.cwd(), Path(__file__).resolve().parents[2]):
         vectors_dir = root / "vectors"
         if vectors_dir.exists():
-            return [str(p) for p in sorted(vectors_dir.glob("*.json"))]
+            return [str(p) for p in sorted(vectors_dir.glob("*.json")) if p.name != "portswigger-expectations.json"]
     return []
 
 
