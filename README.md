@@ -2,6 +2,45 @@
 
 A tiny, standalone headless-browser harness for detecting whether a sanitized HTML payload can execute JavaScript when embedded into the initial HTML page ("server-side" style).
 
+## Latest run (2025-12-29)
+
+Command (Chromium-only for reasonable runtime):
+
+```bash
+xssbench --browser chromium --workers 28 --json-out .xssbench/results-latest.json --no-progress
+```
+
+Totals: 35,040 cases (5 sanitizers × 7,008 vectors) on Chromium.
+
+| sanitizer       | pass | xss  | external | skip | error | lossy |
+|-----------------|-----:|-----:|---------:|-----:|------:|------:|
+| `bleach`        | 6913 |    0 |        3 |   92 |     0 |    79 |
+| `nh3`           | 6913 |    0 |        3 |   92 |     0 |    18 |
+| `lxml_html_clean` | 6913 |  0 |        3 |   92 |     0 |  6120 |
+| `justhtml`      | 6916 |    0 |        0 |   92 |     0 |     0 |
+| `noop`          |  927 | 6065 |        8 |    8 |     0 |  6585 |
+
+Why the results look like this:
+
+- **`noop` is the baseline**: it returns the payload unchanged, so it shows how many vectors *actually execute* in the browser when nothing is sanitized. The reason that not all vectors execute is because they are designed to execute only after unsuccessful cleaning (ie. `<script<script>>`)
+
+- **`xss=0` for the real sanitizers** (in this run) means the harness didn’t observe any execution signals (dialogs, dangerous URLs, unexpected navigations, external script fetch attempts). All cleaners in this test are working well.
+
+- **`external` counts are not “passed”**: the harness blocks network for determinism and records attempted external requests. We track these separately because they’re useful risk signals even when they’re not immediate JS execution. Note that only justhtml has built-in link rewriting, so this is not something that's expected from the others.
+
+- **`skip` happens for out-of-scope contexts**: the suite includes some non-HTML contexts (e.g. JS-string/JS-code injection) that HTML sanitizers intentionally don’t support. These have to take attribute escaping into account, and no sanitizers have support for that currently.
+
+- **`lossy` is a fidelity metric**, not a security metric: it means the sanitizer output didn’t match the vector file’s `expected_tags`.
+
+	One way to think about it: if we deleted all input HTML we’d be “safe”, but we wouldn’t have a useful sanitizer.
+
+	The most common reasons for `lossy` in this run:
+
+	- **`nh3`**: Most lossy cases are *attribute fidelity* mismatches. nh3 often keeps safe URL attributes like `href`/`src` (sometimes normalized to empty strings) in cases where the vector expectations only require the tag (`a`, `img`) without attributes.
+	- **`bleach`**: Similar attribute-fidelity mismatches (safe `href`/`src` surviving when the expectation is a bare `a`/`img`), plus some vectors rely on HTML tag-name quirks like `<image>` being treated as `<img>`.
+	- **`lxml_html_clean`**: `lossy` is high mostly because it aggressively *rewrites* input into safe placeholder markup (often `div`/`span`/`p`) rather than dropping everything. Many vectors expect “no tags”, but lxml’s cleaner preserves safe text inside wrapper elements and may also insert implied structure like `tbody`.
+	- **`noop`**: `lossy` is high because it intentionally doesn’t change the input, while many vectors expect the output to contain no tags at all.
+
 ## Quickstart
 
 ```bash
