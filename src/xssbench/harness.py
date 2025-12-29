@@ -430,6 +430,17 @@ class BrowserHarness:
         if self._page is None or self._timeout_error is None:
             raise RuntimeError("Harness not initialized")
 
+        # Best-effort cleanup: the harness reuses a single Page across vectors.
+        # If a previous vector scheduled work (e.g. setInterval) that triggers
+        # a navigation slightly later, it can be mis-attributed to the next
+        # vector run.
+        try:
+            self._page.evaluate(
+                "() => { try { window.__xssbench && window.__xssbench.cleanup && window.__xssbench.cleanup(); } catch (e) {} }"
+            )
+        except Exception:
+            pass
+
         self._external_script_requests.clear()
         self._external_network_requests.clear()
         self._navigation_requests.clear()
@@ -516,6 +527,21 @@ class BrowserHarness:
                     details=f"Executed: navigation:context-destroyed; payload={payload_html!r}",
                 )
             raise
+
+        # The harness reuses a single Page across vectors. If the previous vector
+        # triggered an in-flight reload/navigation to the base URL, Chromium can
+        # report an extra `framenavigated` to the same URL during this initial
+        # `goto()`. That would otherwise be mis-attributed to the current vector.
+        #
+        # We only discard navigations to the base URL here; navigations to other
+        # URLs are still meaningful execution signals.
+        try:
+            if self._navigation_requests:
+                self._navigation_requests[:] = [u for u in self._navigation_requests if u != self._base_url]
+            if self._base_navigation_count < 1:
+                self._base_navigation_count = 1
+        except Exception:
+            pass
 
         def _hook_details() -> str:
             try:
@@ -892,6 +918,17 @@ class AsyncBrowserHarness:
         if self._page is None or self._timeout_error is None:
             raise RuntimeError("Harness not initialized")
 
+        # Best-effort cleanup: the harness reuses a single Page across vectors.
+        # If a previous vector scheduled work (e.g. setInterval) that triggers
+        # a navigation slightly later, it can be mis-attributed to the next
+        # vector run.
+        try:
+            await self._page.evaluate(
+                "() => { try { window.__xssbench && window.__xssbench.cleanup && window.__xssbench.cleanup(); } catch (e) {} }"
+            )
+        except Exception:
+            pass
+
         self._external_script_requests.clear()
         self._external_network_requests.clear()
         self._navigation_requests.clear()
@@ -973,6 +1010,15 @@ class AsyncBrowserHarness:
                     details=f"Executed: navigation:context-destroyed; payload={payload_html!r}",
                 )
             raise
+
+        # See sync harness `run()` for rationale.
+        try:
+            if self._navigation_requests:
+                self._navigation_requests[:] = [u for u in self._navigation_requests if u != self._base_url]
+            if self._base_navigation_count < 1:
+                self._base_navigation_count = 1
+        except Exception:
+            pass
 
         async def _hook_details() -> str:
             try:
