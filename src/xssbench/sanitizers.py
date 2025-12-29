@@ -344,14 +344,14 @@ def _maybe_justhtml() -> Sanitizer | None:
             ("a", "href"): UrlRule(
                 allow_relative=True,
                 allow_fragment=True,
-                allow_protocol_relative=True,
+                resolve_protocol_relative=True,
                 allowed_schemes=set(_URL_PROTOCOLS),
                 allowed_hosts=None,
             ),
             ("img", "src"): UrlRule(
                 allow_relative=True,
                 allow_fragment=True,
-                allow_protocol_relative=True,
+                resolve_protocol_relative=True,
                 # Keep image loads roughly aligned with other cleaners.
                 allowed_schemes={"http", "https"},
                 allowed_hosts=None,
