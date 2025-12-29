@@ -12,13 +12,15 @@ xssbench --browser chromium --workers 28 --json-out .xssbench/results-latest.jso
 
 Totals: 35,040 cases (5 sanitizers × 7,008 vectors) on Chromium.
 
-| sanitizer       | pass | xss  | external | skip | error | lossy |
-|-----------------|-----:|-----:|---------:|-----:|------:|------:|
-| `bleach`        | 6913 |    0 |        3 |   92 |     0 |    79 |
-| `nh3`           | 6913 |    0 |        3 |   92 |     0 |    18 |
-| `lxml_html_clean` | 6913 |  0 |        3 |   92 |     0 |  6120 |
-| `justhtml`      | 6916 |    0 |        0 |   92 |     0 |     0 |
-| `noop`          |  927 | 6065 |        8 |    8 |     0 |  6585 |
+Engine: Playwright 1.57.0 (Chromium 143.0.7499.4).
+
+| sanitizer         | version | pass | xss  | external | skip | error | lossy |
+|-------------------|:--------|-----:|-----:|---------:|-----:|------:|------:|
+| `bleach`          | 6.3.0   | 6913 |    0 |        3 |   92 |     0 |    79 |
+| `nh3`             | 0.3.2   | 6913 |    0 |        3 |   92 |     0 |    18 |
+| `lxml_html_clean` | 0.4.3   | 6913 |    0 |        3 |   92 |     0 |  6120 |
+| `justhtml`        | 0.18.0  | 6916 |    0 |        0 |   92 |     0 |     0 |
+| `noop`            | —       |  927 | 6065 |        8 |    8 |     0 |  6585 |
 
 Why the results look like this:
 
