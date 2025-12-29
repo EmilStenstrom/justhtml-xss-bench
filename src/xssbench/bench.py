@@ -483,6 +483,8 @@ def run_bench(
                                 run_payload_context=vector.payload_context,
                                 outcome="skip",
                                 executed=False,
+                                lossy=False,
+                                lossy_details="",
                                 details=(
                                     f"Skipped: {sanitizer.name} does not declare href attribute cleaning support"
                                 ),
