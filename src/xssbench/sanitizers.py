@@ -65,7 +65,9 @@ _IMG_ATTRS: frozenset[str] = frozenset({"src", "alt", "title", "width", "height"
 
 _TABLE_CELL_ATTRS: frozenset[str] = frozenset({"colspan", "rowspan"})
 
-_URL_PROTOCOLS: tuple[str, ...] = ("http", "https", "mailto", "tel")
+# Disallow all URL protocols by default.
+# (Relative URLs may still be allowed by some sanitizers depending on their API.)
+_URL_PROTOCOLS: tuple[str, ...] = ()
 
 
 # Shared CSS allowlist (inline style sanitization)
@@ -329,8 +331,7 @@ def _maybe_justhtml() -> Sanitizer | None:
         ("img", "src"): UrlRule(
             allow_fragment=True,
             resolve_protocol_relative="https",
-            # Keep image loads roughly aligned with other cleaners.
-            allowed_schemes={"http", "https"},
+            allowed_schemes=set(_URL_PROTOCOLS),
             allowed_hosts=None,
         ),
     }
