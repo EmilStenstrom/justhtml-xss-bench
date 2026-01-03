@@ -13,17 +13,20 @@ _MAX_PLAYWRIGHT_TIMEOUT_MS = 5000
 
 
 def render_html_document(*, sanitized_html: str, payload_context: "PayloadContext") -> str:
-    template = {
-        "html": _HTML_TEMPLATE,
-        "html_head": _HTML_HEAD_TEMPLATE,
-        "html_outer": _HTML_OUTER_TEMPLATE,
-        "href": _HREF_TEMPLATE,
-        "js": _JS_TEMPLATE,
-        "js_arg": _JS_ARG_TEMPLATE,
-        "js_string": _JS_STRING_TEMPLATE,
-        "js_string_double": _JS_STRING_DOUBLE_TEMPLATE,
-        "onerror_attr": _ONERROR_ATTR_TEMPLATE,
-    }.get(payload_context)
+    if payload_context == "http_leak":
+        template = _template_for_http_leak_payload(sanitized_html)
+    else:
+        template = {
+            "html": _HTML_TEMPLATE,
+            "html_head": _HTML_HEAD_TEMPLATE,
+            "html_outer": _HTML_OUTER_TEMPLATE,
+            "href": _HREF_TEMPLATE,
+            "js": _JS_TEMPLATE,
+            "js_arg": _JS_ARG_TEMPLATE,
+            "js_string": _JS_STRING_TEMPLATE,
+            "js_string_double": _JS_STRING_DOUBLE_TEMPLATE,
+            "onerror_attr": _ONERROR_ATTR_TEMPLATE,
+        }.get(payload_context)
     if template is None:
         raise ValueError(f"Unknown payload_context: {payload_context!r}")
 
@@ -79,7 +82,7 @@ class VectorResult:
     details: str
     # Optional classification hint for callers.
     # - "none": no execution/risk detected
-    # - "external": non-script external network request attempt detected
+    # - "http_leak": non-script external network request attempt detected
     signal: str = "none"
 
 
@@ -90,6 +93,7 @@ PayloadContext = Literal[
     "html",
     "html_head",
     "html_outer",
+    "http_leak",
     "href",
     "js",
     "js_arg",
@@ -97,6 +101,22 @@ PayloadContext = Literal[
     "js_string_double",
     "onerror_attr",
 ]
+
+
+def _template_for_http_leak_payload(sanitized_html: str) -> str:
+    # Heuristic placement for HTTP-leak primitives.
+    # We keep the vector payloads raw but still want head-only tags like <meta>
+    # and <link> to land in <head> when possible.
+    import re
+
+    m = re.search(r"<\s*([A-Za-z][A-Za-z0-9:-]*)", sanitized_html)
+    tag = m.group(1).lower() if m else ""
+
+    if tag in {"meta", "base", "link", "style", "title"}:
+        return _HTML_HEAD_TEMPLATE
+    if tag in {"html", "body", "frameset"}:
+        return _HTML_OUTER_TEMPLATE
+    return _HTML_TEMPLATE
 
 
 _HTML_TEMPLATE = """<!doctype html>
@@ -447,20 +467,6 @@ class BrowserHarness:
         self._dialog_events.clear()
         self._base_navigation_count = 0
 
-        template = {
-            "html": _HTML_TEMPLATE,
-            "html_head": _HTML_HEAD_TEMPLATE,
-            "html_outer": _HTML_OUTER_TEMPLATE,
-            "href": _HREF_TEMPLATE,
-            "js": _JS_TEMPLATE,
-            "js_arg": _JS_ARG_TEMPLATE,
-            "js_string": _JS_STRING_TEMPLATE,
-            "js_string_double": _JS_STRING_DOUBLE_TEMPLATE,
-            "onerror_attr": _ONERROR_ATTR_TEMPLATE,
-        }.get(payload_context)
-        if template is None:
-            raise ValueError(f"Unknown payload_context: {payload_context!r}")
-
         expected_href_click_url: str | None = None
         first_external_network: tuple[str, str] | None = None
 
@@ -472,9 +478,7 @@ class BrowserHarness:
                 expected_href_click_url=expected_href_click_url,
             )
 
-        html = template.replace("__XSSBENCH_PAYLOAD__", sanitized_html)
-        html = html.replace("__XSSBENCH_PRELUDE__", _XSSBENCH_PRELUDE_HTML)
-        self._current_html = html
+        self._current_html = render_html_document(sanitized_html=sanitized_html, payload_context=payload_context)
         # In WebKit, vectors that synchronously trigger a navigation (e.g. via `location = ...`)
         # can prevent the `load` event from ever settling, causing `goto(..., wait_until="load")`
         # to hang until Playwright's default 30s timeout.
@@ -508,7 +512,7 @@ class BrowserHarness:
                     return VectorResult(
                         executed=False,
                         details=f"External fetch: {rtype}:{url}; payload={payload_html!r}",
-                        signal="external",
+                        signal="http_leak",
                     )
                 if self._dialog_events:
                     details = self._dialog_events[0]
@@ -577,21 +581,6 @@ class BrowserHarness:
             return VectorResult(
                 executed=True,
                 details=f"Executed: hook:{hook}; payload={payload_html!r}",
-            )
-
-        if self._dialog_events:
-            details = self._dialog_events[0]
-            return VectorResult(
-                executed=True,
-                details=f"Executed: {details}; payload={payload_html!r}",
-            )
-
-        exec_nav = _execution_navigation_urls()
-        if exec_nav:
-            urls = ", ".join(exec_nav[:3])
-            return VectorResult(
-                executed=True,
-                details=f"Executed: navigation:{urls}; payload={payload_html!r}",
             )
 
         if self._external_script_requests:
@@ -730,7 +719,7 @@ class BrowserHarness:
             return VectorResult(
                 executed=False,
                 details=f"External fetch: {rtype}:{url}; payload={payload_html!r}",
-                signal="external",
+                signal="http_leak",
             )
 
         return VectorResult(executed=False, details="No execution detected")
@@ -937,20 +926,6 @@ class AsyncBrowserHarness:
 
         first_external_network: tuple[str, str] | None = None
 
-        template = {
-            "html": _HTML_TEMPLATE,
-            "html_head": _HTML_HEAD_TEMPLATE,
-            "html_outer": _HTML_OUTER_TEMPLATE,
-            "href": _HREF_TEMPLATE,
-            "js": _JS_TEMPLATE,
-            "js_arg": _JS_ARG_TEMPLATE,
-            "js_string": _JS_STRING_TEMPLATE,
-            "js_string_double": _JS_STRING_DOUBLE_TEMPLATE,
-            "onerror_attr": _ONERROR_ATTR_TEMPLATE,
-        }.get(payload_context)
-        if template is None:
-            raise ValueError(f"Unknown payload_context: {payload_context!r}")
-
         expected_href_click_url: str | None = None
 
         def _execution_navigation_urls() -> list[str]:
@@ -961,8 +936,7 @@ class AsyncBrowserHarness:
                 expected_href_click_url=expected_href_click_url,
             )
 
-        html = template.replace("__XSSBENCH_PAYLOAD__", sanitized_html)
-        html = html.replace("__XSSBENCH_PRELUDE__", _XSSBENCH_PRELUDE_HTML)
+        html = render_html_document(sanitized_html=sanitized_html, payload_context=payload_context)
         self._current_html = html
 
         try:
@@ -991,7 +965,7 @@ class AsyncBrowserHarness:
                     return VectorResult(
                         executed=False,
                         details=f"External fetch: {rtype}:{url}; payload={payload_html!r}",
-                        signal="external",
+                        signal="http_leak",
                     )
                 if self._dialog_events:
                     details = self._dialog_events[0]
@@ -1170,12 +1144,18 @@ class AsyncBrowserHarness:
                         executed=True,
                         details=f"Executed: navigation:{urls}; payload={payload_html!r}",
                     )
+                if self._external_script_requests:
+                    urls = ", ".join(self._external_script_requests[:3])
+                    return VectorResult(
+                        executed=True,
+                        details=f"Executed: external-script:{urls}; payload={payload_html!r}",
+                    )
                 if self._external_network_requests:
                     rtype, url = self._external_network_requests[0]
                     return VectorResult(
                         executed=False,
                         details=f"External fetch: {rtype}:{url}; payload={payload_html!r}",
-                        signal="external",
+                        signal="http_leak",
                     )
                 if _looks_like_navigation_context_destroyed(exc):
                     return VectorResult(
@@ -1203,7 +1183,7 @@ class AsyncBrowserHarness:
             return VectorResult(
                 executed=False,
                 details=f"External fetch: {rtype}:{url}; payload={payload_html!r}",
-                signal="external",
+                signal="http_leak",
             )
 
         return VectorResult(executed=False, details="No execution detected")

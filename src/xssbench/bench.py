@@ -34,7 +34,8 @@ class Vector:
     # Tags/attributes we expect to survive sanitization.
     # - (): explicitly expect NO tags to remain after sanitization
     # - (ExpectedTag("a", {"href"}), ...): expect tag+attrs to remain
-    expected_tags: tuple[ExpectedTag, ...] = ()
+    # - None: do not perform any expected_tags checks for this vector
+    expected_tags: tuple[ExpectedTag, ...] | None = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -44,7 +45,7 @@ class BenchCaseResult:
     vector_id: str
     payload_context: PayloadContext
     run_payload_context: PayloadContext
-    outcome: str  # 'pass' | 'xss' | 'external' | 'skip' | 'error'
+    outcome: str  # 'pass' | 'xss' | 'http_leak' | 'skip' | 'error'
     executed: bool
     lossy: bool
     lossy_details: str
@@ -181,6 +182,8 @@ def _parse_expected_tag_spec(spec: str) -> ExpectedTag:
 def _expected_tags_allowed_for_context(payload_context: PayloadContext) -> bool:
     # expected_tags is a notion for HTML-fragment sanitization.
     # It is explicitly forbidden for href and all js* contexts.
+    if payload_context == "http_leak":
+        return False
     if payload_context == "href":
         return False
     if payload_context.startswith("js"):
@@ -272,6 +275,7 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
         "html",
         "html_head",
         "html_outer",
+        "http_leak",
         "href",
         "js",
         "js_arg",
@@ -288,23 +292,31 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
 
     for raw_path in paths:
         path = Path(raw_path)
-        data = json.loads(path.read_text(encoding="utf-8"))
+        root = json.loads(path.read_text(encoding="utf-8"))
 
         # Vector file schema (strict):
         # {"schema": "xssbench.vectorfile.v1", "meta": {...}, "vectors": [...]}
-        if not isinstance(data, dict):
+        if not isinstance(root, dict):
             raise ValueError(
-                f"Vector file must be a v1 object with schema 'xssbench.vectorfile.v1' (got {type(data)!r}): {path}"
+                f"Vector file must be a v1 object with schema 'xssbench.vectorfile.v1' (got {type(root)!r}): {path}"
             )
 
-        schema = data.get("schema")
+        schema = root.get("schema")
         if schema != "xssbench.vectorfile.v1":
             raise ValueError(f"Vector file schema must be 'xssbench.vectorfile.v1' (got {schema!r}): {path}")
 
-        if "vectors" not in data:
+        if "vectors" not in root:
             raise ValueError(f"Vector file object must contain a 'vectors' key: {path}")
 
-        data = data["vectors"]
+        options = root.get("options")
+        if options is None:
+            options = {}
+        if not isinstance(options, dict):
+            raise ValueError(f"Vector file 'options' must be a JSON object if present: {path}")
+
+        ignore_expected_tags = options.get("expected_tags") == "ignore"
+
+        data = root["vectors"]
 
         if not isinstance(data, list):
             raise ValueError(f"Vector file 'vectors' must be a JSON list: {path}")
@@ -317,6 +329,7 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
                 raise ValueError(f"Vector missing keys {sorted(missing)}: {path}")
 
             raw_context = item.get("payload_context")
+            has_expected_tags = "expected_tags" in item
             raw_expected_tags = item.get("expected_tags")
 
             if "expected_tags_ordered" in item:
@@ -353,25 +366,30 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
 
                 payload_html = str(item["payload_html"])
 
-                expected_tags: tuple[ExpectedTag, ...] = ()
+                expected_tags: tuple[ExpectedTag, ...] | None = ()
                 if _expected_tags_allowed_for_context(payload_context):
-                    if raw_expected_tags is None:
-                        raise ValueError(f"expected_tags is required for payload_context {payload_context!r}: {path}")
-                    if not isinstance(raw_expected_tags, list):
-                        raise ValueError(
-                            f"expected_tags must be a list of strings (got {type(raw_expected_tags)!r}): {path}"
-                        )
-                    if not all(isinstance(x, str) for x in raw_expected_tags):
-                        raise ValueError(f"expected_tags must contain only strings: {path}")
-
-                    if len(raw_expected_tags) == 0:
-                        expected_tags = ()
+                    if ignore_expected_tags:
+                        expected_tags = None
                     else:
-                        expected_tags = _strip_style_from_expected_tags(
-                            tuple(_parse_expected_tag_spec(x) for x in raw_expected_tags)
-                        )
+                        if not has_expected_tags:
+                            raise ValueError(
+                                f"expected_tags is required for payload_context {payload_context!r}: {path}"
+                            )
+                        if not isinstance(raw_expected_tags, list):
+                            raise ValueError(
+                                f"expected_tags must be a list of strings (got {type(raw_expected_tags)!r}): {path}"
+                            )
+                        if not all(isinstance(x, str) for x in raw_expected_tags):
+                            raise ValueError(f"expected_tags must contain only strings: {path}")
+
+                        if len(raw_expected_tags) == 0:
+                            expected_tags = ()
+                        else:
+                            expected_tags = _strip_style_from_expected_tags(
+                                tuple(_parse_expected_tag_spec(x) for x in raw_expected_tags)
+                            )
                 else:
-                    if "expected_tags" in item:
+                    if has_expected_tags:
                         raise ValueError(
                             f"expected_tags is not allowed for payload_context {payload_context!r}: {path}"
                         )
@@ -554,7 +572,10 @@ def run_bench(
 
                         lossy = False
                         lossy_details = ""
-                        if _expected_tags_allowed_for_context(vector.payload_context):
+                        if (
+                            _expected_tags_allowed_for_context(vector.payload_context)
+                            and vector.expected_tags is not None
+                        ):
                             if len(vector.expected_tags) == 0:
                                 unexpected = _unexpected_tags_when_none_expected(sanitized_html=sanitized_html)
                                 if unexpected:
@@ -611,12 +632,15 @@ def run_bench(
                             continue
 
                         signal = str(getattr(vector_result, "signal", "") or "")
-                        if signal == "external":
-                            outcome = "external"
-                            executed = False
+                        # Precedence: if we saw an XSS execution signal, that wins even if we also
+                        # observed external non-script fetches.
+                        executed = bool(vector_result.executed)
+                        if executed:
+                            outcome = "xss"
+                        elif signal == "http_leak":
+                            outcome = "http_leak"
                         else:
-                            outcome = "xss" if vector_result.executed else "pass"
-                            executed = bool(vector_result.executed)
+                            outcome = "pass"
                         result = BenchCaseResult(
                             sanitizer=sanitizer.name,
                             browser=browser,
@@ -639,7 +663,7 @@ def run_bench(
                         if fail_fast and result.outcome == "xss":
                             total_cases = len(results)
                             total_executed = sum(1 for r in results if r.executed)
-                            total_external = sum(1 for r in results if r.outcome == "external")
+                            total_external = sum(1 for r in results if r.outcome == "http_leak")
                             total_errors = sum(1 for r in results if r.outcome == "error")
                             total_lossy = sum(1 for r in results if r.lossy)
                             return BenchSummary(
@@ -653,7 +677,7 @@ def run_bench(
 
         total_cases = len(results)
         total_executed = sum(1 for r in results if r.executed)
-        total_external = sum(1 for r in results if r.outcome == "external")
+        total_external = sum(1 for r in results if r.outcome == "http_leak")
         total_errors = sum(1 for r in results if r.outcome == "error")
         total_lossy = sum(1 for r in results if r.lossy)
 
@@ -747,7 +771,7 @@ def run_bench(
 
                 lossy = False
                 lossy_details = ""
-                if _expected_tags_allowed_for_context(vector.payload_context):
+                if _expected_tags_allowed_for_context(vector.payload_context) and vector.expected_tags is not None:
                     if len(vector.expected_tags) == 0:
                         unexpected = _unexpected_tags_when_none_expected(sanitized_html=sanitized_html)
                         if unexpected:
@@ -803,12 +827,13 @@ def run_bench(
                     continue
 
                 signal = str(getattr(vector_result, "signal", "") or "")
-                if signal == "external":
-                    outcome = "external"
-                    executed = False
+                executed = bool(vector_result.executed)
+                if executed:
+                    outcome = "xss"
+                elif signal == "http_leak":
+                    outcome = "http_leak"
                 else:
-                    outcome = "xss" if vector_result.executed else "pass"
-                    executed = bool(vector_result.executed)
+                    outcome = "pass"
 
                 result = BenchCaseResult(
                     sanitizer=sanitizer.name,
@@ -832,7 +857,7 @@ def run_bench(
                 if fail_fast and result.outcome == "xss":
                     total_cases = len(results)
                     total_executed = sum(1 for r in results if r.executed)
-                    total_external = sum(1 for r in results if r.outcome == "external")
+                    total_external = sum(1 for r in results if r.outcome == "http_leak")
                     total_errors = sum(1 for r in results if r.outcome == "error")
                     total_lossy = sum(1 for r in results if r.lossy)
                     return BenchSummary(
@@ -846,7 +871,7 @@ def run_bench(
 
     total_cases = len(results)
     total_executed = sum(1 for r in results if r.executed)
-    total_external = sum(1 for r in results if r.outcome == "external")
+    total_external = sum(1 for r in results if r.outcome == "http_leak")
     total_errors = sum(1 for r in results if r.outcome == "error")
     total_lossy = sum(1 for r in results if r.lossy)
 

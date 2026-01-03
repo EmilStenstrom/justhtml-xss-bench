@@ -38,7 +38,7 @@ def test_smoke_no_execution(vector: dict[str, str]) -> None:
         pytest.skip(str(exc))
 
     if vector["id"] == "css-background-external":
-        assert result.signal == "external", result.details
+        assert result.signal == "http_leak", result.details
         assert result.executed is False, result.details
     else:
         assert result.executed is True, result.details
@@ -78,7 +78,7 @@ def test_css_background_image_external_fetch_counts_as_external_signal() -> None
         # Playwright missing / browser engine not installed / missing OS deps.
         pytest.skip(str(exc))
 
-    assert result.signal == "external", result.details
+    assert result.signal == "http_leak", result.details
     assert result.executed is False, result.details
 
 

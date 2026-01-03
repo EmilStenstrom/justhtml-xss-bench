@@ -88,6 +88,37 @@ def test_run_bench_external_script_request_counts_as_xss() -> None:
     assert [r.vector_id for r in summary.results if r.outcome == "xss"] == ["v2"]
 
 
+def test_run_bench_external_script_takes_precedence_over_external_signal() -> None:
+    vectors = [
+        Vector(
+            id="v1",
+            description="",
+            payload_html='<script src="https://example.com/x.js"></script>',
+            payload_context="html",
+            expected_tags=None,
+        )
+    ]
+
+    sanitizer = Sanitizer(name="noop", description="", sanitize=lambda html: html)
+
+    def fake_runner(*, payload_html: str, sanitized_html: str, timeout_ms: int, **_kwargs):
+        # Simulate the harness observing both an external fetch and an external script.
+        # XSS must win.
+        return type(
+            "VR",
+            (),
+            {
+                "executed": True,
+                "details": "Executed: external-script:https://example.com/x.js; External fetch: image:https://example.com/x.png",
+                "signal": "http_leak",
+            },
+        )()
+
+    summary = run_bench(vectors=vectors, sanitizers=[sanitizer], runner=fake_runner)
+    assert summary.total_cases == 1
+    assert summary.results[0].outcome == "xss"
+
+
 def test_load_vectors_accepts_meta_wrapper() -> None:
     from xssbench.bench import load_vectors
 
@@ -221,6 +252,39 @@ def test_load_vectors_ignores_unknown_meta_keys() -> None:
         vectors = load_vectors([p])
 
     assert vectors[0].expected_tags == ()
+
+
+def test_load_vectors_can_ignore_expected_tags_via_options() -> None:
+    from xssbench.bench import load_vectors
+
+    payload = {
+        "schema": "xssbench.vectorfile.v1",
+        "options": {"expected_tags": "ignore"},
+        "meta": {
+            "tool": "xssbench",
+            "source_url": "https://example.invalid/",
+            "license": {
+                "spdx": "MIT",
+                "url": "https://spdx.org/licenses/MIT.html",
+                "file": "vectors/example-LICENSE.txt",
+            },
+        },
+        "vectors": [
+            {
+                "id": "v1",
+                "description": "d",
+                "payload_html": "<img src=x>",
+                "payload_context": "html",
+            }
+        ],
+    }
+
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "vectors.json"
+        p.write_text(json.dumps(payload), encoding="utf-8")
+        vectors = load_vectors([p])
+
+    assert vectors[0].expected_tags is None
 
 
 def test_run_bench_fail_fast_stops_after_first_xss() -> None:
@@ -628,6 +692,31 @@ def test_run_bench_empty_expected_tags_means_no_tags_allowed() -> None:
     assert summary.results[0].outcome == "pass"
     assert summary.results[0].lossy is True
     assert "Expected no tags" in summary.results[0].lossy_details
+
+
+def test_run_bench_skips_expected_tags_checks_when_none() -> None:
+    from xssbench.bench import run_bench, Vector
+    from xssbench.sanitizers import Sanitizer
+
+    vectors = [
+        Vector(
+            id="v1",
+            description="",
+            payload_html="<b>ok</b>",
+            payload_context="html",
+            expected_tags=None,
+        ),
+    ]
+    sanitizer = Sanitizer(name="noop", description="", sanitize=lambda html: html)
+
+    def fake_runner(*, payload_html: str, sanitized_html: str, timeout_ms: int, **_kwargs):
+        return type("VR", (), {"executed": False, "details": "nope"})()
+
+    summary = run_bench(vectors=vectors, sanitizers=[sanitizer], runner=fake_runner)
+
+    assert summary.total_cases == 1
+    assert summary.total_lossy == 0
+    assert summary.results[0].lossy is False
 
 
 def test_run_bench_expected_tags_exact_matches_attrs() -> None:

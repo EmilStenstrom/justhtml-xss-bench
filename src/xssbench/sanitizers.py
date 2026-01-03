@@ -100,14 +100,6 @@ DEFAULT_ALLOWED_CSS_PROPERTIES: tuple[str, ...] = (
 )
 
 
-# When supported by the sanitizer, rewrite image src URLs to a same-origin
-# endpoint to avoid making external network requests during benchmarking.
-#
-# The harness treats requests to http://xssbench.local/ as same-origin and does
-# not classify them as external.
-_IMAGE_SRC_PROXY_URL: str = "/img-proxy"
-
-
 def allowed_url_protocols() -> tuple[str, ...]:
     return _URL_PROTOCOLS
 
@@ -319,7 +311,7 @@ def _maybe_justhtml() -> Sanitizer | None:
     try:
         from justhtml import JustHTML  # type: ignore
         from justhtml.context import FragmentContext  # type: ignore
-        from justhtml.sanitize import SanitizationPolicy, UrlRule  # type: ignore
+        from justhtml.sanitize import SanitizationPolicy, UrlPolicy, UrlRule  # type: ignore
     except Exception:
         return None
 
@@ -327,6 +319,22 @@ def _maybe_justhtml() -> Sanitizer | None:
 
     # Configure a policy that mirrors the shared allowlist in this module.
     # Note: `justhtml` merges per-tag allowlists with the global "*" allowlist.
+    allow_rules = {
+        ("a", "href"): UrlRule(
+            allow_fragment=True,
+            resolve_protocol_relative="https",
+            allowed_schemes=set(_URL_PROTOCOLS),
+            allowed_hosts=None,
+        ),
+        ("img", "src"): UrlRule(
+            allow_fragment=True,
+            resolve_protocol_relative="https",
+            # Keep image loads roughly aligned with other cleaners.
+            allowed_schemes={"http", "https"},
+            allowed_hosts=None,
+        ),
+    }
+
     policy = SanitizationPolicy(
         allowed_tags=set(DEFAULT_ALLOWED_TAGS),
         allowed_attributes={
@@ -340,25 +348,11 @@ def _maybe_justhtml() -> Sanitizer | None:
         # Use the shared CSS allowlist to keep behavior aligned with other
         # CSS-aware sanitizers.
         allowed_css_properties=set(DEFAULT_ALLOWED_CSS_PROPERTIES),
-        url_rules={
-            ("a", "href"): UrlRule(
-                allow_relative=True,
-                allow_fragment=True,
-                resolve_protocol_relative="https",
-                allowed_schemes=set(_URL_PROTOCOLS),
-                allowed_hosts=None,
-            ),
-            ("img", "src"): UrlRule(
-                allow_relative=True,
-                allow_fragment=True,
-                resolve_protocol_relative="https",
-                # Keep image loads roughly aligned with other cleaners.
-                allowed_schemes={"http", "https"},
-                allowed_hosts=None,
-                proxy_url=_IMAGE_SRC_PROXY_URL,
-                proxy_param="url",
-            ),
-        },
+        url_policy=UrlPolicy(
+            default_handling="allow",
+            default_allow_relative=True,
+            allow_rules=allow_rules,
+        ),
         # Other defaults (dropping comments/doctype/foreign namespaces, stripping
         # disallowed tags, dropping script/style content) match the spirit of the
         # benchmark policy.
@@ -368,7 +362,7 @@ def _maybe_justhtml() -> Sanitizer | None:
         if not html:
             return ""
         # Parse as a fragment to avoid adding document/body wrappers.
-        doc = JustHTML(html, fragment_context=fragment_context)
+        doc = JustHTML(html, fragment=True, fragment_context=fragment_context)
         # Keep output stable for the harness/expected_tags checks.
         return doc.to_html(pretty=False, safe=True, policy=policy)
 
@@ -376,7 +370,7 @@ def _maybe_justhtml() -> Sanitizer | None:
         name="justhtml",
         description="justhtml sanitizer configured to shared allowlist policy",
         sanitize=_sanitize,
-        supported_contexts={"html", "html_head", "html_outer"},
+        supported_contexts={"html", "html_head", "html_outer", "http_leak"},
     )
 
 
@@ -395,6 +389,7 @@ def available_sanitizers() -> dict[str, Sanitizer]:
                 "html",
                 "html_head",
                 "html_outer",
+                "http_leak",
                 "js",
                 "js_arg",
                 "js_string",

