@@ -157,7 +157,7 @@
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-embedded-newline-to-break-up-xss-example-2--5dfea2c063",
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / Embedded Newline to Break Up XSS / Example 2: Break Up JavaScript Directive with Null",
-			"payload_html": "perl -e 'print \"<IMG SRC=java\\0script:alert(\\\"XSS\\\")>\";' > out",
+			"payload_html": "<IMG SRC=java\u0000script:alert(\"XSS\")>",
 			"payload_context": "html",
 			"expected_tags": ["img"]
 		},
