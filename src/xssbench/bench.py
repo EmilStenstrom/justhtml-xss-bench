@@ -334,10 +334,7 @@ def _missing_expected_tags(*, expected_tags: Iterable[ExpectedTag], sanitized_ht
 
     collector = _TagCollector()
     collector.feed(sanitized_html)
-    # The benchmark treats `style` as non-semantic for expected_tags.
-    # Many sanitizers either drop it entirely or keep a sanitized subset; we
-    # don't want that variance to drive "lossy" outcomes.
-    elements = [(t, {a for a in attrs if a != "style"}) for (t, attrs) in collector.elements]
+    elements = list(collector.elements)
 
     def _fmt(exp: ExpectedTag) -> str:
         if exp.attrs:
@@ -354,11 +351,13 @@ def _missing_expected_tags(*, expected_tags: Iterable[ExpectedTag], sanitized_ht
             return False
         if exp.attrs:
             return all(a in attrs for a in exp.attrs)
-        # Bare tag means: must be attribute-free.
+        # Bare tag means: no attributes are allowed.
         return len(attrs) == 0
 
     # Exact mode (default): the sanitized output must contain exactly the
     # expected tags, in that order (no extras, and no skipping/re-using).
+    # Attribute checks are minimum-only: expected attrs must be present, but
+    # additional attrs are allowed.
     mismatches: list[str] = []
     common = min(len(expected_list), len(elements))
     for idx in range(common):
@@ -390,18 +389,6 @@ def _normalize_expected_tag(tag: str) -> str:
     if not parsed.attrs:
         return parsed.tag
     return f"{parsed.tag}[{', '.join(sorted(parsed.attrs))}]"
-
-
-def _strip_style_from_expected_tags(expected_tags: tuple[ExpectedTag, ...]) -> tuple[ExpectedTag, ...]:
-    if not expected_tags:
-        return expected_tags
-    out: list[ExpectedTag] = []
-    for t in expected_tags:
-        if "style" not in t.attrs:
-            out.append(t)
-            continue
-        out.append(ExpectedTag(tag=t.tag, attrs=frozenset(a for a in t.attrs if a != "style")))
-    return tuple(out)
 
 
 def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
@@ -527,9 +514,7 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
                         if len(raw_expected_tags) == 0:
                             expected_tags = ()
                         else:
-                            expected_tags = _strip_style_from_expected_tags(
-                                tuple(_parse_expected_tag_spec(x) for x in raw_expected_tags)
-                            )
+                            expected_tags = tuple(_parse_expected_tag_spec(x) for x in raw_expected_tags)
                 else:
                     if has_expected_tags:
                         raise ValueError(

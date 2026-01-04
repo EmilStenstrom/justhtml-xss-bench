@@ -82,6 +82,41 @@ def test_css_background_image_external_fetch_counts_as_external_signal() -> None
     assert result.executed is False, result.details
 
 
+def test_iframe_srcdoc_navigation_is_not_xss_in_http_leak_context() -> None:
+    payload_html = '<iframe srcdoc="<img src=https://leaking.via/iframe-srcdoc-img-src>"></iframe>'
+    sanitized_html = noop(payload_html)
+
+    try:
+        result = run_vector(
+            payload_html=payload_html,
+            sanitized_html=sanitized_html,
+            payload_context="http_leak",
+            timeout_ms=2500,
+        )
+    except RuntimeError as exc:
+        pytest.skip(str(exc))
+
+    assert result.signal == "http_leak", result.details
+    assert result.executed is False, result.details
+
+
+def test_iframe_srcdoc_inline_script_triggers_execution() -> None:
+    payload_html = '<iframe srcdoc="<script>alert(1)</script>"></iframe>'
+    sanitized_html = noop(payload_html)
+
+    try:
+        result = run_vector(
+            payload_html=payload_html,
+            sanitized_html=sanitized_html,
+            payload_context="html",
+            timeout_ms=1500,
+        )
+    except RuntimeError as exc:
+        pytest.skip(str(exc))
+
+    assert result.executed is True, result.details
+
+
 def test_lxml_html_clean_does_not_add_wrapper_div() -> None:
     from xssbench.sanitizers import available_sanitizers
 
@@ -104,3 +139,28 @@ def test_lxml_html_clean_empty_input_is_ok() -> None:
 
     assert s.sanitize("") == ""
     assert s.sanitize("   ") == ""
+
+
+def test_nh3_allowing_script_or_style_does_not_panic() -> None:
+    from xssbench.sanitizers import available_sanitizers
+
+    sanitizers = available_sanitizers()
+    s = sanitizers.get("nh3")
+    if s is None:
+        return
+
+    # These tags show up in httpleaks allowlists. nh3/ammonia previously panicked
+    # if a tag was both allowlisted and configured as a clean-content tag.
+    out1 = s.sanitize(
+        '<script src="https://example.com/x.js"></script>',
+        allow_tags={"script"},
+        allow_attrs={"*": {"class", "id", "title", "lang", "dir", "style"}, "script": {"src"}},
+    )
+    assert isinstance(out1, str)
+
+    out2 = s.sanitize(
+        "<style>@import url('https://example.com/x.css');</style>",
+        allow_tags={"style"},
+        allow_attrs={"*": {"class", "id", "title", "lang", "dir", "style"}},
+    )
+    assert isinstance(out2, str)

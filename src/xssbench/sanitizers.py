@@ -73,13 +73,15 @@ _URL_PROTOCOLS: tuple[str, ...] = ()
 
 # Shared CSS allowlist (inline style sanitization)
 #
-# Intent: allow the set of properties you can reasonably expect from WYSIWYG
-# editors and rich-text content (alignment, typography, spacing, borders), plus
-# background/background-image for compatibility with common content.
+# Intent: allow a realistic subset of inline CSS while still relying on the
+# underlying sanitizer to *sanitize values* (e.g. strip/neutralize `url()` with
+# unsafe schemes, IE `expression()`, etc). If we allow `style` at the attribute
+# level but do not allow common properties here, most style-bearing payloads
+# end up with an empty `style` and some sanitizers will drop the attribute.
 #
 # Note: `justhtml` will *drop the entire style attribute* if, after sanitization,
 # no allowed properties remain. Keeping this list reasonably broad avoids
-# unnecessary `lossy` results for style-bearing vectors.
+# unnecessary `lossy` results for style-heavy corpora.
 DEFAULT_ALLOWED_CSS_PROPERTIES: tuple[str, ...] = (
     # Typography
     "color",
@@ -96,10 +98,69 @@ DEFAULT_ALLOWED_CSS_PROPERTIES: tuple[str, ...] = (
     "text-transform",
     "white-space",
     "vertical-align",
-    # Backgrounds
+    # Box model / layout
+    "display",
+    "float",
+    "clear",
+    "width",
+    "height",
+    "min-width",
+    "min-height",
+    "max-width",
+    "max-height",
+    "margin",
+    "margin-top",
+    "margin-right",
+    "margin-bottom",
+    "margin-left",
+    "padding",
+    "padding-top",
+    "padding-right",
+    "padding-bottom",
+    "padding-left",
+    "border",
+    "border-top",
+    "border-right",
+    "border-bottom",
+    "border-left",
+    "border-color",
+    "border-style",
+    "border-width",
+    "border-radius",
+    # Backgrounds (URL-bearing; used in some XSS/HTTP-leak vectors)
     "background",
     "background-color",
     "background-image",
+    # Lists (URL-bearing for list-style-image)
+    "list-style",
+    "list-style-type",
+    "list-style-position",
+    "list-style-image",
+    # Images / shapes (URL-bearing)
+    "border-image",
+    "border-image-source",
+    "-moz-border-image",
+    "-webkit-border-image",
+    "shape-outside",
+    "-webkit-shape-outside",
+    # Cursor (URL-bearing)
+    "cursor",
+    # Motion / effects (commonly present in modern content)
+    "transform",
+    "transition",
+    "transition-property",
+    "transition-duration",
+    "transition-timing-function",
+    "transition-delay",
+    "animation",
+    "animation-name",
+    "animation-duration",
+    "animation-timing-function",
+    "animation-delay",
+    "animation-iteration-count",
+    "animation-direction",
+    "animation-fill-mode",
+    "animation-play-state",
 )
 
 
@@ -269,6 +330,11 @@ def _maybe_nh3() -> Sanitizer | None:
         "td": set(_TABLE_CELL_ATTRS),
     }
 
+    # nh3/ammonia has special handling for tags whose *content* should be
+    # cleaned (notably <script> and <style>). ammonia panics if a tag appears in
+    # both `clean_content_tags` and the main `tags` allowlist.
+    base_clean_content_tags: set[str] = {"script", "style"}
+
     def _sanitize(html: str, *, allow_tags=None, allow_attrs=None) -> str:
         if allow_tags is None and allow_attrs is None:
             tags = base_allowed_tags
@@ -280,11 +346,14 @@ def _maybe_nh3() -> Sanitizer | None:
             tags = set(tags_raw)
             attributes = {t: set(a) for (t, a) in dict(attrs_map_raw).items()}
 
+        clean_content_tags = set(base_clean_content_tags) - set(tags)
+
         # Keep the call signature conservative to avoid version-specific args.
         try:
             return nh3.clean(
                 html,
                 tags=tags,
+                clean_content_tags=clean_content_tags,
                 attributes=attributes,
                 url_schemes=set(_URL_PROTOCOLS),
                 link_rel=None,  # Disable automatic rel management.
@@ -522,6 +591,7 @@ def available_sanitizers() -> dict[str, Sanitizer]:
                 "js_string",
                 "js_string_double",
                 "onerror_attr",
+                "href",
             },
         ),
     }

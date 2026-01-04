@@ -784,7 +784,7 @@ def test_run_bench_expected_tags_exact_fails_on_extra_tags() -> None:
     assert "unexpected" in summary.results[0].lossy_details
 
 
-def test_run_bench_bare_tag_requires_attribute_free_element() -> None:
+def test_run_bench_bare_tag_disallows_attributes() -> None:
     vectors = [
         Vector(
             id="v1",
@@ -813,6 +813,7 @@ def test_run_bench_bare_tag_requires_attribute_free_element() -> None:
     assert called["n"] == 1
     assert summary.results[0].outcome == "pass"
     assert summary.results[0].lossy is True
+    assert "a" in summary.results[0].lossy_details
 
     sanitizer2 = Sanitizer(
         name="s2",

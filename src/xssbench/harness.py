@@ -85,6 +85,9 @@ def _is_ignorable_navigation_url(url: str) -> bool:
     # Can appear transiently during navigations.
     if url == "about:blank":
         return True
+    # <iframe srcdoc> loads navigate to about:srcdoc; that's not script execution.
+    if url.startswith("about:srcdoc"):
+        return True
     return False
 
 
@@ -313,7 +316,12 @@ def _script_tag(js: str) -> str:
     return f"<script>\n{js}\n</script>"
 
 
-_XSSBENCH_PRELUDE_HTML = _script_tag(_read_js_asset_text("prelude.js").strip("\n"))
+_XSSBENCH_PRELUDE_JS = _read_js_asset_text("prelude.js")
+
+# The prelude is installed via Playwright init scripts so it runs in *all*
+# documents/frames (including <iframe srcdoc>). Keep the HTML placeholder empty
+# to avoid double-wrapping timer functions.
+_XSSBENCH_PRELUDE_HTML = ""
 
 _TRIGGER_EVENTS_JS = _read_js_asset_text("trigger_events.js")
 
@@ -379,6 +387,12 @@ class BrowserHarness:
             ) from exc
 
         self._page = self._browser_instance.new_page()
+
+        # Ensure our execution hook is present in every frame/document.
+        try:
+            self._page.add_init_script(script=_XSSBENCH_PRELUDE_JS)
+        except Exception:
+            pass
 
         # Keep runtime low and avoid long stalls (Playwright defaults to ~30s).
         # Individual operations that pass an explicit timeout (e.g. our adaptive
@@ -517,11 +531,20 @@ class BrowserHarness:
         # a navigation slightly later, it can be mis-attributed to the next
         # vector run.
         try:
-            self._page.evaluate(
-                "() => { try { window.__xssbench && window.__xssbench.cleanup && window.__xssbench.cleanup(); } catch (e) {} }"
-            )
+            frames_attr = getattr(self._page, "frames", None)
+            frames = list(frames_attr() if callable(frames_attr) else (frames_attr or []))
         except Exception:
-            pass
+            frames = []
+        if not frames:
+            frames = [self._page]
+
+        for frame in frames:
+            try:
+                frame.evaluate(
+                    "() => { try { window.__xssbench && window.__xssbench.cleanup && window.__xssbench.cleanup(); } catch (e) {} }"
+                )
+            except Exception:
+                continue
 
         self._external_script_requests.clear()
         self._external_network_requests.clear()
@@ -558,6 +581,12 @@ class BrowserHarness:
                 exec_nav = _execution_navigation_urls()
                 if exec_nav:
                     urls = ", ".join(exec_nav[:3])
+                    if payload_context == "http_leak":
+                        return VectorResult(
+                            executed=False,
+                            details=f"External fetch: document:{urls}; payload={payload_html!r}",
+                            signal="http_leak",
+                        )
                     return VectorResult(
                         executed=True,
                         details=f"Executed: navigation:{urls}; payload={payload_html!r}",
@@ -610,14 +639,23 @@ class BrowserHarness:
 
         def _hook_details() -> str:
             try:
-                return str(
-                    self._page.evaluate(
-                        "() => (window.__xssbench && window.__xssbench.executed) ? String(window.__xssbench.details || '') : ''"
-                    )
-                    or ""
-                )
+                frames_attr = getattr(self._page, "frames", None)
+                page_frames = list(frames_attr() if callable(frames_attr) else (frames_attr or []))
             except Exception:
-                return ""
+                page_frames = []
+            for frame in page_frames:
+                try:
+                    details = str(
+                        frame.evaluate(
+                            "() => (window.__xssbench && window.__xssbench.executed) ? String(window.__xssbench.details || '') : ''"
+                        )
+                        or ""
+                    )
+                except Exception:
+                    details = ""
+                if details:
+                    return details
+            return ""
 
         # Deterministic signal: if the DOM contains any `javascript:` URL attributes,
         # treat that as execution/risk even if a particular engine doesn't reliably
@@ -687,6 +725,12 @@ class BrowserHarness:
                 exec_nav = _execution_navigation_urls()
                 if exec_nav:
                     urls = ", ".join(exec_nav[:3])
+                    if payload_context == "http_leak":
+                        return VectorResult(
+                            executed=False,
+                            details=f"External fetch: document:{urls}; payload={payload_html!r}",
+                            signal="http_leak",
+                        )
                     return VectorResult(
                         executed=True,
                         details=f"Executed: navigation:{urls}; payload={payload_html!r}",
@@ -735,6 +779,12 @@ class BrowserHarness:
         exec_nav = _execution_navigation_urls()
         if exec_nav:
             urls = ", ".join(exec_nav[:3])
+            if payload_context == "http_leak":
+                return VectorResult(
+                    executed=False,
+                    details=f"External fetch: document:{urls}; payload={payload_html!r}",
+                    signal="http_leak",
+                )
             return VectorResult(
                 executed=True,
                 details=f"Executed: navigation:{urls}; payload={payload_html!r}",
@@ -767,6 +817,12 @@ class BrowserHarness:
                 exec_nav = _execution_navigation_urls()
                 if exec_nav:
                     urls = ", ".join(exec_nav[:3])
+                    if payload_context == "http_leak":
+                        return VectorResult(
+                            executed=False,
+                            details=f"External fetch: document:{urls}; payload={payload_html!r}",
+                            signal="http_leak",
+                        )
                     return VectorResult(
                         executed=True,
                         details=f"Executed: navigation:{urls}; payload={payload_html!r}",
@@ -825,6 +881,12 @@ class BrowserHarness:
         exec_nav = _execution_navigation_urls()
         if exec_nav:
             urls = ", ".join(exec_nav[:3])
+            if payload_context == "http_leak":
+                return VectorResult(
+                    executed=False,
+                    details=f"External fetch: document:{urls}; payload={payload_html!r}",
+                    signal="http_leak",
+                )
             return VectorResult(
                 executed=True,
                 details=f"Executed: navigation:{urls}; payload={payload_html!r}",
@@ -912,6 +974,12 @@ class AsyncBrowserHarness:
             ) from exc
 
         self._page = await self._browser_instance.new_page()
+
+        # Ensure our execution hook is present in every frame/document.
+        try:
+            await self._page.add_init_script(script=_XSSBENCH_PRELUDE_JS)
+        except Exception:
+            pass
 
         try:
             self._page.set_default_timeout(_MAX_PLAYWRIGHT_TIMEOUT_MS)
@@ -1042,11 +1110,20 @@ class AsyncBrowserHarness:
         # a navigation slightly later, it can be mis-attributed to the next
         # vector run.
         try:
-            await self._page.evaluate(
-                "() => { try { window.__xssbench && window.__xssbench.cleanup && window.__xssbench.cleanup(); } catch (e) {} }"
-            )
+            frames_attr = getattr(self._page, "frames", None)
+            frames = list(frames_attr() if callable(frames_attr) else (frames_attr or []))
         except Exception:
-            pass
+            frames = []
+        if not frames:
+            frames = [self._page]
+
+        for frame in frames:
+            try:
+                await frame.evaluate(
+                    "() => { try { window.__xssbench && window.__xssbench.cleanup && window.__xssbench.cleanup(); } catch (e) {} }"
+                )
+            except Exception:
+                continue
 
         self._external_script_requests.clear()
         self._external_network_requests.clear()
@@ -1080,6 +1157,12 @@ class AsyncBrowserHarness:
                 exec_nav = _execution_navigation_urls()
                 if exec_nav:
                     urls = ", ".join(exec_nav[:3])
+                    if payload_context == "http_leak":
+                        return VectorResult(
+                            executed=False,
+                            details=f"External fetch: document:{urls}; payload={payload_html!r}",
+                            signal="http_leak",
+                        )
                     return VectorResult(
                         executed=True,
                         details=f"Executed: navigation:{urls}; payload={payload_html!r}",
@@ -1126,16 +1209,25 @@ class AsyncBrowserHarness:
 
         async def _hook_details() -> str:
             try:
-                return str(
-                    (
-                        await self._page.evaluate(
-                            "() => (window.__xssbench && window.__xssbench.executed) ? String(window.__xssbench.details || '') : ''"
-                        )
-                    )
-                    or ""
-                )
+                frames_attr = getattr(self._page, "frames", None)
+                page_frames = list(frames_attr() if callable(frames_attr) else (frames_attr or []))
             except Exception:
-                return ""
+                page_frames = []
+            for frame in page_frames:
+                try:
+                    details = str(
+                        (
+                            await frame.evaluate(
+                                "() => (window.__xssbench && window.__xssbench.executed) ? String(window.__xssbench.details || '') : ''"
+                            )
+                        )
+                        or ""
+                    )
+                except Exception:
+                    details = ""
+                if details:
+                    return details
+            return ""
 
         try:
             js_urls = await self._page.evaluate(_DETECT_JAVASCRIPT_URLS_JS)
@@ -1169,6 +1261,12 @@ class AsyncBrowserHarness:
         exec_nav = _execution_navigation_urls()
         if exec_nav:
             urls = ", ".join(exec_nav[:3])
+            if payload_context == "http_leak":
+                return VectorResult(
+                    executed=False,
+                    details=f"External fetch: document:{urls}; payload={payload_html!r}",
+                    signal="http_leak",
+                )
             return VectorResult(
                 executed=True,
                 details=f"Executed: navigation:{urls}; payload={payload_html!r}",
@@ -1216,6 +1314,12 @@ class AsyncBrowserHarness:
                 exec_nav = _execution_navigation_urls()
                 if exec_nav:
                     urls = ", ".join(exec_nav[:3])
+                    if payload_context == "http_leak":
+                        return VectorResult(
+                            executed=False,
+                            details=f"External fetch: document:{urls}; payload={payload_html!r}",
+                            signal="http_leak",
+                        )
                     return VectorResult(
                         executed=True,
                         details=f"Executed: navigation:{urls}; payload={payload_html!r}",
@@ -1260,6 +1364,12 @@ class AsyncBrowserHarness:
         exec_nav = _execution_navigation_urls()
         if exec_nav:
             urls = ", ".join(exec_nav[:3])
+            if payload_context == "http_leak":
+                return VectorResult(
+                    executed=False,
+                    details=f"External fetch: document:{urls}; payload={payload_html!r}",
+                    signal="http_leak",
+                )
             return VectorResult(
                 executed=True,
                 details=f"Executed: navigation:{urls}; payload={payload_html!r}",
@@ -1287,6 +1397,12 @@ class AsyncBrowserHarness:
                 exec_nav = _execution_navigation_urls()
                 if exec_nav:
                     urls = ", ".join(exec_nav[:3])
+                    if payload_context == "http_leak":
+                        return VectorResult(
+                            executed=False,
+                            details=f"External fetch: document:{urls}; payload={payload_html!r}",
+                            signal="http_leak",
+                        )
                     return VectorResult(
                         executed=True,
                         details=f"Executed: navigation:{urls}; payload={payload_html!r}",
