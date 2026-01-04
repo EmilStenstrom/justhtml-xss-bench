@@ -238,7 +238,7 @@ def _maybe_bleach() -> Sanitizer | None:
         description="bleach Cleaner shared allowlist (keep common markup; strip dangerous)",
         sanitize=_sanitize,
         # bleach is an HTML sanitizer; JS-string/JS-code and event-handler JS are out of scope.
-        supported_contexts={"html", "html_head", "html_outer"},
+        supported_contexts={"html", "html_head", "html_outer", "http_leak"},
     )
 
 
@@ -247,6 +247,14 @@ def _maybe_nh3() -> Sanitizer | None:
         import nh3  # type: ignore
     except Exception:
         return None
+
+    def _is_pyo3_panic(exc: BaseException) -> bool:
+        # nh3 is backed by Rust via pyo3; a Rust panic can surface as
+        # pyo3_runtime.PanicException, which may not inherit from Exception.
+        try:
+            return exc.__class__.__name__ == "PanicException" and exc.__class__.__module__.startswith("pyo3_runtime")
+        except Exception:
+            return False
 
     # nh3 uses allowlisted attributes by tag, plus a global "*" entry.
     base_allowed_tags: set[str] = set(DEFAULT_ALLOWED_TAGS)
@@ -273,21 +281,26 @@ def _maybe_nh3() -> Sanitizer | None:
             attributes = {t: set(a) for (t, a) in dict(attrs_map_raw).items()}
 
         # Keep the call signature conservative to avoid version-specific args.
-        return nh3.clean(
-            html,
-            tags=tags,
-            attributes=attributes,
-            url_schemes=set(_URL_PROTOCOLS),
-            link_rel=None,  # Disable automatic rel management.
-            filter_style_properties=set(DEFAULT_ALLOWED_CSS_PROPERTIES),
-        )
+        try:
+            return nh3.clean(
+                html,
+                tags=tags,
+                attributes=attributes,
+                url_schemes=set(_URL_PROTOCOLS),
+                link_rel=None,  # Disable automatic rel management.
+                filter_style_properties=set(DEFAULT_ALLOWED_CSS_PROPERTIES),
+            )
+        except BaseException as exc:
+            if _is_pyo3_panic(exc):
+                raise RuntimeError(f"nh3 panic: {exc}") from None
+            raise
 
     return Sanitizer(
         name="nh3",
         description="nh3 shared allowlist (keep common markup; strip dangerous)",
         sanitize=_sanitize,
         # nh3 is an HTML sanitizer; JS-string/JS-code and event-handler JS are out of scope.
-        supported_contexts={"html", "html_head", "html_outer"},
+        supported_contexts={"html", "html_head", "html_outer", "http_leak"},
     )
 
 
@@ -381,7 +394,7 @@ def _maybe_lxml_html_clean() -> Sanitizer | None:
         name="lxml_html_clean",
         description="lxml-html-clean Cleaner shared allowlist (configured to match bleach/nh3 style)",
         sanitize=_sanitize,
-        supported_contexts={"html", "html_head", "html_outer"},
+        supported_contexts={"html", "html_head", "html_outer", "http_leak"},
     )
 
 
