@@ -15,7 +15,7 @@ from .harness import (
     render_html_document,
     run_vector_in_browser,
 )
-from .sanitizers import Sanitizer
+from .sanitizers import Sanitizer, SanitizerConfigUnsupported
 from .sanitizers import allowed_attributes_for_tag
 
 
@@ -36,6 +36,39 @@ class Vector:
     # - (ExpectedTag("a", {"href"}), ...): expect tag+attrs to remain
     # - None: do not perform any expected_tags checks for this vector
     expected_tags: tuple[ExpectedTag, ...] | None = ()
+
+    # For payload_context == "http_leak": per-vector sanitizer allowlist.
+    #
+    # The goal is to avoid runtime inference: each vector declares the minimum
+    # tags and attributes a sanitizer is allowed to preserve for this case.
+    #
+    # Format: a list of tag specs, e.g. ["base[href]", "meta[content]", "?import[implementation]"]
+    # (URL *values* are still expected to be sanitized by the sanitizer policy.)
+    sanitizer_allow_tags: tuple[ExpectedTag, ...] = ()
+
+
+def sanitizer_overrides_for_vector(vector: Vector) -> dict[str, object]:
+    """Return sanitizer allowlist overrides for a vector.
+
+    For http_leak vectors, each vector declares the minimal tags/attrs that a
+    sanitizer is allowed to preserve for this case.
+    """
+
+    if vector.payload_context != "http_leak":
+        return {}
+
+    allow_tags: set[str] = set()
+    allow_attrs: dict[str, set[str]] = {}
+    for req in vector.sanitizer_allow_tags:
+        # Processing instructions are tracked for presence checks but cannot be
+        # expressed as allowlists in sanitizer libraries.
+        if req.tag.startswith("?"):
+            continue
+        allow_tags.add(req.tag)
+        if req.attrs:
+            allow_attrs[req.tag] = set(req.attrs)
+
+    return {"allow_tags": allow_tags, "allow_attrs": allow_attrs}
 
 
 @dataclass(frozen=True, slots=True)
@@ -115,8 +148,8 @@ class _TagCollector:
         return self.tags
 
 
-_EXPECTED_TAG_WITH_ATTRS_RE = re.compile(r"^\s*([A-Za-z][A-Za-z0-9:-]*)\[(.*)\]\s*$")
-_EXPECTED_TAG_ONLY_RE = re.compile(r"^\s*([A-Za-z][A-Za-z0-9:-]*)\s*$")
+_TAG_SPEC_WITH_ATTRS_RE = re.compile(r"^\s*(\??)([A-Za-z][A-Za-z0-9:-]*)\[(.*)\]\s*$")
+_TAG_SPEC_ONLY_RE = re.compile(r"^\s*(\??)([A-Za-z][A-Za-z0-9:-]*)\s*$")
 
 
 def _normalize_expected_tag_name(tag: str) -> str:
@@ -148,21 +181,12 @@ def _normalize_expected_attr_name(attr: str) -> str:
 
 
 def _parse_expected_tag_spec(spec: str) -> ExpectedTag:
-    raw = str(spec)
-    m = _EXPECTED_TAG_WITH_ATTRS_RE.match(raw)
-    if m:
-        tag_name = _normalize_expected_tag_name(m.group(1))
-        attrs_raw = m.group(2).strip()
-        if attrs_raw == "":
-            raise ValueError(f"expected_tags entry {spec!r} must not use empty brackets; use {tag_name!r} instead")
-    else:
-        m2 = _EXPECTED_TAG_ONLY_RE.match(raw)
-        if not m2:
-            raise ValueError(
-                "expected_tags entries must use the form tag or tag[attrs], e.g. 'p', 'p[class]' or 'a[href, style]'"
-            )
-        tag_name = _normalize_expected_tag_name(m2.group(1))
-        attrs_raw = ""
+    tag_name, attrs_raw = _parse_tag_spec(
+        spec=spec,
+        allow_pi=False,
+        kind="expected_tags",
+        example="'p', 'p[class]' or 'a[href, style]'",
+    )
 
     if not attrs_raw:
         return ExpectedTag(tag=tag_name, attrs=frozenset())
@@ -179,6 +203,63 @@ def _parse_expected_tag_spec(spec: str) -> ExpectedTag:
     return ExpectedTag(tag=tag_name, attrs=frozenset(attrs))
 
 
+def _parse_sanitizer_allow_tag_spec(spec: str) -> ExpectedTag:
+    """Parse a sanitizer_allow_tags entry like tag[attrs] or ?pi[attrs].
+
+    This intentionally does NOT apply the shared allowlist restrictions used by
+    expected_tags. It is used for per-vector sanitizer allowlists.
+    """
+
+    tag_name, attrs_raw = _parse_tag_spec(
+        spec=spec,
+        allow_pi=True,
+        kind="sanitizer_allow_tags",
+        example="'meta[content]' or '?xml-stylesheet[href]'",
+    )
+
+    if not attrs_raw:
+        return ExpectedTag(tag=tag_name, attrs=frozenset())
+
+    parts = [p.strip() for p in attrs_raw.split(",")]
+    if any(p == "" for p in parts):
+        raise ValueError(f"Invalid sanitizer_allow_tags attribute list: {spec!r}")
+    attrs = {_normalize_expected_attr_name(p) for p in parts}
+    return ExpectedTag(tag=tag_name, attrs=frozenset(attrs))
+
+
+def _parse_tag_spec(*, spec: str, allow_pi: bool, kind: str, example: str) -> tuple[str, str]:
+    """Parse a tag-spec string like tag[attrs] or ?pi[attrs].
+
+    Returns: (tag_name, attrs_raw)
+    - tag_name is normalized and includes the leading '?' for processing instructions
+    - attrs_raw is the raw attribute list content (comma-separated) or "" if none
+    """
+
+    raw = str(spec)
+    m = _TAG_SPEC_WITH_ATTRS_RE.match(raw)
+    if m:
+        is_pi = m.group(1) == "?"
+        if is_pi and not allow_pi:
+            raise ValueError(f"{kind} entries must not start with '?': {spec!r}")
+        base_name = _normalize_expected_tag_name(m.group(2))
+        tag_name = f"?{base_name}" if is_pi else base_name
+        attrs_raw = m.group(3).strip()
+        if attrs_raw == "":
+            raise ValueError(f"{kind} entry {spec!r} must not use empty brackets; use {tag_name!r} instead")
+        return tag_name, attrs_raw
+
+    m2 = _TAG_SPEC_ONLY_RE.match(raw)
+    if not m2:
+        raise ValueError(f"{kind} entries must use the form tag or tag[attrs], e.g. {example}")
+
+    is_pi = m2.group(1) == "?"
+    if is_pi and not allow_pi:
+        raise ValueError(f"{kind} entries must not start with '?': {spec!r}")
+    base_name = _normalize_expected_tag_name(m2.group(2))
+    tag_name = f"?{base_name}" if is_pi else base_name
+    return tag_name, ""
+
+
 def _expected_tags_allowed_for_context(payload_context: PayloadContext) -> bool:
     # expected_tags is a notion for HTML-fragment sanitization.
     # It is explicitly forbidden for href and all js* contexts.
@@ -189,6 +270,61 @@ def _expected_tags_allowed_for_context(payload_context: PayloadContext) -> bool:
     if payload_context.startswith("js"):
         return False
     return True
+
+
+def _missing_allowlisted_primitives(*, required_tags: Iterable[ExpectedTag], sanitized_html: str) -> list[str]:
+    """Return missing tag/attr primitives that were explicitly allowlisted.
+
+    This is intentionally a presence check (not an exact/ordered tag list like
+    expected_tags). It also supports processing-instruction checks via '?name'.
+    """
+
+    reqs = list(required_tags)
+    if not reqs:
+        return []
+
+    collector = _TagCollector()
+    collector.feed(sanitized_html)
+
+    def _fmt(req: ExpectedTag) -> str:
+        if req.attrs:
+            return f"{req.tag}[{', '.join(sorted(req.attrs))}]"
+        return req.tag
+
+    missing: list[str] = []
+    for req in reqs:
+        if req.tag.startswith("?"):
+            pi = req.tag[1:]
+            # Processing instructions are not parsed by HTMLParser; match in the raw HTML.
+            # Example: <?xml-stylesheet type="text/xsl" href="https://..." ?>
+            pi_re = re.compile(
+                r"<\?\s*" + re.escape(pi) + r"\b([\s\S]*?)\?>",
+                flags=re.IGNORECASE,
+            )
+            matches = list(pi_re.finditer(sanitized_html))
+            if not matches:
+                missing.append(_fmt(req))
+                continue
+            if req.attrs:
+
+                def _attrs_present(attr_blob: str) -> bool:
+                    return all(
+                        re.search(r"\b" + re.escape(a) + r"\s*=", attr_blob, flags=re.IGNORECASE) is not None
+                        for a in req.attrs
+                    )
+
+                if not any(_attrs_present(m.group(1)) for m in matches):
+                    missing.append(_fmt(req))
+            continue
+
+        occurrences = collector.attr_sets_by_tag.get(req.tag, [])
+        if not occurrences:
+            missing.append(_fmt(req))
+            continue
+        if req.attrs:
+            if not any(all(a in attrs for a in req.attrs) for attrs in occurrences):
+                missing.append(_fmt(req))
+    return missing
 
 
 def _missing_expected_tags(*, expected_tags: Iterable[ExpectedTag], sanitized_html: str) -> list[str]:
@@ -332,6 +468,12 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
             has_expected_tags = "expected_tags" in item
             raw_expected_tags = item.get("expected_tags")
 
+            has_http_leak_required = "http_leak_required_tags" in item
+
+            has_sanitizer_allow_tags = "sanitizer_allow_tags" in item
+            raw_sanitizer_allow_tags = item.get("sanitizer_allow_tags")
+            has_sanitizer_allow_attrs = "sanitizer_allow_attrs" in item
+
             if "expected_tags_ordered" in item:
                 raise ValueError(
                     f"expected_tags_ordered is no longer supported; expected_tags are always ordered: {path}"
@@ -394,6 +536,39 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
                             f"expected_tags is not allowed for payload_context {payload_context!r}: {path}"
                         )
 
+                sanitizer_allow_tags: tuple[ExpectedTag, ...] = ()
+                if payload_context == "http_leak":
+                    if has_http_leak_required:
+                        raise ValueError(
+                            f"http_leak_required_tags is no longer supported; use sanitizer_allow_tags instead: {path}"
+                        )
+
+                    if has_sanitizer_allow_attrs:
+                        raise ValueError(
+                            f"sanitizer_allow_attrs is no longer supported; encode attrs in sanitizer_allow_tags like 'base[href]': {path}"
+                        )
+
+                    if not has_sanitizer_allow_tags:
+                        raise ValueError(f"sanitizer_allow_tags is required for payload_context 'http_leak': {path}")
+
+                    if not isinstance(raw_sanitizer_allow_tags, list) or not all(
+                        isinstance(x, str) for x in raw_sanitizer_allow_tags
+                    ):
+                        raise ValueError(
+                            f"sanitizer_allow_tags must be a list of strings (got {type(raw_sanitizer_allow_tags)!r}): {path}"
+                        )
+                    if len(raw_sanitizer_allow_tags) == 0:
+                        raise ValueError(
+                            f"sanitizer_allow_tags must be non-empty for payload_context 'http_leak': {path}"
+                        )
+
+                    sanitizer_allow_tags = tuple(_parse_sanitizer_allow_tag_spec(x) for x in raw_sanitizer_allow_tags)
+                else:
+                    if has_sanitizer_allow_tags or has_sanitizer_allow_attrs:
+                        raise ValueError(
+                            f"sanitizer_allow_tags/sanitizer_allow_attrs are only allowed for payload_context 'http_leak': {path}"
+                        )
+
                 vectors.append(
                     Vector(
                         id=vector_id,
@@ -401,6 +576,7 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
                         payload_html=payload_html,
                         payload_context=payload_context,  # type: ignore[arg-type]
                         expected_tags=expected_tags,
+                        sanitizer_allow_tags=sanitizer_allow_tags,
                     )
                 )
 
@@ -424,13 +600,15 @@ def run_bench(
     fail_fast: bool = False,
 ) -> BenchSummary:
     def _prepare_for_sanitizer(*, vector: Vector, sanitizer: Sanitizer) -> tuple[str, str, PayloadContext, str]:
+        sanitizer_kwargs = sanitizer_overrides_for_vector(vector)
+
         if vector.payload_context == "onerror_attr":
             sanitizer_input_html = f'<img src="nonexistent://x" onerror="{vector.payload_html}">'
-            sanitized_html = sanitizer.sanitize(sanitizer_input_html)
+            sanitized_html = sanitizer.sanitize(sanitizer_input_html, **sanitizer_kwargs)
             return sanitizer_input_html, sanitized_html, "html", sanitized_html
 
         sanitizer_input_html = vector.payload_html
-        sanitized_html = sanitizer.sanitize(sanitizer_input_html)
+        sanitized_html = sanitizer.sanitize(sanitizer_input_html, **sanitizer_kwargs)
         return (
             sanitizer_input_html,
             sanitized_html,
@@ -548,6 +726,27 @@ def run_bench(
                                 payload_context_to_run,
                                 sanitized_html_to_run,
                             ) = _prepare_for_sanitizer(vector=vector, sanitizer=sanitizer)
+                        except SanitizerConfigUnsupported as exc:
+                            result = BenchCaseResult(
+                                sanitizer=sanitizer.name,
+                                browser=browser,
+                                vector_id=vector.id,
+                                payload_context=vector.payload_context,
+                                run_payload_context=vector.payload_context,
+                                outcome="skip",
+                                executed=False,
+                                lossy=False,
+                                lossy_details="",
+                                details=f"Skipped: {sanitizer.name} cannot represent the requested allowlist: {exc}",
+                                sanitizer_input_html="",
+                                sanitized_html="",
+                                rendered_html="",
+                            )
+                            results.append(result)
+                            case_index += 1
+                            if progress is not None:
+                                progress(case_index, total_planned, result)
+                            continue
                         except Exception as exc:
                             result = BenchCaseResult(
                                 sanitizer=sanitizer.name,

@@ -4,12 +4,54 @@ from dataclasses import dataclass
 from functools import lru_cache
 import importlib
 import importlib.resources
+import re
+import time
 from typing import Any
 from typing import Literal
 from urllib.parse import urlsplit
 
 
 _MAX_PLAYWRIGHT_TIMEOUT_MS = 5000
+
+
+_META_REFRESH_CONTENT_RE = re.compile(
+    r"^\s*(?P<delay>\d+)?\s*(?:;\s*)?(?:url\s*=\s*(?P<url>.+?))?\s*$",
+    flags=re.IGNORECASE,
+)
+
+
+def _speed_up_meta_refresh(html: str, *, max_delay_s: int = 0) -> str:
+    """Reduce meta refresh delays inside already-sanitized HTML.
+
+    This is a speed/ergonomics tweak: we still observe the navigation like normal,
+    but we don't want a 10s refresh to force a 10s timeout.
+    """
+
+    if "http-equiv" not in html.lower() or "refresh" not in html.lower():
+        return html
+
+    def _repl(m: re.Match[str]) -> str:
+        before, content, after = m.group(1), m.group(2), m.group(3)
+        content_s = str(content or "")
+        parsed = _META_REFRESH_CONTENT_RE.match(content_s)
+        if not parsed:
+            return m.group(0)
+
+        url = (parsed.group("url") or "").strip()
+        url = url.strip("\"'")
+        if url:
+            new_content = f"{int(max_delay_s)}; url={url}"
+        else:
+            new_content = f"{int(max_delay_s)}"
+        return f"{before}{new_content}{after}"
+
+    # Rewrite: content="10; url=..." -> content="0; url=..." (case-insensitive).
+    return re.sub(
+        r"(<meta\b[^>]*\bhttp-equiv\s*=\s*['\"]?refresh['\"]?[^>]*\bcontent\s*=\s*['\"])([^'\"]*)(['\"])",
+        _repl,
+        html,
+        flags=re.IGNORECASE,
+    )
 
 
 def render_html_document(*, sanitized_html: str, payload_context: "PayloadContext") -> str:
@@ -32,6 +74,7 @@ def render_html_document(*, sanitized_html: str, payload_context: "PayloadContex
 
     html = template.replace("__XSSBENCH_PAYLOAD__", sanitized_html)
     html = html.replace("__XSSBENCH_PRELUDE__", _XSSBENCH_PRELUDE_HTML)
+    html = _speed_up_meta_refresh(html)
     return html
 
 
@@ -107,16 +150,16 @@ def _template_for_http_leak_payload(sanitized_html: str) -> str:
     # Heuristic placement for HTTP-leak primitives.
     # We keep the vector payloads raw but still want head-only tags like <meta>
     # and <link> to land in <head> when possible.
-    import re
-
     m = re.search(r"<\s*([A-Za-z][A-Za-z0-9:-]*)", sanitized_html)
     tag = m.group(1).lower() if m else ""
 
-    if tag in {"meta", "base", "link", "style", "title"}:
-        return _HTML_HEAD_TEMPLATE
+    # For leak vectors, many primitives only fire when the tag ends up in the
+    # right place (head vs body), and some engines are stricter than others.
+    # To avoid per-vector special-casing, render most payloads in BOTH head and
+    # body. The browser's parser will ignore/move invalid placements.
     if tag in {"html", "body", "frameset"}:
         return _HTML_OUTER_TEMPLATE
-    return _HTML_TEMPLATE
+    return _HTML_HEAD_AND_BODY_TEMPLATE
 
 
 _HTML_TEMPLATE = """<!doctype html>
@@ -143,6 +186,23 @@ _HTML_HEAD_TEMPLATE = """<!doctype html>
     </head>
     <body>
         <div id=\"root\"></div>
+    </body>
+</html>
+"""
+
+
+_HTML_HEAD_AND_BODY_TEMPLATE = """<!doctype html>
+<html>
+    <head>
+        <meta charset=\"utf-8\">
+        <base href=\"http://xssbench.local/\">
+        __XSSBENCH_PRELUDE__
+        __XSSBENCH_PAYLOAD__
+    </head>
+    <body>
+        <div id=\"root\">__XSSBENCH_PAYLOAD__</div>
+        <s id=\"xssbench-css-target\">x</s>
+        <big id=\"xssbench-css-target2\">x</big>
     </body>
 </html>
 """
@@ -258,6 +318,8 @@ _XSSBENCH_PRELUDE_HTML = _script_tag(_read_js_asset_text("prelude.js").strip("\n
 _TRIGGER_EVENTS_JS = _read_js_asset_text("trigger_events.js")
 
 _DETECT_JAVASCRIPT_URLS_JS = _read_js_asset_text("detect_javascript_urls.js")
+
+_EXTERNAL_REQUEST_GESTURES_JS = _read_js_asset_text("external_request_gestures.js")
 
 
 class BrowserHarness:
@@ -468,7 +530,6 @@ class BrowserHarness:
         self._base_navigation_count = 0
 
         expected_href_click_url: str | None = None
-        first_external_network: tuple[str, str] | None = None
 
         def _execution_navigation_urls() -> list[str]:
             return _filter_navigation_urls_for_execution(
@@ -590,8 +651,9 @@ class BrowserHarness:
                 details=f"Executed: external-script:{urls}; payload={payload_html!r}",
             )
 
-        if self._external_network_requests:
-            first_external_network = self._external_network_requests[0]
+        # Note: we intentionally do NOT snapshot external network requests here.
+        # Some leak primitives fire later (e.g. meta refresh, favicon fetch,
+        # deferred resource loads). We'll check again after the wait.
 
         if payload_context == "href":
             try:
@@ -662,6 +724,12 @@ class BrowserHarness:
             except Exception:
                 pass
 
+            if payload_context == "http_leak":
+                try:
+                    self._page.evaluate(_EXTERNAL_REQUEST_GESTURES_JS)
+                except Exception:
+                    pass
+
         # Some payloads execute by causing a navigation rather than calling alert().
         # If we observed any document navigation attempt at any point, treat it as execution.
         exec_nav = _execution_navigation_urls()
@@ -677,15 +745,25 @@ class BrowserHarness:
         if self._timeout_error is None:  # pragma: no cover
             raise RuntimeError("Harness not initialized")
 
+        if payload_context == "http_leak" and self._external_network_requests:
+            rtype, url = self._external_network_requests[0]
+            return VectorResult(
+                executed=False,
+                details=f"External fetch: {rtype}:{url}; payload={payload_html!r}",
+                signal="http_leak",
+            )
+
         if timeout_ms > 0:
-            try:
-                self._page.wait_for_function(
-                    "() => (window.__xssbench && window.__xssbench.executed) === true",
-                    timeout=timeout_ms,
-                )
-            except self._timeout_error:
-                pass
-            except Exception as exc:
+            deadline_s = time.monotonic() + (timeout_ms / 1000.0)
+            poll_ms = 50
+            while True:
+                if self._external_script_requests:
+                    urls = ", ".join(self._external_script_requests[:3])
+                    return VectorResult(
+                        executed=True,
+                        details=f"Executed: external-script:{urls}; payload={payload_html!r}",
+                    )
+
                 exec_nav = _execution_navigation_urls()
                 if exec_nav:
                     urls = ", ".join(exec_nav[:3])
@@ -693,12 +771,64 @@ class BrowserHarness:
                         executed=True,
                         details=f"Executed: navigation:{urls}; payload={payload_html!r}",
                     )
-                if _looks_like_navigation_context_destroyed(exc):
+
+                hook = _hook_details()
+                if hook:
                     return VectorResult(
                         executed=True,
-                        details=f"Executed: navigation:context-destroyed; payload={payload_html!r}",
+                        details=f"Executed: hook:{hook}; payload={payload_html!r}",
                     )
-                raise exc
+
+                if self._dialog_events:
+                    details = self._dialog_events[0]
+                    return VectorResult(
+                        executed=True,
+                        details=f"Executed: {details}; payload={payload_html!r}",
+                    )
+
+                if payload_context == "http_leak" and self._external_network_requests:
+                    rtype, url = self._external_network_requests[0]
+                    return VectorResult(
+                        executed=False,
+                        details=f"External fetch: {rtype}:{url}; payload={payload_html!r}",
+                        signal="http_leak",
+                    )
+
+                remaining_ms = int((deadline_s - time.monotonic()) * 1000)
+                if remaining_ms <= 0:
+                    break
+                try:
+                    self._page.wait_for_timeout(min(poll_ms, remaining_ms))
+                except Exception as exc:
+                    exec_nav = _execution_navigation_urls()
+                    if exec_nav:
+                        urls = ", ".join(exec_nav[:3])
+                        return VectorResult(
+                            executed=True,
+                            details=f"Executed: navigation:{urls}; payload={payload_html!r}",
+                        )
+                    if _looks_like_navigation_context_destroyed(exc):
+                        return VectorResult(
+                            executed=True,
+                            details=f"Executed: navigation:context-destroyed; payload={payload_html!r}",
+                        )
+                    raise
+
+        # Re-check delayed signals after waiting.
+        if self._external_script_requests:
+            urls = ", ".join(self._external_script_requests[:3])
+            return VectorResult(
+                executed=True,
+                details=f"Executed: external-script:{urls}; payload={payload_html!r}",
+            )
+
+        exec_nav = _execution_navigation_urls()
+        if exec_nav:
+            urls = ", ".join(exec_nav[:3])
+            return VectorResult(
+                executed=True,
+                details=f"Executed: navigation:{urls}; payload={payload_html!r}",
+            )
 
         hook = _hook_details()
         if hook:
@@ -714,8 +844,8 @@ class BrowserHarness:
                 details=f"Executed: {details}; payload={payload_html!r}",
             )
 
-        if first_external_network is not None:
-            rtype, url = first_external_network
+        if self._external_network_requests:
+            rtype, url = self._external_network_requests[0]
             return VectorResult(
                 executed=False,
                 details=f"External fetch: {rtype}:{url}; payload={payload_html!r}",
@@ -1051,8 +1181,9 @@ class AsyncBrowserHarness:
                 details=f"Executed: external-script:{urls}; payload={payload_html!r}",
             )
 
-        if self._external_network_requests:
-            first_external_network = self._external_network_requests[0]
+        # Note: we intentionally do NOT snapshot external network requests here.
+        # Some leak primitives fire later (e.g. meta refresh, favicon fetch,
+        # deferred resource loads). We'll check again after the wait.
 
         if payload_context == "href":
             try:
@@ -1120,6 +1251,12 @@ class AsyncBrowserHarness:
             except Exception:
                 pass
 
+            if payload_context == "http_leak":
+                try:
+                    await self._page.evaluate(_EXTERNAL_REQUEST_GESTURES_JS)
+                except Exception:
+                    pass
+
         exec_nav = _execution_navigation_urls()
         if exec_nav:
             urls = ", ".join(exec_nav[:3])
@@ -1128,15 +1265,25 @@ class AsyncBrowserHarness:
                 details=f"Executed: navigation:{urls}; payload={payload_html!r}",
             )
 
+        if payload_context == "http_leak" and self._external_network_requests:
+            rtype, url = self._external_network_requests[0]
+            return VectorResult(
+                executed=False,
+                details=f"External fetch: {rtype}:{url}; payload={payload_html!r}",
+                signal="http_leak",
+            )
+
         if timeout_ms > 0:
-            try:
-                await self._page.wait_for_function(
-                    "() => (window.__xssbench && window.__xssbench.executed) === true",
-                    timeout=timeout_ms,
-                )
-            except self._timeout_error:
-                pass
-            except Exception as exc:
+            deadline_s = time.monotonic() + (timeout_ms / 1000.0)
+            poll_ms = 50
+            while True:
+                if self._external_script_requests:
+                    urls = ", ".join(self._external_script_requests[:3])
+                    return VectorResult(
+                        executed=True,
+                        details=f"Executed: external-script:{urls}; payload={payload_html!r}",
+                    )
+
                 exec_nav = _execution_navigation_urls()
                 if exec_nav:
                     urls = ", ".join(exec_nav[:3])
@@ -1144,25 +1291,77 @@ class AsyncBrowserHarness:
                         executed=True,
                         details=f"Executed: navigation:{urls}; payload={payload_html!r}",
                     )
-                if self._external_script_requests:
-                    urls = ", ".join(self._external_script_requests[:3])
+
+                hook = await _hook_details()
+                if hook:
                     return VectorResult(
                         executed=True,
-                        details=f"Executed: external-script:{urls}; payload={payload_html!r}",
+                        details=f"Executed: hook:{hook}; payload={payload_html!r}",
                     )
-                if self._external_network_requests:
+
+                if self._dialog_events:
+                    details = self._dialog_events[0]
+                    return VectorResult(
+                        executed=True,
+                        details=f"Executed: {details}; payload={payload_html!r}",
+                    )
+
+                if payload_context == "http_leak" and self._external_network_requests:
                     rtype, url = self._external_network_requests[0]
                     return VectorResult(
                         executed=False,
                         details=f"External fetch: {rtype}:{url}; payload={payload_html!r}",
                         signal="http_leak",
                     )
-                if _looks_like_navigation_context_destroyed(exc):
-                    return VectorResult(
-                        executed=True,
-                        details=f"Executed: navigation:context-destroyed; payload={payload_html!r}",
-                    )
-                raise exc
+
+                remaining_ms = int((deadline_s - time.monotonic()) * 1000)
+                if remaining_ms <= 0:
+                    break
+                try:
+                    await self._page.wait_for_timeout(min(poll_ms, remaining_ms))
+                except Exception as exc:
+                    exec_nav = _execution_navigation_urls()
+                    if exec_nav:
+                        urls = ", ".join(exec_nav[:3])
+                        return VectorResult(
+                            executed=True,
+                            details=f"Executed: navigation:{urls}; payload={payload_html!r}",
+                        )
+                    if self._external_script_requests:
+                        urls = ", ".join(self._external_script_requests[:3])
+                        return VectorResult(
+                            executed=True,
+                            details=f"Executed: external-script:{urls}; payload={payload_html!r}",
+                        )
+                    if payload_context == "http_leak" and self._external_network_requests:
+                        rtype, url = self._external_network_requests[0]
+                        return VectorResult(
+                            executed=False,
+                            details=f"External fetch: {rtype}:{url}; payload={payload_html!r}",
+                            signal="http_leak",
+                        )
+                    if _looks_like_navigation_context_destroyed(exc):
+                        return VectorResult(
+                            executed=True,
+                            details=f"Executed: navigation:context-destroyed; payload={payload_html!r}",
+                        )
+                    raise
+
+        # Re-check delayed signals after waiting.
+        if self._external_script_requests:
+            urls = ", ".join(self._external_script_requests[:3])
+            return VectorResult(
+                executed=True,
+                details=f"Executed: external-script:{urls}; payload={payload_html!r}",
+            )
+
+        exec_nav = _execution_navigation_urls()
+        if exec_nav:
+            urls = ", ".join(exec_nav[:3])
+            return VectorResult(
+                executed=True,
+                details=f"Executed: navigation:{urls}; payload={payload_html!r}",
+            )
 
         hook = await _hook_details()
         if hook:
@@ -1178,8 +1377,8 @@ class AsyncBrowserHarness:
                 details=f"Executed: {details}; payload={payload_html!r}",
             )
 
-        if first_external_network is not None:
-            rtype, url = first_external_network
+        if self._external_network_requests:
+            rtype, url = self._external_network_requests[0]
             return VectorResult(
                 executed=False,
                 details=f"External fetch: {rtype}:{url}; payload={payload_html!r}",

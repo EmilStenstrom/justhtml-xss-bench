@@ -12,10 +12,10 @@ import time
 import re
 import queue
 
-from .bench import BenchCaseResult, load_vectors, run_bench
+from .bench import BenchCaseResult, load_vectors, run_bench, sanitizer_overrides_for_vector
 from .harness import BrowserName
 from .portswigger import ensure_portswigger_vectors_file
-from .sanitizers import available_sanitizers, default_sanitizers, get_sanitizer
+from .sanitizers import SanitizerConfigUnsupported, available_sanitizers, default_sanitizers, get_sanitizer
 
 
 _WORKER_VECTOR_PATHS: tuple[str, ...] | None = None
@@ -75,11 +75,13 @@ def _queue_worker_main(
     # Using the Async API avoids that check entirely.
 
     def _prepare_for_sanitizer(*, vector, sanitizer):
+        sanitizer_kwargs = sanitizer_overrides_for_vector(vector)
+
         if vector.payload_context == "href":
             sanitizer_input_html = f'<a href="{vector.payload_html}">x</a>'
             return (
                 sanitizer_input_html,
-                sanitizer.sanitize(sanitizer_input_html),
+                sanitizer.sanitize(sanitizer_input_html, **sanitizer_kwargs),
                 "html",
             )
 
@@ -87,14 +89,14 @@ def _queue_worker_main(
             sanitizer_input_html = f'<img src="nonexistent://x" onerror="{vector.payload_html}">'
             return (
                 sanitizer_input_html,
-                sanitizer.sanitize(sanitizer_input_html),
+                sanitizer.sanitize(sanitizer_input_html, **sanitizer_kwargs),
                 "html",
             )
 
         sanitizer_input_html = vector.payload_html
         return (
             sanitizer_input_html,
-            sanitizer.sanitize(sanitizer_input_html),
+            sanitizer.sanitize(sanitizer_input_html, **sanitizer_kwargs),
             vector.payload_context,
         )
 
@@ -141,6 +143,7 @@ def _queue_worker_main(
         from .harness import AsyncBrowserHarness, render_html_document
         from .bench import (
             _expected_tags_allowed_for_context,
+            _missing_allowlisted_primitives,
             _missing_expected_tags,
             _unexpected_tags_when_none_expected,
         )
@@ -216,6 +219,25 @@ def _queue_worker_main(
                                         sanitized_html,
                                         payload_context_to_run,
                                     ) = _prepare_for_sanitizer(vector=vector, sanitizer=sanitizer)
+                                except SanitizerConfigUnsupported as exc:
+                                    part.append(
+                                        BenchCaseResult(
+                                            sanitizer=sanitizer.name,
+                                            browser=browser,
+                                            vector_id=vector.id,
+                                            payload_context=vector.payload_context,
+                                            run_payload_context=vector.payload_context,
+                                            outcome="skip",
+                                            executed=False,
+                                            lossy=False,
+                                            lossy_details="",
+                                            details=f"Skipped: {sanitizer.name} cannot represent the requested allowlist: {exc}",
+                                            sanitizer_input_html="",
+                                            sanitized_html="",
+                                            rendered_html="",
+                                        )
+                                    )
+                                    continue
                                 except Exception as exc:
                                     part.append(
                                         BenchCaseResult(
@@ -260,6 +282,11 @@ def _queue_worker_main(
                                             lossy_details = "Missing expected tags after sanitization: " + ", ".join(
                                                 missing_tags
                                             )
+
+                                # Note: we intentionally do not mark http_leak cases as `lossy`.
+                                # The purpose of these vectors is to measure external-request behavior,
+                                # and sanitizers may legitimately prevent leaks by stripping URL-bearing
+                                # tags/attributes entirely.
 
                                 try:
                                     rendered_html = render_html_document(
@@ -658,6 +685,17 @@ def main(argv: list[str] | None = None) -> int:
             vectors_per_task = 1
             if args.progress_every and args.progress_every > 0:
                 vectors_per_task = max(1, math.ceil(int(args.progress_every) / cases_per_vector))
+
+            # If the user forces a long per-case timeout, large chunks make the
+            # progress output look "stuck" because we only report after a chunk
+            # completes. Cap the chunk size so we still get regular updates.
+            #
+            # Example: with --timeout-ms 12000 and the default --progress-every 25,
+            # a chunk would take ~25 * 12s = 300s before the first progress line.
+            if args.timeout_ms is not None and int(args.timeout_ms) > 0:
+                target_chunk_s = 5
+                max_vectors_by_timeout = max(1, (target_chunk_s * 1000) // int(args.timeout_ms))
+                vectors_per_task = min(vectors_per_task, int(max_vectors_by_timeout))
 
             if not args.no_progress and args.progress_every > 0:
                 print(

@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable
+import re
+from typing import AbstractSet, Callable, Mapping
 
 from .harness import PayloadContext
 
@@ -130,11 +131,29 @@ def allowed_attributes_for_tag(tag: str) -> frozenset[str]:
 class Sanitizer:
     name: str
     description: str
-    sanitize: Callable[[str], str]
+    sanitize: Callable[..., str]
     supported_contexts: set[PayloadContext] | None = None
 
 
-def noop(html: str) -> str:
+class SanitizerConfigUnsupported(Exception):
+    """Raised when a sanitizer library cannot represent the requested allowlist."""
+
+
+def _override_allowlist_raw(
+    *,
+    allow_tags: AbstractSet[str] | None,
+    allow_attrs: Mapping[str, AbstractSet[str]] | None,
+) -> tuple[AbstractSet[str], Mapping[str, AbstractSet[str]]]:
+    """Return override allowlist without validation/normalization.
+
+    Intentionally does not normalize case, filter invalid tag names, or strip
+    processing-instruction pseudo tags.
+    """
+
+    return (allow_tags or frozenset()), (allow_attrs or {})
+
+
+def noop(html: str, *, allow_tags=None, allow_attrs=None) -> str:
     """No-op sanitizer.
 
     Useful as a baseline to verify that the harness correctly detects execution.
@@ -174,7 +193,7 @@ def _maybe_bleach() -> Sanitizer | None:
             return True
         return False
 
-    cleaner_kwargs = dict(
+    base_cleaner_kwargs = dict(
         tags=list(DEFAULT_ALLOWED_TAGS),
         attributes=_bleach_attr_filter,
         protocols=list(_URL_PROTOCOLS),
@@ -182,10 +201,36 @@ def _maybe_bleach() -> Sanitizer | None:
         strip_comments=True,
     )
     if css_sanitizer is not None:
-        cleaner_kwargs["css_sanitizer"] = css_sanitizer
-    cleaner = Cleaner(**cleaner_kwargs)
+        base_cleaner_kwargs["css_sanitizer"] = css_sanitizer
+    base_cleaner = Cleaner(**base_cleaner_kwargs)
+    override_cache: dict[tuple[tuple[str, ...], tuple[tuple[str, tuple[str, ...]], ...]], Cleaner] = {}
 
-    def _sanitize(html: str) -> str:
+    def _sanitize(html: str, *, allow_tags=None, allow_attrs=None) -> str:
+        if allow_tags is None and allow_attrs is None:
+            return base_cleaner.clean(html)
+
+        tags_raw, attrs_map_raw = _override_allowlist_raw(allow_tags=allow_tags, allow_attrs=allow_attrs)
+        tags_list = list(tags_raw)
+        attrs_map = dict(attrs_map_raw)
+
+        key = None
+        try:
+            key = (
+                tuple(sorted(tags_list)),
+                tuple(sorted((t, tuple(sorted(a))) for (t, a) in attrs_map.items())),
+            )
+        except Exception:
+            key = None
+
+        cleaner = override_cache.get(key) if key is not None else None
+        if cleaner is None:
+            cleaner_kwargs = dict(base_cleaner_kwargs)
+            cleaner_kwargs["tags"] = tags_list
+            # Let bleach handle invalid config if present.
+            cleaner_kwargs["attributes"] = {t: list(a) for (t, a) in attrs_map.items()}
+            cleaner = Cleaner(**cleaner_kwargs)
+            if key is not None:
+                override_cache[key] = cleaner
         return cleaner.clean(html)
 
     return Sanitizer(
@@ -203,10 +248,9 @@ def _maybe_nh3() -> Sanitizer | None:
     except Exception:
         return None
 
-    allowed_tags: set[str] = set(DEFAULT_ALLOWED_TAGS)
-
     # nh3 uses allowlisted attributes by tag, plus a global "*" entry.
-    allowed_attributes: dict[str, set[str]] = {
+    base_allowed_tags: set[str] = set(DEFAULT_ALLOWED_TAGS)
+    base_allowed_attributes: dict[str, set[str]] = {
         "*": set(_GLOBAL_ATTRS),
         # NOTE: do not allow `rel` here.
         # nh3 (ammonia) manages link rel via the separate `link_rel=` setting and
@@ -217,12 +261,22 @@ def _maybe_nh3() -> Sanitizer | None:
         "td": set(_TABLE_CELL_ATTRS),
     }
 
-    def _sanitize(html: str) -> str:
+    def _sanitize(html: str, *, allow_tags=None, allow_attrs=None) -> str:
+        if allow_tags is None and allow_attrs is None:
+            tags = base_allowed_tags
+            attributes = base_allowed_attributes
+        else:
+            tags_raw, attrs_map_raw = _override_allowlist_raw(allow_tags=allow_tags, allow_attrs=allow_attrs)
+            if any("rel" in s for s in attrs_map_raw.values()):
+                raise SanitizerConfigUnsupported("nh3 cannot allow the 'rel' attribute (ammonia limitation)")
+            tags = set(tags_raw)
+            attributes = {t: set(a) for (t, a) in dict(attrs_map_raw).items()}
+
         # Keep the call signature conservative to avoid version-specific args.
         return nh3.clean(
             html,
-            tags=allowed_tags,
-            attributes=allowed_attributes,
+            tags=tags,
+            attributes=attributes,
             url_schemes=set(_URL_PROTOCOLS),
             link_rel=None,  # Disable automatic rel management.
             filter_style_properties=set(DEFAULT_ALLOWED_CSS_PROPERTIES),
@@ -244,14 +298,14 @@ def _maybe_lxml_html_clean() -> Sanitizer | None:
         return None
 
     # Configure lxml-html-clean to match the shared allowlist policy.
-    allowed_tags: set[str] = set(DEFAULT_ALLOWED_TAGS)
+    base_allowed_tags: set[str] = set(DEFAULT_ALLOWED_TAGS)
 
     # lxml-html-clean's attribute allowlist is global (not per-tag).
-    safe_attrs: frozenset[str] = frozenset(
+    base_safe_attrs: frozenset[str] = frozenset(
         set(_GLOBAL_ATTRS) | set(_A_ATTRS) | set(_IMG_ATTRS) | set(_TABLE_CELL_ATTRS)
     )
 
-    cleaner = Cleaner(
+    base_cleaner = Cleaner(
         # XSS primitives
         scripts=True,
         javascript=True,
@@ -263,19 +317,47 @@ def _maybe_lxml_html_clean() -> Sanitizer | None:
         # Do not turn fragments into full documents / add <body> wrappers.
         page_structure=False,
         # Remove tags not in our allowlist (including svg/math).
-        allow_tags=allowed_tags,
+        allow_tags=base_allowed_tags,
         # NOTE: lxml-html-clean forbids combining allow_tags + remove_unknown_tags.
         # allow_tags is sufficient for our purposes.
         remove_unknown_tags=False,
         safe_attrs_only=True,
-        safe_attrs=safe_attrs,
+        safe_attrs=base_safe_attrs,
         # Keep external-link behavior aligned with other sanitizers (no auto rel).
         add_nofollow=False,
     )
 
-    def _sanitize(html: str) -> str:
+    override_cache: dict[tuple[tuple[str, ...], tuple[str, ...]], Cleaner] = {}
+
+    def _sanitize(html: str, *, allow_tags=None, allow_attrs=None) -> str:
         if not html.strip():
             return ""
+
+        if allow_tags is None and allow_attrs is None:
+            cleaner = base_cleaner
+        else:
+            tags_raw, attrs_map_raw = _override_allowlist_raw(allow_tags=allow_tags, allow_attrs=allow_attrs)
+            attrs_map = dict(attrs_map_raw)
+            safe_attrs = set()
+            for a in attrs_map.values():
+                safe_attrs.update(a)
+            key = (tuple(sorted(tags_raw)), tuple(sorted(safe_attrs)))
+            cleaner = override_cache.get(key)
+            if cleaner is None:
+                cleaner = Cleaner(
+                    scripts=True,
+                    javascript=True,
+                    comments=True,
+                    style=False,
+                    processing_instructions=True,
+                    page_structure=False,
+                    allow_tags=set(tags_raw),
+                    remove_unknown_tags=False,
+                    safe_attrs_only=True,
+                    safe_attrs=frozenset(safe_attrs),
+                    add_nofollow=False,
+                )
+                override_cache[key] = cleaner
         try:
             cleaned = cleaner.clean_html(html)
         except Exception:
@@ -319,49 +401,80 @@ def _maybe_justhtml() -> Sanitizer | None:
 
     fragment_context = FragmentContext("div")
 
-    # Configure a policy that mirrors the shared allowlist in this module.
-    # Note: `justhtml` merges per-tag allowlists with the global "*" allowlist.
-    allow_rules = {
-        ("a", "href"): UrlRule(
-            allow_fragment=True,
-            resolve_protocol_relative="https",
-            allowed_schemes=set(_URL_PROTOCOLS),
-            allowed_hosts=None,
-        ),
-        ("img", "src"): UrlRule(
-            allow_fragment=True,
-            resolve_protocol_relative="https",
-            allowed_schemes=set(_URL_PROTOCOLS),
-            allowed_hosts=None,
-        ),
-    }
+    _URL_ATTRS: frozenset[str] = frozenset(
+        {
+            "href",
+            "src",
+            "srcset",
+            "poster",
+            "data",
+            "codebase",
+            "background",
+            "manifest",
+            "content",
+            "action",
+        }
+    )
 
-    policy = SanitizationPolicy(
-        allowed_tags=set(DEFAULT_ALLOWED_TAGS),
-        allowed_attributes={
+    def _make_policy(*, tags: AbstractSet[str], attrs: Mapping[str, AbstractSet[str]]) -> SanitizationPolicy:
+        # Note: `justhtml` merges per-tag allowlists with the global "*" allowlist.
+        allow_rules = {}
+        for tag, attrset in attrs.items():
+            if tag == "*":
+                continue
+            for attr in attrset:
+                if attr not in _URL_ATTRS:
+                    continue
+                allow_rules[(tag, attr)] = UrlRule(
+                    allow_fragment=True,
+                    resolve_protocol_relative="https",
+                    allowed_schemes=set(_URL_PROTOCOLS),
+                    allowed_hosts=None,
+                )
+
+        return SanitizationPolicy(
+            allowed_tags=set(tags),
+            allowed_attributes={k: set(v) for (k, v) in attrs.items()},
+            allowed_css_properties=set(DEFAULT_ALLOWED_CSS_PROPERTIES),
+            url_policy=UrlPolicy(
+                default_handling="allow",
+                default_allow_relative=True,
+                allow_rules=allow_rules,
+            ),
+        )
+
+    base_policy = _make_policy(
+        tags=set(DEFAULT_ALLOWED_TAGS),
+        attrs={
             "*": set(_GLOBAL_ATTRS),
             "a": set(_A_ATTRS),
             "img": set(_IMG_ATTRS),
             "th": set(_TABLE_CELL_ATTRS),
             "td": set(_TABLE_CELL_ATTRS),
         },
-        # justhtml drops `style="..."` unless at least one CSS property is allowlisted.
-        # Use the shared CSS allowlist to keep behavior aligned with other
-        # CSS-aware sanitizers.
-        allowed_css_properties=set(DEFAULT_ALLOWED_CSS_PROPERTIES),
-        url_policy=UrlPolicy(
-            default_handling="allow",
-            default_allow_relative=True,
-            allow_rules=allow_rules,
-        ),
-        # Other defaults (dropping comments/doctype/foreign namespaces, stripping
-        # disallowed tags, dropping script/style content) match the spirit of the
-        # benchmark policy.
     )
 
-    def _sanitize(html: str) -> str:
+    policy_cache: dict[tuple[tuple[str, ...], tuple[tuple[str, tuple[str, ...]], ...]], SanitizationPolicy] = {}
+
+    def _sanitize(html: str, *, allow_tags=None, allow_attrs=None) -> str:
         if not html:
             return ""
+
+        if allow_tags is None and allow_attrs is None:
+            policy = base_policy
+        else:
+            tags_raw, attrs_map_raw = _override_allowlist_raw(allow_tags=allow_tags, allow_attrs=allow_attrs)
+            attrs_full: dict[str, AbstractSet[str]] = dict(attrs_map_raw)
+
+            key = (
+                tuple(sorted(tags_raw)),
+                tuple(sorted((t, tuple(sorted(a))) for (t, a) in attrs_full.items() if t != "*")),
+            )
+            policy = policy_cache.get(key)
+            if policy is None:
+                policy = _make_policy(tags=set(tags_raw), attrs=attrs_full)
+                policy_cache[key] = policy
+
         # Parse as a fragment to avoid adding document/body wrappers.
         doc = JustHTML(html, fragment=True, fragment_context=fragment_context)
         # Keep output stable for the harness/expected_tags checks.
