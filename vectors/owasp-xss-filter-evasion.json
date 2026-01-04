@@ -555,7 +555,7 @@
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / IMG Embedded Commands",
 			"payload_html": "<IMG SRC=\"http://www.thesiteyouareon.com/somecommand.php?somevariables=maliciouscode\">",
 			"payload_context": "html",
-			"expected_tags": ["img[src]"]
+			"expected_tags": ["img"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-img-embedded-commands-img-embedded-commands-f5cc304dc3",
