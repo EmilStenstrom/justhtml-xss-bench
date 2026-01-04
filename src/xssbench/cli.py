@@ -22,6 +22,35 @@ _WORKER_VECTOR_PATHS: tuple[str, ...] | None = None
 _WORKER_VECTORS = None
 
 
+def _normalize_id_args(raw_ids: list[str]) -> list[str]:
+    # Allow either: --ids a b c  OR  --ids a,b,c
+    ids: list[str] = []
+    for item in raw_ids:
+        for part in str(item).split(","):
+            part = part.strip()
+            if part:
+                ids.append(part)
+    return ids
+
+
+def _select_vectors_by_id(vectors, ids: list[str]):
+    # Preserve the user-provided ID order; ignore duplicates.
+    by_id = {v.id: v for v in vectors}
+    out = []
+    seen = set()
+    missing: list[str] = []
+    for vid in ids:
+        if vid in seen:
+            continue
+        seen.add(vid)
+        v = by_id.get(vid)
+        if v is None:
+            missing.append(vid)
+        else:
+            out.append(v)
+    return out, missing
+
+
 def _worker_init(vector_paths: list[str]) -> None:
     global _WORKER_VECTOR_PATHS, _WORKER_VECTORS
     _WORKER_VECTOR_PATHS = tuple(vector_paths)
@@ -60,6 +89,7 @@ def _worker_run(
 def _queue_worker_main(
     *,
     vector_paths: list[str],
+    vector_ids: list[str] | None,
     sanitizer_names: list[str],
     browsers: list[BrowserName],
     timeout_ms: int | None,
@@ -134,6 +164,10 @@ def _queue_worker_main(
 
     async def _async_main() -> None:
         vectors = load_vectors(vector_paths)
+        if vector_ids:
+            vectors, missing = _select_vectors_by_id(vectors, vector_ids)
+            if missing:
+                raise RuntimeError(f"Unknown vector id(s): {', '.join(missing)}")
         sanitizers = [get_sanitizer(str(n)) for n in sanitizer_names]
 
         # Keep browsers open for the lifetime of the worker so small tasks don't
@@ -429,6 +463,13 @@ def _parse_run_args(argv: list[str]) -> argparse.Namespace:
     )
 
     parser.add_argument(
+        "--ids",
+        nargs="+",
+        default=None,
+        help="Only run the vectors with these IDs (space-separated, or a single comma-separated value)",
+    )
+
+    parser.add_argument(
         "--timeout-ms",
         type=int,
         default=None,
@@ -674,6 +715,15 @@ def main(argv: list[str] | None = None) -> int:
         )
 
     vectors = load_vectors(vector_paths)
+    vector_ids = _normalize_id_args(args.ids) if args.ids else None
+    if vector_ids:
+        vectors, missing = _select_vectors_by_id(vectors, vector_ids)
+        if missing:
+            print(
+                f"Unknown vector id(s): {', '.join(missing)}",
+                file=sys.stderr,
+            )
+            return 2
 
     if args.sanitizers is None:
         sanitizers = list(default_sanitizers().values())
@@ -782,6 +832,7 @@ def main(argv: list[str] | None = None) -> int:
                     target=_queue_worker_main,
                     kwargs={
                         "vector_paths": list(vector_paths),
+                        "vector_ids": list(vector_ids) if vector_ids else None,
                         "sanitizer_names": sanitizer_names,
                         "browsers": list(browsers),
                         "timeout_ms": args.timeout_ms,
