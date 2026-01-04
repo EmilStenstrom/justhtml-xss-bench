@@ -502,17 +502,55 @@ def _repr_truncated(value: str, *, limit: int = 400) -> str:
 
 
 def _print_table(summary) -> None:
+    def _is_js_context(ctx: str) -> bool:
+        c = str(ctx)
+        return c.startswith("js") or c == "onerror_attr"
+
     # Build per-sanitizer+browser counts.
     per = {}
     for r in summary.results:
         key = (r.sanitizer, r.browser)
-        per.setdefault(key, {"total": 0, "xss": 0, "http_leak": 0, "errors": 0, "lossy": 0, "skipped": 0})
-        per[key]["total"] += 1
-        per[key]["xss"] += 1 if r.outcome == "xss" else 0
-        per[key]["http_leak"] += 1 if r.outcome == "http_leak" else 0
-        per[key]["errors"] += 1 if r.outcome == "error" else 0
-        per[key]["lossy"] += 1 if getattr(r, "lossy", False) else 0
-        per[key]["skipped"] += 1 if r.outcome == "skip" else 0
+        row = per.setdefault(
+            key,
+            {
+                "xss": 0,
+                "lossy": 0,
+                "errors": 0,
+                "passed": 0,
+                "js_total": 0,
+                "js_skipped": 0,
+                "js_xss": 0,
+                "href_total": 0,
+                "href_skipped": 0,
+                "href_xss": 0,
+                "http_leak_total": 0,
+                "http_leak_skipped": 0,
+                "http_leak_hits": 0,
+            },
+        )
+
+        if r.outcome == "xss":
+            row["xss"] += 1
+        if bool(getattr(r, "lossy", False)):
+            row["lossy"] += 1
+        if r.outcome == "error":
+            row["errors"] += 1
+        if r.outcome == "pass" and not bool(getattr(r, "lossy", False)):
+            row["passed"] += 1
+
+        ctx = str(getattr(r, "payload_context", ""))
+        if _is_js_context(ctx):
+            row["js_total"] += 1
+            row["js_skipped"] += 1 if r.outcome == "skip" else 0
+            row["js_xss"] += 1 if r.outcome == "xss" else 0
+        elif ctx == "href":
+            row["href_total"] += 1
+            row["href_skipped"] += 1 if r.outcome == "skip" else 0
+            row["href_xss"] += 1 if r.outcome == "xss" else 0
+        elif ctx == "http_leak":
+            row["http_leak_total"] += 1
+            row["http_leak_skipped"] += 1 if r.outcome == "skip" else 0
+            row["http_leak_hits"] += 1 if r.outcome == "http_leak" else 0
 
     xss = [r for r in summary.results if r.outcome == "xss"]
     http_leak = [r for r in summary.results if r.outcome == "http_leak"]
@@ -567,13 +605,39 @@ def _print_table(summary) -> None:
     if xss or http_leak or errors or lossy:
         print("")
 
-    header = f"{'sanitizer':<22}  {'browser':<8}  {'xss':>6}  {'http_leak':>9}  {'lossy':>6}  {'errors':>6}  {'skipped':>7}  {'total':>5}"
+    header = (
+        f"{'sanitizer':<22}  {'browser':<8}"
+        f"  {'xss':>6}  {'lossy':>6}  {'errors':>6}"
+        f"  {'js':>6}  {'href':>6}  {'http_leak':>9}"
+        f"  {'passed':>6}"
+    )
     print(header)
     print("-" * len(header))
     for name, browser in sorted(per.keys()):
         row = per[(name, browser)]
+
+        def _skip_or_num(*, total: int, skipped: int, value: int) -> str:
+            if total == 0:
+                return "-"
+            if skipped == total:
+                return "skip"
+            return str(value)
+
+        js_cell = _skip_or_num(total=int(row["js_total"]), skipped=int(row["js_skipped"]), value=int(row["js_xss"]))
+        href_cell = _skip_or_num(
+            total=int(row["href_total"]), skipped=int(row["href_skipped"]), value=int(row["href_xss"])
+        )
+        http_leak_cell = _skip_or_num(
+            total=int(row["http_leak_total"]),
+            skipped=int(row["http_leak_skipped"]),
+            value=int(row["http_leak_hits"]),
+        )
+
         print(
-            f"{name:<22}  {browser:<8}  {row['xss']:>6}  {row['http_leak']:>9}  {row['lossy']:>6}  {row['errors']:>6}  {row['skipped']:>7}  {row['total']:>5}"
+            f"{name:<22}  {browser:<8}"
+            f"  {row['xss']:>6}  {row['lossy']:>6}  {row['errors']:>6}"
+            f"  {js_cell:>6}  {href_cell:>6}  {http_leak_cell:>9}"
+            f"  {row['passed']:>6}"
         )
 
 
