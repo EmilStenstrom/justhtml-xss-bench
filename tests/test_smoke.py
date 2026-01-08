@@ -117,6 +117,25 @@ def test_iframe_srcdoc_inline_script_triggers_execution() -> None:
     assert result.executed is True, result.details
 
 
+def test_css_url_javascript_does_not_count_as_execution() -> None:
+    # CSS url(javascript:...) does not execute in the browsers we test.
+    # Treating it as XSS would be a detection artifact, not a real execution.
+    payload_html = '<div style="background: url(x)\\20url(javascript:alert(1))">x</div>'
+    sanitized_html = noop(payload_html)
+
+    try:
+        result = run_vector(
+            payload_html=payload_html,
+            sanitized_html=sanitized_html,
+            payload_context="html",
+            timeout_ms=1500,
+        )
+    except RuntimeError as exc:
+        pytest.skip(str(exc))
+
+    assert result.executed is False, result.details
+
+
 def test_lxml_html_clean_does_not_add_wrapper_div() -> None:
     from xssbench.sanitizers import available_sanitizers
 

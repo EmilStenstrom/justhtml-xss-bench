@@ -52,28 +52,6 @@
 
 	const elements = document.querySelectorAll("*");
 	for (const el of elements) {
-		// Check for inline style with javascript: or data:
-		try {
-			if (el.hasAttribute("style")) {
-				const style = el.getAttribute("style");
-				const normalized = normalizeForScheme(style);
-				// Simple check for url(javascript:...) or url(data:...)
-				// This is a heuristic, but effective for common vectors.
-				if (
-					/url\s*\(\s*['"]?\s*javascript:/i.test(normalized) ||
-					/url\s*\(\s*['"]?\s*data:/i.test(normalized)
-				) {
-					hits.push({
-						tag: (el.tagName || "").toLowerCase(),
-						attr: "style",
-						value: style,
-					});
-				}
-			}
-		} catch {
-			// ignore
-		}
-
 		// Check for on* event handlers
 		try {
 			for (const attr of el.getAttributeNames()) {
