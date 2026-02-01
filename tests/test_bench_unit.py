@@ -29,7 +29,7 @@ def test_run_bench_uses_runner_and_counts_executed() -> None:
     sanitizer = Sanitizer(
         name="noop",
         description="",
-        sanitize=lambda html: html,
+        sanitize=lambda html, **kwargs: html,
     )
 
     def fake_runner(*, payload_html: str, sanitized_html: str, timeout_ms: int, **_kwargs):
@@ -72,7 +72,7 @@ def test_run_bench_external_script_request_counts_as_xss() -> None:
         ),
     ]
 
-    sanitizer = Sanitizer(name="noop", description="", sanitize=lambda html: html)
+    sanitizer = Sanitizer(name="noop", description="", sanitize=lambda html, **kwargs: html)
 
     def fake_runner(*, payload_html: str, sanitized_html: str, timeout_ms: int, **_kwargs):
         if 'src="https://example.com/x.js"' in sanitized_html:
@@ -99,7 +99,7 @@ def test_run_bench_external_script_takes_precedence_over_external_signal() -> No
         )
     ]
 
-    sanitizer = Sanitizer(name="noop", description="", sanitize=lambda html: html)
+    sanitizer = Sanitizer(name="noop", description="", sanitize=lambda html, **kwargs: html)
 
     def fake_runner(*, payload_html: str, sanitized_html: str, timeout_ms: int, **_kwargs):
         # Simulate the harness observing both an external fetch and an external script.
@@ -308,7 +308,7 @@ def test_run_bench_fail_fast_stops_after_first_xss() -> None:
         ),
     ]
 
-    sanitizer = Sanitizer(name="noop", description="", sanitize=lambda html: html)
+    sanitizer = Sanitizer(name="noop", description="", sanitize=lambda html, **kwargs: html)
 
     calls: list[str] = []
 
@@ -339,7 +339,7 @@ def test_expected_tags_are_ordered_and_match_distinct_elements_in_order() -> Non
         )
     ]
 
-    sanitizer = Sanitizer(name="noop", description="", sanitize=lambda html: html)
+    sanitizer = Sanitizer(name="noop", description="", sanitize=lambda html, **kwargs: html)
 
     def fake_runner(*_args, **_kwargs):
         return type("VR", (), {"executed": False, "details": "no"})()
@@ -362,7 +362,7 @@ def test_expected_tags_require_multiple_matches_for_duplicates() -> None:
         )
     ]
 
-    sanitizer = Sanitizer(name="noop", description="", sanitize=lambda html: html)
+    sanitizer = Sanitizer(name="noop", description="", sanitize=lambda html, **kwargs: html)
 
     def fake_runner(*_args, **_kwargs):
         return type("VR", (), {"executed": False, "details": "no"})()
@@ -390,7 +390,7 @@ def test_run_bench_skips_href_without_attribute_cleaning_support() -> None:
     seen_inputs: list[str] = []
     called = {"n": 0}
 
-    def sanitize(html: str) -> str:
+    def sanitize(html: str, **kwargs) -> str:
         seen_inputs.append(html)
         # Simulate a sanitizer that strips javascript: to '#'
         return '<a href="#">x</a>'
@@ -497,7 +497,7 @@ def test_run_bench_runs_href_if_sanitizer_supports_it() -> None:
     seen_payload_contexts: list[str] = []
     seen_sanitized_html: list[str] = []
 
-    def sanitize(value: str) -> str:
+    def sanitize(value: str, **_kwargs) -> str:
         seen_inputs.append(value)
         return "#"
 
@@ -532,7 +532,7 @@ def test_run_bench_does_not_wrap_js_payload_before_sanitizing() -> None:
     seen_inputs: list[str] = []
     seen_payload_contexts: list[str] = []
 
-    def sanitize(html: str) -> str:
+    def sanitize(html: str, **kwargs) -> str:
         seen_inputs.append(html)
         return html
 
@@ -575,7 +575,7 @@ def test_run_bench_skips_unsupported_contexts() -> None:
     sanitizer = Sanitizer(
         name="htmlonly",
         description="",
-        sanitize=lambda html: html,
+        sanitize=lambda html, **_kwargs: html,
         supported_contexts={"html", "href", "html_head", "html_outer", "onerror_attr"},
     )
 
@@ -609,7 +609,7 @@ def test_run_bench_wraps_onerror_attr_payload_before_sanitizing() -> None:
     seen_inputs: list[str] = []
     seen_payload_contexts: list[str] = []
 
-    def sanitize(html: str) -> str:
+    def sanitize(html: str, **kwargs) -> str:
         seen_inputs.append(html)
         return html
 
@@ -645,7 +645,7 @@ def test_run_bench_marks_missing_expected_tags_as_lossy_but_still_runs_runner() 
         ),
     ]
 
-    sanitizer = Sanitizer(name="s", description="", sanitize=lambda _html: "keep")
+    sanitizer = Sanitizer(name="s", description="", sanitize=lambda _html, **kwargs: "keep")
 
     called = {"n": 0}
 
@@ -676,7 +676,7 @@ def test_run_bench_empty_expected_tags_means_no_tags_allowed() -> None:
         ),
     ]
 
-    sanitizer = Sanitizer(name="s", description="", sanitize=lambda _html: "<b>still here</b>")
+    sanitizer = Sanitizer(name="s", description="", sanitize=lambda _html, **kwargs: "<b>still here</b>")
 
     called = {"n": 0}
 
@@ -707,7 +707,7 @@ def test_run_bench_skips_expected_tags_checks_when_none() -> None:
             expected_tags=None,
         ),
     ]
-    sanitizer = Sanitizer(name="noop", description="", sanitize=lambda html: html)
+    sanitizer = Sanitizer(name="noop", description="", sanitize=lambda html, **kwargs: html)
 
     def fake_runner(*, payload_html: str, sanitized_html: str, timeout_ms: int, **_kwargs):
         return type("VR", (), {"executed": False, "details": "nope"})()
@@ -734,7 +734,7 @@ def test_run_bench_expected_tags_exact_matches_attrs() -> None:
     sanitizer = Sanitizer(
         name="s",
         description="",
-        sanitize=lambda _html: "<a href='#'>y</a>",
+        sanitize=lambda _html, **kwargs: "<a href='#'>y</a>",
     )
 
     called = {"n": 0}
@@ -765,7 +765,7 @@ def test_run_bench_expected_tags_exact_fails_on_extra_tags() -> None:
     sanitizer = Sanitizer(
         name="s",
         description="",
-        sanitize=lambda _html: "<b>ok</b><i>extra</i>",
+        sanitize=lambda _html, **kwargs: "<b>ok</b><i>extra</i>",
     )
 
     called = {"n": 0}
@@ -798,7 +798,7 @@ def test_run_bench_bare_tag_disallows_attributes() -> None:
     sanitizer = Sanitizer(
         name="s",
         description="",
-        sanitize=lambda _html: "<a href='#'>y</a>",
+        sanitize=lambda _html, **kwargs: "<a href='#'>y</a>",
     )
 
     called = {"n": 0}
@@ -818,7 +818,7 @@ def test_run_bench_bare_tag_disallows_attributes() -> None:
     sanitizer2 = Sanitizer(
         name="s2",
         description="",
-        sanitize=lambda _html: "<a>y</a>",
+        sanitize=lambda _html, **kwargs: "<a>y</a>",
     )
     summary2 = run_bench(vectors=vectors, sanitizers=[sanitizer2], runner=fake_runner)
     assert summary2.total_cases == 1
@@ -837,7 +837,7 @@ def test_run_bench_can_be_both_lossy_and_xss() -> None:
         ),
     ]
 
-    sanitizer = Sanitizer(name="noop", description="", sanitize=lambda _html: "<img src=x onerror=1>")
+    sanitizer = Sanitizer(name="noop", description="", sanitize=lambda _html, **kwargs: "<img src=x onerror=1>")
 
     def fake_runner(*, sanitized_html: str, **_kwargs):
         if "onerror" in sanitized_html:
