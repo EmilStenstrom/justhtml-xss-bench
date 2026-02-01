@@ -67,6 +67,19 @@
 				window.__xssbench.executed = true;
 				const msg = args?.length ? String(args[0]) : "";
 				window.__xssbench.details = `${kind}:${msg}`;
+
+				// Also mark the top window so we can detect execution in iframes
+				// without iterating through potentially-hanging child frames.
+				try {
+					if (window.top && window.top !== window && window.top.__xssbench) {
+						window.top.__xssbench.executed = true;
+						if (!window.top.__xssbench.details) {
+							window.top.__xssbench.details = `iframe:${kind}:${msg}`;
+						}
+					}
+				} catch {
+					/* ignore cross-origin access */
+				}
 			} catch {
 				/* ignore */
 			}

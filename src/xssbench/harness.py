@@ -5,6 +5,7 @@ from functools import lru_cache
 import importlib
 import importlib.resources
 import re
+import signal
 import time
 from typing import Any
 from typing import Literal
@@ -530,21 +531,15 @@ class BrowserHarness:
         # If a previous vector scheduled work (e.g. setInterval) that triggers
         # a navigation slightly later, it can be mis-attributed to the next
         # vector run.
+        #
+        # Only clean up the main page; child frames can hang if they're navigating
+        # or in a problematic state.
         try:
-            frames_attr = getattr(self._page, "frames", None)
-            frames = list(frames_attr() if callable(frames_attr) else (frames_attr or []))
+            self._page.evaluate(
+                "() => { try { window.__xssbench && window.__xssbench.cleanup && window.__xssbench.cleanup(); } catch (e) {} }"
+            )
         except Exception:
-            frames = []
-        if not frames:
-            frames = [self._page]
-
-        for frame in frames:
-            try:
-                frame.evaluate(
-                    "() => { try { window.__xssbench && window.__xssbench.cleanup && window.__xssbench.cleanup(); } catch (e) {} }"
-                )
-            except Exception:
-                continue
+            pass
 
         self._external_script_requests.clear()
         self._external_network_requests.clear()
@@ -638,23 +633,19 @@ class BrowserHarness:
             pass
 
         def _hook_details() -> str:
+            # Only check the main page; child frames can hang if they're navigating
+            # or in a problematic state.
             try:
-                frames_attr = getattr(self._page, "frames", None)
-                page_frames = list(frames_attr() if callable(frames_attr) else (frames_attr or []))
-            except Exception:
-                page_frames = []
-            for frame in page_frames:
-                try:
-                    details = str(
-                        frame.evaluate(
-                            "() => (window.__xssbench && window.__xssbench.executed) ? String(window.__xssbench.details || '') : ''"
-                        )
-                        or ""
+                details = str(
+                    self._page.evaluate(
+                        "() => (window.__xssbench && window.__xssbench.executed) ? String(window.__xssbench.details || '') : ''"
                     )
-                except Exception:
-                    details = ""
+                    or ""
+                )
                 if details:
                     return details
+            except Exception:
+                pass
             return ""
 
         # Deterministic signal: if the DOM contains any `javascript:` URL attributes,
@@ -1109,21 +1100,15 @@ class AsyncBrowserHarness:
         # If a previous vector scheduled work (e.g. setInterval) that triggers
         # a navigation slightly later, it can be mis-attributed to the next
         # vector run.
+        #
+        # Only clean up the main page; child frames can hang if they're navigating
+        # or in a problematic state.
         try:
-            frames_attr = getattr(self._page, "frames", None)
-            frames = list(frames_attr() if callable(frames_attr) else (frames_attr or []))
+            await self._page.evaluate(
+                "() => { try { window.__xssbench && window.__xssbench.cleanup && window.__xssbench.cleanup(); } catch (e) {} }"
+            )
         except Exception:
-            frames = []
-        if not frames:
-            frames = [self._page]
-
-        for frame in frames:
-            try:
-                await frame.evaluate(
-                    "() => { try { window.__xssbench && window.__xssbench.cleanup && window.__xssbench.cleanup(); } catch (e) {} }"
-                )
-            except Exception:
-                continue
+            pass
 
         self._external_script_requests.clear()
         self._external_network_requests.clear()
@@ -1208,25 +1193,21 @@ class AsyncBrowserHarness:
             pass
 
         async def _hook_details() -> str:
+            # Only check the main page; child frames can hang if they're navigating
+            # or in a problematic state.
             try:
-                frames_attr = getattr(self._page, "frames", None)
-                page_frames = list(frames_attr() if callable(frames_attr) else (frames_attr or []))
-            except Exception:
-                page_frames = []
-            for frame in page_frames:
-                try:
-                    details = str(
-                        (
-                            await frame.evaluate(
-                                "() => (window.__xssbench && window.__xssbench.executed) ? String(window.__xssbench.details || '') : ''"
-                            )
+                details = str(
+                    (
+                        await self._page.evaluate(
+                            "() => (window.__xssbench && window.__xssbench.executed) ? String(window.__xssbench.details || '') : ''"
                         )
-                        or ""
                     )
-                except Exception:
-                    details = ""
+                    or ""
+                )
                 if details:
                     return details
+            except Exception:
+                pass
             return ""
 
         try:
