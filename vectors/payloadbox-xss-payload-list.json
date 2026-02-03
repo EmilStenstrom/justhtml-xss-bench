@@ -315,7 +315,7 @@
     {
       "id": "payloadbox-xss-payload-list-00041",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 43",
-      "payload_html": "<script>alert(1)<!–",
+      "payload_html": "<script>alert(1)<!\u2013",
       "payload_context": "html",
       "expected_tags": []
     },
@@ -36081,7 +36081,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><a id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></a>",
       "payload_context": "html",
       "expected_tags": [
-        "a[id, style]"
+        "a[id, style[position]]"
       ]
     },
     {
@@ -36089,56 +36089,72 @@
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4860",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><abbr id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></abbr>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "abbr[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04848",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4861",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><acronym id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></acronym>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "acronym[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04849",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4862",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><address id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></address>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "address[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04850",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4863",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><applet id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></applet>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "applet[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04851",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4864",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><area id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></area>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "area[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04852",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4865",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><article id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></article>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "article[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04853",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4866",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><aside id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></aside>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "aside[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04854",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4867",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><audio id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></audio>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "audio[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04855",
@@ -36146,7 +36162,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><b id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></b>",
       "payload_context": "html",
       "expected_tags": [
-        "b[id, style]"
+        "b[id, style[position]]"
       ]
     },
     {
@@ -36154,49 +36170,63 @@
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4869",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><base id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></base>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "base[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04857",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4870",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><basefont id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></basefont>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "basefont[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04858",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4871",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><bdi id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></bdi>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "bdi[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04859",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4872",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><bdo id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></bdo>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "bdo[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04860",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4873",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><bgsound id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></bgsound>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "bgsound[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04861",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4874",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><big id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></big>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "big[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04862",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4875",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><blink id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></blink>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "blink[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04863",
@@ -36204,7 +36234,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><blockquote id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></blockquote>",
       "payload_context": "html",
       "expected_tags": [
-        "blockquote[id, style]"
+        "blockquote[id, style[position]]"
       ]
     },
     {
@@ -36220,7 +36250,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><br id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></br>",
       "payload_context": "html",
       "expected_tags": [
-        "br[id, style]",
+        "br[id, style[position]]",
         "br"
       ]
     },
@@ -36229,35 +36259,46 @@
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4879",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><button id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></button>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "button[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04867",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4880",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><canvas id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></canvas>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "canvas[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04868",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4881",
-      "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><caption id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></caption>",
+      "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><table><caption id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></caption>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "table",
+        "caption[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04869",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4882",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><center id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></center>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "center[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04870",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4883",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><cite id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></cite>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "cite[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04871",
@@ -36265,7 +36306,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><code id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></code>",
       "payload_context": "html",
       "expected_tags": [
-        "code[id, style]"
+        "code[id, style[position]]"
       ]
     },
     {
@@ -36273,84 +36314,109 @@
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4885",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><col id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></col>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "col[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04873",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4886",
-      "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><colgroup id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></colgroup>",
+      "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><table><colgroup id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></colgroup>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "table",
+        "colgroup[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04874",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4887",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><command id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></command>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "command[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04875",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4888",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><content id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></content>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "content[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04876",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4889",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><data id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></data>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "data[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04877",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4890",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><datalist id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></datalist>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "datalist[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04878",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4891",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><dd id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></dd>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "dd[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04879",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4892",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><del id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></del>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "del[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04880",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4893",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><details id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></details>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "details[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04881",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4894",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><dfn id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></dfn>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "dfn[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04882",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4895",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><dialog id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></dialog>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "dialog[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04883",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4896",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><dir id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></dir>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "dir[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04884",
@@ -36358,7 +36424,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><div id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></div>",
       "payload_context": "html",
       "expected_tags": [
-        "div[id, style]"
+        "div[id, style[position]]"
       ]
     },
     {
@@ -36366,21 +36432,27 @@
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4898",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><dl id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></dl>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "dl[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04886",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4899",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><dt id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></dt>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "dt[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04887",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4900",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><element id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></element>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "element[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04888",
@@ -36388,7 +36460,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><em id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></em>",
       "payload_context": "html",
       "expected_tags": [
-        "em[id, style]"
+        "em[id, style[position]]"
       ]
     },
     {
@@ -36396,56 +36468,72 @@
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4902",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><embed id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></embed>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "embed[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04890",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4903",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><fieldset id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></fieldset>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "fieldset[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04891",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4904",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><figcaption id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></figcaption>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "figcaption[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04892",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4905",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><figure id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></figure>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "figure[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04893",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4906",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><font id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></font>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "font[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04894",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4907",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><footer id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></footer>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "footer[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04895",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4908",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><form id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></form>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "form[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04896",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4909",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><frame id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></frame>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "frame[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04897",
@@ -36460,14 +36548,14 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><h1 id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></h1>",
       "payload_context": "html",
       "expected_tags": [
-        "h1[id, style]"
+        "h1[id, style[position]]"
       ]
     },
     {
       "id": "payloadbox-xss-payload-list-04899",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4912",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><head id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></head>",
-      "payload_context": "html",
+      "payload_context": "html_outer",
       "expected_tags": []
     },
     {
@@ -36475,14 +36563,18 @@
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4913",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><header id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></header>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "header[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04901",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4914",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><hgroup id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></hgroup>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "hgroup[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04902",
@@ -36490,7 +36582,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><hr id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></hr>",
       "payload_context": "html",
       "expected_tags": [
-        "hr[id, style]"
+        "hr[id, style[position]]"
       ]
     },
     {
@@ -36506,7 +36598,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><i id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></i>",
       "payload_context": "html",
       "expected_tags": [
-        "i[id, style]"
+        "i[id, style[position]]"
       ]
     },
     {
@@ -36514,7 +36606,9 @@
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4918",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><iframe id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></iframe>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "iframe[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04906",
@@ -36531,7 +36625,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><img id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></img>",
       "payload_context": "html",
       "expected_tags": [
-        "img[id, style]"
+        "img[id, style[position]]"
       ]
     },
     {
@@ -36539,49 +36633,63 @@
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4921",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><input id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></input>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "input[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04909",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4922",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><ins id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></ins>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "ins[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04910",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4923",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><isindex id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></isindex>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "isindex[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04911",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4924",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><kbd id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></kbd>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "kbd[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04912",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4925",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><keygen id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></keygen>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "keygen[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04913",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4926",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><label id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></label>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "label[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04914",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4927",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><legend id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></legend>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "legend[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04915",
@@ -36589,7 +36697,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><li id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></li>",
       "payload_context": "html",
       "expected_tags": [
-        "li[id, style]"
+        "li[id, style[position]]"
       ]
     },
     {
@@ -36597,126 +36705,162 @@
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4929",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><link id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></link>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "link[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04917",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4930",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><listing id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></listing>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "listing[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04918",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4931",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><main id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></main>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "main[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04919",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4932",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><map id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></map>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "map[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04920",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4933",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><mark id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></mark>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "mark[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04921",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4934",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><marquee id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></marquee>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "marquee[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04922",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4935",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><menu id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></menu>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "menu[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04923",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4936",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><menuitem id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></menuitem>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "menuitem[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04924",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4937",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><meta id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></meta>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "meta[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04925",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4938",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><meter id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></meter>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "meter[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04926",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4939",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><multicol id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></multicol>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "multicol[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04927",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4940",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><nav id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></nav>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "nav[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04928",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4941",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><nextid id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></nextid>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "nextid[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04929",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4942",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><nobr id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></nobr>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "nobr[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04930",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4943",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><noembed id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></noembed>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "noembed[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04931",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4944",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><noframes id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></noframes>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "noframes[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04932",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4945",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><noscript id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></noscript>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "noscript[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04933",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4946",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><object id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></object>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "object[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04934",
@@ -36724,7 +36868,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><ol id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></ol>",
       "payload_context": "html",
       "expected_tags": [
-        "ol[id, style]"
+        "ol[id, style[position]]"
       ]
     },
     {
@@ -36732,21 +36876,27 @@
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4948",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><optgroup id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></optgroup>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "optgroup[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04936",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4949",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><option id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></option>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "option[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04937",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4950",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><output id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></output>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "output[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04938",
@@ -36754,7 +36904,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><p id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></p>",
       "payload_context": "html",
       "expected_tags": [
-        "p[id, style]"
+        "p[id, style[position]]"
       ]
     },
     {
@@ -36762,21 +36912,27 @@
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4952",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><param id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></param>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "param[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04940",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4953",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><picture id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></picture>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "picture[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04941",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4954",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><plaintext id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></plaintext>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "plaintext[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04942",
@@ -36784,7 +36940,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><pre id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></pre>",
       "payload_context": "html",
       "expected_tags": [
-        "pre[id, style]"
+        "pre[id, style[position]]"
       ]
     },
     {
@@ -36792,49 +36948,63 @@
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4956",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><progress id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></progress>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "progress[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04944",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4957",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><q id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></q>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "q[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04945",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4958",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><rb id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></rb>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "rb[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04946",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4959",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><rp id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></rp>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "rp[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04947",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4960",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><rt id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></rt>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "rt[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04948",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4961",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><rtc id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></rtc>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "rtc[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04949",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4962",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><ruby id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></ruby>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "ruby[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04950",
@@ -36842,7 +37012,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><s id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></s>",
       "payload_context": "html",
       "expected_tags": [
-        "s[id, style]"
+        "s[id, style[position]]"
       ]
     },
     {
@@ -36850,63 +37020,81 @@
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4964",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><samp id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></samp>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "samp[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04952",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4965",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><script id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></script>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "script[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04953",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4966",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><section id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></section>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "section[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04954",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4967",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><select id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></select>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "select[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04955",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4968",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><shadow id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></shadow>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "shadow[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04956",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4969",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><slot id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></slot>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "slot[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04957",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4970",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><small id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></small>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "small[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04958",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4971",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><source id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></source>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "source[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04959",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4972",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><spacer id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></spacer>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "spacer[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04960",
@@ -36914,7 +37102,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><span id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></span>",
       "payload_context": "html",
       "expected_tags": [
-        "span[id, style]"
+        "span[id, style[position]]"
       ]
     },
     {
@@ -36922,7 +37110,9 @@
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4974",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><strike id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></strike>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "strike[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04962",
@@ -36930,7 +37120,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><strong id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></strong>",
       "payload_context": "html",
       "expected_tags": [
-        "strong[id, style]"
+        "strong[id, style[position]]"
       ]
     },
     {
@@ -36946,7 +37136,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><sub id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></sub>",
       "payload_context": "html",
       "expected_tags": [
-        "sub[id, style]"
+        "sub[id, style[position]]"
       ]
     },
     {
@@ -36954,7 +37144,9 @@
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4978",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><summary id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></summary>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "summary[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04966",
@@ -36962,7 +37154,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><sup id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></sup>",
       "payload_context": "html",
       "expected_tags": [
-        "sup[id, style]"
+        "sup[id, style[position]]"
       ]
     },
     {
@@ -36978,92 +37170,122 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><table id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></table>",
       "payload_context": "html",
       "expected_tags": [
-        "table[id, style]"
+        "table[id, style[position]]"
       ]
     },
     {
       "id": "payloadbox-xss-payload-list-04969",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4982",
-      "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><tbody id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></tbody>",
+      "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><table><tbody id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></tbody>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "table",
+        "tbody[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04970",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4983",
-      "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><td id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></td>",
+      "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><table><td id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></td>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "table",
+        "td[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04971",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4984",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><template id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></template>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "template[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04972",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4985",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><textarea id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></textarea>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "textarea[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04973",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4986",
-      "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><tfoot id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></tfoot>",
+      "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><table><tfoot id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></tfoot>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "table",
+        "tfoot[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04974",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4987",
-      "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><th id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></th>",
+      "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><table><th id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></th>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "table",
+        "th[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04975",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4988",
-      "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><thead id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></thead>",
+      "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><table><thead id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></thead>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "table",
+        "thead[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04976",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4989",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><time id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></time>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "time[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04977",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4990",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><title id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></title>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "title[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04978",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4991",
-      "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><tr id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></tr>",
+      "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><table><tr id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></tr>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "table",
+        "tr[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04979",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4992",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><track id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></track>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "track[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04980",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4993",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><tt id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></tt>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "tt[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04981",
@@ -37071,7 +37293,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><u id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></u>",
       "payload_context": "html",
       "expected_tags": [
-        "u[id, style]"
+        "u[id, style[position]]"
       ]
     },
     {
@@ -37080,7 +37302,7 @@
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><ul id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></ul>",
       "payload_context": "html",
       "expected_tags": [
-        "ul[id, style]"
+        "ul[id, style[position]]"
       ]
     },
     {
@@ -37088,28 +37310,36 @@
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4996",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><var id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></var>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "var[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04984",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4997",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><video id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></video>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "video[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04985",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4998",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><wbr id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></wbr>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "wbr[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04986",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 4999",
       "payload_html": "<style>@keyframes x{from {left:0;}to {left: 1000px;}}:target {animation:10s ease-in-out 0s 1 x;}</style><xmp id=x style=\"position:absolute;\" onanimationcancel=\"alert(1)\"></xmp>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "xmp[style[position]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-04987",
@@ -38926,16 +39156,22 @@
     {
       "id": "payloadbox-xss-payload-list-05233",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 5246",
-      "payload_html": "<style>@keyframes x{}</style><tbody style=\"animation-name:x\" onanimationend=\"alert(1)\"></tbody>",
+      "payload_html": "<style>@keyframes x{}</style><table><tbody style=\"animation-name:x\" onanimationend=\"alert(1)\"></tbody>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "table",
+        "tbody[style[animation-name]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-05234",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 5247",
-      "payload_html": "<style>@keyframes x{}</style><tbody style=\"animation-name:x\" onanimationstart=\"alert(1)\"></tbody>",
+      "payload_html": "<style>@keyframes x{}</style><table><tbody style=\"animation-name:x\" onanimationstart=\"alert(1)\"></tbody>",
       "payload_context": "html",
-      "expected_tags": []
+      "expected_tags": [
+        "table",
+        "tbody[style[animation-name]]"
+      ]
     },
     {
       "id": "payloadbox-xss-payload-list-05235",
@@ -45961,7 +46197,7 @@
     {
       "id": "payloadbox-xss-payload-list-06185",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6199",
-      "payload_html": "x”</title><img src%3dx onerror%3dalert(1)>",
+      "payload_html": "x\u201d</title><img src%3dx onerror%3dalert(1)>",
       "payload_context": "html",
       "expected_tags": [
         "img"
@@ -46134,7 +46370,7 @@
       "payload_html": "<img src=http://www.google.fr/images/srpr/logo3w.png onload=alert(this.ownerDocument.cookie) width=0 height= 0 /> #",
       "payload_context": "html",
       "expected_tags": [
-        "img[height, src, width]"
+        "img[height, width]"
       ]
     },
     {
@@ -46143,7 +46379,7 @@
       "payload_html": "<script>  function foo(elem, doc, text) {   elem.onclick = function (e) {    e.__defineGetter__(text[0], function () { return true })    alert(Safe.get());   };      var event = doc.createEvent(text[1]);   event.initEvent(text[2], true, true);   elem.dispatchEvent(event);  } </script> <img src=http://www.google.fr/images/srpr/logo3w.png onload=foo(this,this.ownerDocument,this.name.split(/,/)) name=isTrusted,MouseEvent,click width=0 height=0 /> #",
       "payload_context": "html",
       "expected_tags": [
-        "img[height, src, width]"
+        "img[height, name, width]"
       ]
     },
     {
@@ -47180,23 +47416,111 @@
       "expected_tags": []
     },
     {
-      "id": "payloadbox-xss-payload-list-06352",
-      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399",
-      "payload_html": "<div id=\"1\"><form id=\"test\"></form><button form=\"test\" formaction=\"javascript:alert(1)\">X</button>//[\"'`-->]]>]</div><div id=\"2\"><meta charset=\"x-imap4-modified-utf7\">&ADz&AGn&AG0&AEf&ACA&AHM&AHI&AGO&AD0&AGn&ACA&AG8Abg&AGUAcgByAG8AcgA9AGEAbABlAHIAdAAoADEAKQ&ACAAPABi//[\"'`-->]]>]</div><div id=\"3\"><meta charset=\"x-imap4-modified-utf7\">&<script&S1&TS&1>alert&A7&(1)&R&UA;&&<&A9&11/script&X&>//[\"'`-->]]>]</div><div id=\"4\">0?<script>Worker(\"#\").onmessage=function(_)eval(_.data)</script> :postMessage(importScripts('data:;base64,cG9zdE1lc3NhZ2UoJ2FsZXJ0KDEpJyk'))//[\"'`-->]]>]</div><div id=\"5\"><script>crypto.generateCRMFRequest('CN=0',0,0,null,'alert(5)',384,null,'rsa-dual-use')</script>//[\"'`-->]]>]</div><div id=\"6\"><script>({set/**/$($){_/**/setter=$,_=1}}).$=alert</script>//[\"'`-->]]>]</div><div id=\"7\"><input onfocus=alert(7) autofocus>//[\"'`-->]]>]</div><div id=\"8\"><input onblur=alert(8) autofocus><input autofocus>//[\"'`-->]]>]</div><div id=\"9\"><a style=\"-o-link:'javascript:alert(9)';-o-link-source:current\">X</a>//[\"'`-->]]>]</div><div id=\"10\"><video poster=javascript:alert(10)//></video>//[\"'`-->]]>]</div><div id=\"11\"><svg xmlns=\"http://www.w3.org/2000/svg\"><g onload=\"javascript:alert(11)\"></g></svg>//[\"'`-->]]>]</div><div id=\"12\"><body onscroll=alert(12)><br><br><br><br><br><br>...<br><br><br><br><input autofocus>//[\"'`-->]]>]</div><div id=\"13\"><x repeat=\"template\" repeat-start=\"999999\">0<y repeat=\"template\" repeat-start=\"999999\">1</y></x>//[\"'`-->]]>]</div><div id=\"14\"><input pattern=^((a+.)a)+$ value=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa!>//[\"'`-->]]>]</div><div id=\"15\"><script>({0:#0=alert/#0#/#0#(0)})</script>//[\"'`-->]]>]</div><div id=\"16\">X<x style=`behavior:url(#default#time2)` onbegin=`alert(16)` >//[\"'`-->]]>]</div><div id=\"17\"><?xml-stylesheet href=\"javascript:alert(17)\"?><root/>//[\"'`-->]]>]</div><div id=\"18\"><script xmlns=\"http://www.w3.org/1999/xhtml\">&#x61;l&#x65;rt&#40;1)</script>//[\"'`-->]]>]</div><div id=\"19\"><meta charset=\"x-mac-farsi\">¼script ¾alert(19)//¼/script ¾//[\"'`-->]]>]</div><div id=\"20\"><script>ReferenceError.prototype.__defineGetter__('name', function(){alert(20)}),x</script>//[\"'`-->]]>]</div><div id=\"21\"><script>Object.__noSuchMethod__ = Function,[{}][0].constructor._('alert(21)')()</script>//[\"'`-->]]>]</div><div id=\"22\"><input onblur=focus() autofocus><input>//[\"'`-->]]>]</div><div id=\"23\"><form id=test onforminput=alert(23)><input></form><button form=test onformchange=alert(2)>X</button>//[\"'`-->]]>]</div><div id=\"24\">1<set/xmlns=`urn:schemas-microsoft-com:time` style=`beh&#x41vior:url(#default#time2)` attributename=`innerhtml` to=`&lt;img/src=&quot;x&quot;onerror=alert(24)&gt;`>//[\"'`-->]]>]</div><div id=\"25\"><script src=\"#\">{alert(25)}</script>;1//[\"'`-->]]>]</div><div id=\"26\">+ADw-html+AD4APA-body+AD4APA-div+AD4-top secret+ADw-/div+AD4APA-/body+AD4APA-/html+AD4-.toXMLString().match(/.*/m),alert(RegExp.input);//[\"'`-->]]>]</div><div id=\"27\"><style>p[foo=bar{}*{-o-link:'javascript:alert(27)'}{}*{-o-link-source:current}*{background:red}]{background:green};</style>//[\"'`-->]]>]</div>",
+      "id": "payloadbox-xss-payload-list-06352-01",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 1)",
+      "payload_html": "<div id=\"1\"><form id=\"test\"></form><button form=\"test\" formaction=\"javascript:alert(1)\">X</button>//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-02",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 2)",
+      "payload_html": "<div id=\"2\"><meta charset=\"x-imap4-modified-utf7\">&ADz&AGn&AG0&AEf&ACA&AHM&AHI&AGO&AD0&AGn&ACA&AG8Abg&AGUAcgByAG8AcgA9AGEAbABlAHIAdAAoADEAKQ&ACAAPABi//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-03",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 3)",
+      "payload_html": "<div id=\"3\"><meta charset=\"x-imap4-modified-utf7\">&<script&S1&TS&1>alert&A7&(1)&R&UA;&&<&A9&11/script&X&>//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-04",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 4)",
+      "payload_html": "<div id=\"4\">0?<script>Worker(\"#\").onmessage=function(_)eval(_.data)</script> :postMessage(importScripts('data:;base64,cG9zdE1lc3NhZ2UoJ2FsZXJ0KDEpJyk'))//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-05",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 5)",
+      "payload_html": "<div id=\"5\"><script>crypto.generateCRMFRequest('CN=0',0,0,null,'alert(5)',384,null,'rsa-dual-use')</script>//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-06",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 6)",
+      "payload_html": "<div id=\"6\"><script>({set/**/$($){_/**/setter=$,_=1}}).$=alert</script>//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-07",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 7)",
+      "payload_html": "<div id=\"7\"><input onfocus=alert(7) autofocus>//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-08",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 8)",
+      "payload_html": "<div id=\"8\"><input onblur=alert(8) autofocus><input autofocus>//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-09",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 9)",
+      "payload_html": "<div id=\"9\"><a style=\"-o-link:'javascript:alert(9)';-o-link-source:current\">X</a>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
         "div[id]",
-        "div[id]",
-        "div[id]",
-        "div[id]",
-        "div[id]",
-        "div[id]",
-        "div[id]",
-        "div[id]",
-        "div[id]",
-        "a[style]",
-        "div[id]",
-        "div[id]",
+        "a"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-10",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 10)",
+      "payload_html": "<div id=\"10\"><video poster=javascript:alert(10)//></video>//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-11",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 11)",
+      "payload_html": "<div id=\"11\"><svg xmlns=\"http://www.w3.org/2000/svg\"><g onload=\"javascript:alert(11)\"></g></svg>//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-12",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 12)",
+      "payload_html": "<div id=\"12\"><body onscroll=alert(12)><br><br><br><br><br><br>...<br><br><br><br><input autofocus>//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
         "div[id]",
         "br",
         "br",
@@ -47207,21 +47531,141 @@
         "br",
         "br",
         "br",
-        "br",
-        "div[id]",
-        "div[id]",
-        "div[id]",
-        "div[id]",
-        "div[id]",
-        "div[id]",
-        "div[id]",
-        "div[id]",
-        "div[id]",
-        "div[id]",
-        "div[id]",
-        "div[id]",
-        "div[id]",
-        "div[id]",
+        "br"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-13",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 13)",
+      "payload_html": "<div id=\"13\"><x repeat=\"template\" repeat-start=\"999999\">0<y repeat=\"template\" repeat-start=\"999999\">1</y></x>//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-14",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 14)",
+      "payload_html": "<div id=\"14\"><input pattern=^((a+.)a)+$ value=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa!>//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-15",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 15)",
+      "payload_html": "<div id=\"15\"><script>({0:#0=alert/#0#/#0#(0)})</script>//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-16",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 16)",
+      "payload_html": "<div id=\"16\">X<x style=`behavior:url(#default#time2)` onbegin=`alert(16)` >//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-17",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 17)",
+      "payload_html": "<div id=\"17\"><?xml-stylesheet href=\"javascript:alert(17)\"?><root/>//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-18",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 18)",
+      "payload_html": "<div id=\"18\"><script xmlns=\"http://www.w3.org/1999/xhtml\">&#x61;l&#x65;rt&#40;1)</script>//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-19",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 19)",
+      "payload_html": "<div id=\"19\"><meta charset=\"x-mac-farsi\">\u00bcscript \u00bealert(19)//\u00bc/script \u00be//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-20",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 20)",
+      "payload_html": "<div id=\"20\"><script>ReferenceError.prototype.__defineGetter__('name', function(){alert(20)}),x</script>//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-21",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 21)",
+      "payload_html": "<div id=\"21\"><script>Object.__noSuchMethod__ = Function,[{}][0].constructor._('alert(21)')()</script>//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-22",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 22)",
+      "payload_html": "<div id=\"22\"><input onblur=focus() autofocus><input>//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-23",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 23)",
+      "payload_html": "<div id=\"23\"><form id=test onforminput=alert(23)><input></form><button form=test onformchange=alert(2)>X</button>//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-24",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 24)",
+      "payload_html": "<div id=\"24\">1<set/xmlns=`urn:schemas-microsoft-com:time` style=`beh&#x41vior:url(#default#time2)` attributename=`innerhtml` to=`&lt;img/src=&quot;x&quot;onerror=alert(24)&gt;`>//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-25",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 25)",
+      "payload_html": "<div id=\"25\"><script src=\"#\">{alert(25)}</script>;1//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-26",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 26)",
+      "payload_html": "<div id=\"26\">+ADw-html+AD4APA-body+AD4APA-div+AD4-top secret+ADw-/div+AD4APA-/body+AD4APA-/html+AD4-.toXMLString().match(/.*/m),alert(RegExp.input);//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06352-27",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6399 (part 27)",
+      "payload_html": "<div id=\"27\"><style>p[foo=bar{}*{-o-link:'javascript:alert(27)'}{}*{-o-link-source:current}*{background:red}]{background:green};</style>//[\"'`-->]]>]</div>",
+      "payload_context": "html",
+      "expected_tags": [
         "div[id]"
       ]
     },
@@ -47235,27 +47679,100 @@
       ]
     },
     {
-      "id": "payloadbox-xss-payload-list-06354",
-      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6401",
-      "payload_html": "<div id=\"29\"><link rel=stylesheet href=data:,*%7bx:expression(alert(29))%7d//[\"'`-->]]>]</div><div id=\"30\"><style>@import \"data:,*%7bx:expression(alert(30))%7D\";</style>//[\"'`-->]]>]</div><div id=\"31\"><frameset onload=alert(31)>//[\"'`-->]]>]</div><div id=\"32\"><table background=\"javascript:alert(32)\"></table>//[\"'`-->]]>]</div><div id=\"33\"><a style=\"pointer-events:none;position:absolute;\"><a style=\"position:absolute;\" onclick=\"alert(33);\">XXX</a></a><a href=\"javascript:alert(2)\">XXX</a>//[\"'`-->]]>]</div><div id=\"34\">1<vmlframe xmlns=urn:schemas-microsoft-com:vml style=behavior:url(#default#vml);position:absolute;width:100%;height:100% src=test.vml#xss></vmlframe>//[\"'`-->]]>]</div><div id=\"35\">1<a href=#><line xmlns=urn:schemas-microsoft-com:vml style=behavior:url(#default#vml);position:absolute href=javascript:alert(35) strokecolor=white strokeweight=1000px from=0 to=1000 /></a>//[\"'`-->]]>]</div><div id=\"36\"><a style=\"behavior:url(#default#AnchorClick);\" folder=\"javascript:alert(36)\">XXX</a>//[\"'`-->]]>]</div><div id=\"37\"><!--<img src=\"--><img src=x onerror=alert(37)//\">//[\"'`-->]]>]</div><div id=\"38\"><comment><img src=\"</comment><img src=x onerror=alert(38)//\">//[\"'`-->]]>]</div>",
+      "id": "payloadbox-xss-payload-list-06354-01",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6401 part 1",
+      "payload_html": "<div id=\"29\"><link rel=stylesheet href=data:,*%7bx:expression(alert(29))%7d></div>",
       "payload_context": "html",
       "expected_tags": [
         "div[id]",
+        "link[rel]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06354-02",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6401 part 2",
+      "payload_html": "<div id=\"30\"><style>@import \"data:,*%7bx:expression(alert(30))%7D\";</style></div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06354-03",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6401 part 3",
+      "payload_html": "<div id=\"31\"><frameset onload=alert(31)></div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06354-04",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6401 part 4",
+      "payload_html": "<div id=\"32\"><table background=\"javascript:alert(32)\"></table></div>",
+      "payload_context": "html",
+      "expected_tags": [
         "div[id]",
+        "table"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06354-05",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6401 part 5",
+      "payload_html": "<div id=\"33\"><a style=\"pointer-events:none;position:absolute;\"><a style=\"position:absolute;\" onclick=\"alert(33);\">XXX</a></a><a href=\"javascript:alert(2)\">XXX</a></div>",
+      "payload_context": "html",
+      "expected_tags": [
         "div[id]",
+        "a[style[pointer-events, position]]",
+        "a[style[position]]",
+        "a"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06354-06",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6401 part 6",
+      "payload_html": "<div id=\"34\">1<vmlframe xmlns=urn:schemas-microsoft-com:vml style=behavior:url(#default#vml);position:absolute;width:100%;height:100% src=test.vml#xss></vmlframe></div>",
+      "payload_context": "html",
+      "expected_tags": [
+        "div[id]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06354-07",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6401 part 7",
+      "payload_html": "<div id=\"35\">1<a href=#><line xmlns=urn:schemas-microsoft-com:vml style=behavior:url(#default#vml);position:absolute href=javascript:alert(35) strokecolor=white strokeweight=1000px from=0 to=1000 /></a></div>",
+      "payload_context": "html",
+      "expected_tags": [
         "div[id]",
-        "table",
+        "a[href]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06354-08",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6401 part 8",
+      "payload_html": "<div id=\"36\"><a style=\"behavior:url(#default#AnchorClick);\" folder=\"javascript:alert(36)\">XXX</a></div>",
+      "payload_context": "html",
+      "expected_tags": [
         "div[id]",
-        "a[style]",
-        "a[style]",
-        "a",
+        "a"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06354-09",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6401 part 9",
+      "payload_html": "<div id=\"37\"><!--<img src=\"--><img src=x onerror=alert(37)//\"></div>",
+      "payload_context": "html",
+      "expected_tags": [
         "div[id]",
-        "div[id]",
-        "a[href]",
-        "div[id]",
-        "a[style]",
-        "div[id]",
-        "img[src]",
+        "img[src]"
+      ]
+    },
+    {
+      "id": "payloadbox-xss-payload-list-06354-10",
+      "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6401 part 10",
+      "payload_html": "<div id=\"38\"><comment><img src=\"</comment><img src=x onerror=alert(38)//\"></div>",
+      "payload_context": "html",
+      "expected_tags": [
         "div[id]",
         "img[src]"
       ]
@@ -47311,7 +47828,7 @@
       "payload_context": "html",
       "expected_tags": [
         "div[id]",
-        "li[style]"
+        "li"
       ]
     },
     {
@@ -47422,7 +47939,7 @@
         "div[id]",
         "div[id]",
         "div[id]",
-        "div[style]"
+        "div"
       ]
     },
     {
@@ -47432,7 +47949,7 @@
       "payload_context": "html",
       "expected_tags": [
         "div[id]",
-        "div[style]"
+        "div"
       ]
     },
     {
@@ -47475,7 +47992,7 @@
     {
       "id": "payloadbox-xss-payload-list-06378",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6425",
-      "payload_html": "<div id=\"63\"><embed src=\"javascript:alert(63)\"></embed> // O10.10↓, OM10.0↓, GC6↓, FF",
+      "payload_html": "<div id=\"63\"><embed src=\"javascript:alert(63)\"></embed> // O10.10\u2193, OM10.0\u2193, GC6\u2193, FF",
       "payload_context": "html",
       "expected_tags": [
         "div[id]"
@@ -47493,7 +48010,7 @@
     {
       "id": "payloadbox-xss-payload-list-06380",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6427",
-      "payload_html": "<image src=\"javascript:alert(2)\"> // IE6, O10.10↓, OM10.0↓",
+      "payload_html": "<image src=\"javascript:alert(2)\"> // IE6, O10.10\u2193, OM10.0\u2193",
       "payload_context": "html",
       "expected_tags": [
         "img"
@@ -47502,7 +48019,7 @@
     {
       "id": "payloadbox-xss-payload-list-06381",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6428",
-      "payload_html": "<script src=\"javascript:alert(3)\"></script> // IE6, O11.01↓, OM10.1↓//[\"'`-->]]>]</div>",
+      "payload_html": "<script src=\"javascript:alert(3)\"></script> // IE6, O11.01\u2193, OM10.1\u2193//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": []
     },
@@ -47561,7 +48078,7 @@
     {
       "id": "payloadbox-xss-payload-list-06388",
       "description": "payloadbox/xss-payload-list Intruder/xss-payload-list.txt line 6435",
-      "payload_html": "<div id=\"69\"><card xmlns=\"http://www.wapforum.org/2001/wml\"><onevent type=\"ontimer\"><go href=\"javascript:alert(69)\"/></onevent><timer value=\"1\"/></card>//[\"'`-->]]>]</div><div id=\"70\"><div style=width:1px;filter:glow onfilterchange=alert(70)>x</div>//[\"'`-->]]>]</div><div id=\"71\"><// style=x:expression\\28alert(71)\\29>//[\"'`-->]]>]</div><div id=\"72\"><form><button formaction=\"javascript:alert(72)\">X</button>//[\"'`-->]]>]</div><div id=\"73\"><event-source src=\"event.php\" onload=\"alert(73)\">//[\"'`-->]]>]</div><div id=\"74\"><a href=\"javascript:alert(74)\"><event-source src=\"data:application/x-dom-event-stream,Event:click%0Adata:XXX%0A%0A\" /></a>//[\"'`-->]]>]</div><div id=\"75\"><script<{alert(75)}/></script </>//[\"'`-->]]>]</div><div id=\"76\"><?xml-stylesheet type=\"text/css\"?><!DOCTYPE x SYSTEM \"test.dtd\"><x>&x;</x>//[\"'`-->]]>]</div><div id=\"77\"><?xml-stylesheet type=\"text/css\"?><root style=\"x:expression(alert(77))\"/>//[\"'`-->]]>]</div><div id=\"78\"><?xml-stylesheet type=\"text/xsl\" href=\"#\"?><img xmlns=\"x-schema:test.xdr\"/>//[\"'`-->]]>]</div><div id=\"79\"><object allowscriptaccess=\"always\" data=\"test.swf\"></object>//[\"'`-->]]>]</div><div id=\"80\"><style>*{x:ｅｘｐｒｅｓｓｉｏｎ(alert(80))}</style>//[\"'`-->]]>]</div><div id=\"81\"><x xmlns:xlink=\"http://www.w3.org/1999/xlink\" xlink:actuate=\"onLoad\" xlink:href=\"javascript:alert(81)\" xlink:type=\"simple\"/>//[\"'`-->]]>]</div><div id=\"82\"><?xml-stylesheet type=\"text/css\" href=\"data:,*%7bx:expression(write(2));%7d\"?>//[\"'`-->]]>]</div>",
+      "payload_html": "<div id=\"69\"><card xmlns=\"http://www.wapforum.org/2001/wml\"><onevent type=\"ontimer\"><go href=\"javascript:alert(69)\"/></onevent><timer value=\"1\"/></card>//[\"'`-->]]>]</div><div id=\"70\"><div style=width:1px;filter:glow onfilterchange=alert(70)>x</div>//[\"'`-->]]>]</div><div id=\"71\"><// style=x:expression\\28alert(71)\\29>//[\"'`-->]]>]</div><div id=\"72\"><form><button formaction=\"javascript:alert(72)\">X</button>//[\"'`-->]]>]</div><div id=\"73\"><event-source src=\"event.php\" onload=\"alert(73)\">//[\"'`-->]]>]</div><div id=\"74\"><a href=\"javascript:alert(74)\"><event-source src=\"data:application/x-dom-event-stream,Event:click%0Adata:XXX%0A%0A\" /></a>//[\"'`-->]]>]</div><div id=\"75\"><script<{alert(75)}/></script </>//[\"'`-->]]>]</div><div id=\"76\"><?xml-stylesheet type=\"text/css\"?><!DOCTYPE x SYSTEM \"test.dtd\"><x>&x;</x>//[\"'`-->]]>]</div><div id=\"77\"><?xml-stylesheet type=\"text/css\"?><root style=\"x:expression(alert(77))\"/>//[\"'`-->]]>]</div><div id=\"78\"><?xml-stylesheet type=\"text/xsl\" href=\"#\"?><img xmlns=\"x-schema:test.xdr\"/>//[\"'`-->]]>]</div><div id=\"79\"><object allowscriptaccess=\"always\" data=\"test.swf\"></object>//[\"'`-->]]>]</div><div id=\"80\"><style>*{x:\uff45\uff58\uff50\uff52\uff45\uff53\uff53\uff49\uff4f\uff4e(alert(80))}</style>//[\"'`-->]]>]</div><div id=\"81\"><x xmlns:xlink=\"http://www.w3.org/1999/xlink\" xlink:actuate=\"onLoad\" xlink:href=\"javascript:alert(81)\" xlink:type=\"simple\"/>//[\"'`-->]]>]</div><div id=\"82\"><?xml-stylesheet type=\"text/css\" href=\"data:,*%7bx:expression(write(2));%7d\"?>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
         "div[id]",
@@ -47712,7 +48229,7 @@
       "payload_html": "<div style=content:url(test2.svg)></div>",
       "payload_context": "html",
       "expected_tags": [
-        "div[style]"
+        "div"
       ]
     },
     {
@@ -47735,7 +48252,7 @@
       "payload_html": "<div style=\"background:url(test5.svg)\">PRESS ENTER</div>//[\"'`-->]]>]</div>",
       "payload_context": "html",
       "expected_tags": [
-        "div[style]"
+        "div"
       ]
     },
     {
@@ -47796,9 +48313,9 @@
       "payload_context": "html",
       "expected_tags": [
         "div[id]",
-        "div[style]",
+        "div",
         "div[id]",
-        "div[style]"
+        "div"
       ]
     },
     {
@@ -47905,7 +48422,7 @@
       "expected_tags": [
         "div[id]",
         "div[id]",
-        "div[style]"
+        "div"
       ]
     },
     {
@@ -48016,7 +48533,7 @@
       "payload_html": "<a href=http://foo.bar/#x=`y></a><img alt=\"`><img src=xx:x onerror=alert(108)></a>\">",
       "payload_context": "html",
       "expected_tags": [
-        "a[href]",
+        "a",
         "img[alt]"
       ]
     },
@@ -48093,9 +48610,9 @@
       "payload_context": "html",
       "expected_tags": [
         "div[id]",
-        "div[style]",
+        "div",
         "div[id]",
-        "div[style]"
+        "div[style[font-family]]"
       ]
     },
     {
@@ -48178,7 +48695,7 @@
       "payload_context": "html",
       "expected_tags": [
         "div[id]",
-        "a[href]"
+        "a"
       ]
     },
     {
@@ -48309,7 +48826,7 @@
       "payload_html": "<a class=bar href=\"http://www.example.org\">www.example.org</a>",
       "payload_context": "html",
       "expected_tags": [
-        "a[class, href]"
+        "a[class]"
       ]
     },
     {
@@ -48449,7 +48966,7 @@
       "payload_html": "<image style='filter:url(\"data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22><script>parent.alert(129)</script></svg>\")'>",
       "payload_context": "html",
       "expected_tags": [
-        "img[style]"
+        "img"
       ]
     },
     {

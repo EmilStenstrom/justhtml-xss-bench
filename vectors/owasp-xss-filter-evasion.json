@@ -353,14 +353,14 @@
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / STYLE Attribute that Breaks Up an Expression",
 			"payload_html": "<IMG STYLE=\"xss:expr/*XSS*/ession(alert('XSS'))\">",
 			"payload_context": "html",
-			"expected_tags": ["img[style]"]
+			"expected_tags": ["img"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-img-style-with-expressions-91ca3f04b1",
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / IMG STYLE with Expressions",
 			"payload_html": "exp/*<A STYLE='no\\xss:noxss(\"*//*\");\nxss:ex/*XSS*//*/*/pression(alert(\"XSS\"))'>",
 			"payload_context": "html",
-			"expected_tags": ["a[style]"]
+			"expected_tags": ["a"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-style-tag-using-background-image-e968c83781",
@@ -457,28 +457,28 @@
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / DIV / DIV Background-image",
 			"payload_html": "<DIV STYLE=\"background-image: url(javascript:alert('XSS'))\">",
 			"payload_context": "html",
-			"expected_tags": ["div[style]"]
+			"expected_tags": ["div"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-div-div-background-image-with-unicode-xss-e-93cad23907",
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / DIV / DIV Background-image with Unicode XSS Exploit",
 			"payload_html": "<DIV STYLE=\"background-image:\\0075\\0072\\006C\\0028'\\006a\\0061\\0076\\0061\\0073\\0063\\0072\\0069\\0070\\0074\\003a\\0061\\006c\\0065\\0072\\0074\\0028.1027\\0058.1053\\0053\\0027\\0029'\\0029\">",
 			"payload_context": "html",
-			"expected_tags": ["div[style]"]
+			"expected_tags": ["div"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-div-div-background-image-plus-extra-charact-b290ae3d13",
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / DIV / DIV Background-image Plus Extra Characters",
 			"payload_html": "<DIV STYLE=\"background-image: url(\u0001javascript:alert('XSS'))\">",
 			"payload_context": "html",
-			"expected_tags": ["div[style]"]
+			"expected_tags": ["div"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-div-div-expression-4425078a59",
 			"description": "XSS Filter Evasion Cheat Sheet / Tests / DIV / DIV Expression",
 			"payload_html": "<DIV STYLE=\"width: expression(alert('XSS'));\">",
 			"payload_context": "html",
-			"expected_tags": ["div[style]"]
+			"expected_tags": ["div"]
 		},
 		{
 			"id": "owasp-xss-filter-evasion-cheat-sheet-tests-downlevel-hidden-block-b0ae63c1b8",

@@ -2,10 +2,12 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from functools import lru_cache
+import asyncio
 import importlib
 import importlib.resources
 import re
 import signal
+import threading
 import time
 from typing import Any
 from typing import Literal
@@ -56,7 +58,7 @@ def _speed_up_meta_refresh(html: str, *, max_delay_s: int = 0) -> str:
 
 
 def render_html_document(*, sanitized_html: str, payload_context: "PayloadContext") -> str:
-    if payload_context == "http_leak":
+    if payload_context in ("http_leak", "http_leak_style"):
         template = _template_for_http_leak_payload(sanitized_html)
     else:
         template = {
@@ -141,6 +143,7 @@ PayloadContext = Literal[
     "html_head",
     "html_outer",
     "http_leak",
+    "http_leak_style",
     "href",
     "js",
     "js_arg",
@@ -148,6 +151,10 @@ PayloadContext = Literal[
     "js_string_double",
     "onerror_attr",
 ]
+
+
+def _is_http_leak_context(payload_context: "PayloadContext") -> bool:
+    return payload_context in ("http_leak", "http_leak_style")
 
 
 def _template_for_http_leak_payload(sanitized_html: str) -> str:
@@ -576,7 +583,7 @@ class BrowserHarness:
                 exec_nav = _execution_navigation_urls()
                 if exec_nav:
                     urls = ", ".join(exec_nav[:3])
-                    if payload_context == "http_leak":
+                    if _is_http_leak_context(payload_context):
                         return VectorResult(
                             executed=False,
                             details=f"External fetch: document:{urls}; payload={payload_html!r}",
@@ -673,12 +680,12 @@ class BrowserHarness:
                 details=f"Executed: hook:{hook}; payload={payload_html!r}",
             )
 
-        if self._external_script_requests:
-            urls = ", ".join(self._external_script_requests[:3])
-            return VectorResult(
-                executed=True,
-                details=f"Executed: external-script:{urls}; payload={payload_html!r}",
-            )
+            if self._external_script_requests:
+                urls = ", ".join(self._external_script_requests[:3])
+                return VectorResult(
+                    executed=True,
+                    details=f"Executed: external-script:{urls}; payload={payload_html!r}",
+                )
 
         # Note: we intentionally do NOT snapshot external network requests here.
         # Some leak primitives fire later (e.g. meta refresh, favicon fetch,
@@ -716,7 +723,7 @@ class BrowserHarness:
                 exec_nav = _execution_navigation_urls()
                 if exec_nav:
                     urls = ", ".join(exec_nav[:3])
-                    if payload_context == "http_leak":
+                    if _is_http_leak_context(payload_context):
                         return VectorResult(
                             executed=False,
                             details=f"External fetch: document:{urls}; payload={payload_html!r}",
@@ -759,7 +766,7 @@ class BrowserHarness:
             except Exception:
                 pass
 
-            if payload_context == "http_leak":
+            if _is_http_leak_context(payload_context):
                 try:
                     self._page.evaluate(_EXTERNAL_REQUEST_GESTURES_JS)
                 except Exception:
@@ -770,7 +777,7 @@ class BrowserHarness:
         exec_nav = _execution_navigation_urls()
         if exec_nav:
             urls = ", ".join(exec_nav[:3])
-            if payload_context == "http_leak":
+            if _is_http_leak_context(payload_context):
                 return VectorResult(
                     executed=False,
                     details=f"External fetch: document:{urls}; payload={payload_html!r}",
@@ -786,7 +793,7 @@ class BrowserHarness:
         if self._timeout_error is None:  # pragma: no cover
             raise RuntimeError("Harness not initialized")
 
-        if payload_context == "http_leak" and self._external_network_requests:
+        if _is_http_leak_context(payload_context) and self._external_network_requests:
             rtype, url = self._external_network_requests[0]
             return VectorResult(
                 executed=False,
@@ -808,7 +815,7 @@ class BrowserHarness:
                 exec_nav = _execution_navigation_urls()
                 if exec_nav:
                     urls = ", ".join(exec_nav[:3])
-                    if payload_context == "http_leak":
+                    if _is_http_leak_context(payload_context):
                         return VectorResult(
                             executed=False,
                             details=f"External fetch: document:{urls}; payload={payload_html!r}",
@@ -833,7 +840,7 @@ class BrowserHarness:
                         details=f"Executed: {details}; payload={payload_html!r}",
                     )
 
-                if payload_context == "http_leak" and self._external_network_requests:
+                if _is_http_leak_context(payload_context) and self._external_network_requests:
                     rtype, url = self._external_network_requests[0]
                     return VectorResult(
                         executed=False,
@@ -872,7 +879,7 @@ class BrowserHarness:
         exec_nav = _execution_navigation_urls()
         if exec_nav:
             urls = ", ".join(exec_nav[:3])
-            if payload_context == "http_leak":
+            if _is_http_leak_context(payload_context):
                 return VectorResult(
                     executed=False,
                     details=f"External fetch: document:{urls}; payload={payload_html!r}",
@@ -1142,7 +1149,7 @@ class AsyncBrowserHarness:
                 exec_nav = _execution_navigation_urls()
                 if exec_nav:
                     urls = ", ".join(exec_nav[:3])
-                    if payload_context == "http_leak":
+                    if _is_http_leak_context(payload_context):
                         return VectorResult(
                             executed=False,
                             details=f"External fetch: document:{urls}; payload={payload_html!r}",
@@ -1242,7 +1249,7 @@ class AsyncBrowserHarness:
         exec_nav = _execution_navigation_urls()
         if exec_nav:
             urls = ", ".join(exec_nav[:3])
-            if payload_context == "http_leak":
+            if _is_http_leak_context(payload_context):
                 return VectorResult(
                     executed=False,
                     details=f"External fetch: document:{urls}; payload={payload_html!r}",
@@ -1295,7 +1302,7 @@ class AsyncBrowserHarness:
                 exec_nav = _execution_navigation_urls()
                 if exec_nav:
                     urls = ", ".join(exec_nav[:3])
-                    if payload_context == "http_leak":
+                    if _is_http_leak_context(payload_context):
                         return VectorResult(
                             executed=False,
                             details=f"External fetch: document:{urls}; payload={payload_html!r}",
@@ -1336,7 +1343,7 @@ class AsyncBrowserHarness:
             except Exception:
                 pass
 
-            if payload_context == "http_leak":
+            if _is_http_leak_context(payload_context):
                 try:
                     await self._page.evaluate(_EXTERNAL_REQUEST_GESTURES_JS)
                 except Exception:
@@ -1345,7 +1352,7 @@ class AsyncBrowserHarness:
         exec_nav = _execution_navigation_urls()
         if exec_nav:
             urls = ", ".join(exec_nav[:3])
-            if payload_context == "http_leak":
+            if _is_http_leak_context(payload_context):
                 return VectorResult(
                     executed=False,
                     details=f"External fetch: document:{urls}; payload={payload_html!r}",
@@ -1356,7 +1363,7 @@ class AsyncBrowserHarness:
                 details=f"Executed: navigation:{urls}; payload={payload_html!r}",
             )
 
-        if payload_context == "http_leak" and self._external_network_requests:
+        if _is_http_leak_context(payload_context) and self._external_network_requests:
             rtype, url = self._external_network_requests[0]
             return VectorResult(
                 executed=False,
@@ -1378,7 +1385,7 @@ class AsyncBrowserHarness:
                 exec_nav = _execution_navigation_urls()
                 if exec_nav:
                     urls = ", ".join(exec_nav[:3])
-                    if payload_context == "http_leak":
+                    if _is_http_leak_context(payload_context):
                         return VectorResult(
                             executed=False,
                             details=f"External fetch: document:{urls}; payload={payload_html!r}",
@@ -1403,7 +1410,7 @@ class AsyncBrowserHarness:
                         details=f"Executed: {details}; payload={payload_html!r}",
                     )
 
-                if payload_context == "http_leak" and self._external_network_requests:
+                if _is_http_leak_context(payload_context) and self._external_network_requests:
                     rtype, url = self._external_network_requests[0]
                     return VectorResult(
                         executed=False,
@@ -1430,7 +1437,7 @@ class AsyncBrowserHarness:
                             executed=True,
                             details=f"Executed: external-script:{urls}; payload={payload_html!r}",
                         )
-                    if payload_context == "http_leak" and self._external_network_requests:
+                    if _is_http_leak_context(payload_context) and self._external_network_requests:
                         rtype, url = self._external_network_requests[0]
                         return VectorResult(
                             executed=False,
@@ -1516,10 +1523,43 @@ def run_vector_in_browser(
     This uses the same mechanics as `BrowserHarness`, but does not reuse the browser.
     """
 
-    with BrowserHarness(browser=browser, headless=True) as harness:
-        return harness.run(
-            payload_html=payload_html,
-            sanitized_html=sanitized_html,
-            payload_context=payload_context,
-            timeout_ms=timeout_ms,
-        )
+    def _run_sync() -> VectorResult:
+        with BrowserHarness(browser=browser, headless=True) as harness:
+            return harness.run(
+                payload_html=payload_html,
+                sanitized_html=sanitized_html,
+                payload_context=payload_context,
+                timeout_ms=timeout_ms,
+            )
+
+    # Playwright's Sync API cannot be used inside a running asyncio loop.
+    # Some test runners (or environments) keep a loop running in the main thread,
+    # so transparently run the sync harness in a worker thread in that case.
+    try:
+        asyncio.get_running_loop()
+        loop_running = True
+    except RuntimeError:
+        loop_running = False
+
+    if not loop_running:
+        return _run_sync()
+
+    result: VectorResult | None = None
+    error: BaseException | None = None
+
+    def _worker() -> None:
+        nonlocal result, error
+        try:
+            result = _run_sync()
+        except BaseException as exc:
+            error = exc
+
+    t = threading.Thread(target=_worker, name="xssbench-playwright-sync", daemon=True)
+    t.start()
+    t.join()
+
+    if error is not None:
+        raise error
+    if result is None:  # pragma: no cover
+        raise RuntimeError("run_vector_in_browser failed without an error")
+    return result

@@ -23,6 +23,7 @@ from .sanitizers import allowed_attributes_for_tag
 class ExpectedTag:
     tag: str
     attrs: frozenset[str] = frozenset()
+    allowed_styles: frozenset[str] = frozenset()
 
 
 @dataclass(frozen=True, slots=True)
@@ -37,7 +38,7 @@ class Vector:
     # - None: do not perform any expected_tags checks for this vector
     expected_tags: tuple[ExpectedTag, ...] | None = ()
 
-    # For payload_context == "http_leak": per-vector sanitizer allowlist.
+    # For payload_context == "http_leak"/"http_leak_style": per-vector sanitizer allowlist.
     #
     # The goal is to avoid runtime inference: each vector declares the minimum
     # tags and attributes a sanitizer is allowed to preserve for this case.
@@ -50,25 +51,54 @@ class Vector:
 def sanitizer_overrides_for_vector(vector: Vector) -> dict[str, object]:
     """Return sanitizer allowlist overrides for a vector.
 
-    For http_leak vectors, each vector declares the minimal tags/attrs that a
+    For http_leak/http_leak_style vectors, each vector declares the minimal tags/attrs that a
     sanitizer is allowed to preserve for this case.
+
+    For standard vectors (e.g. keyframes tests), expected_tags can establish
+    requirements for allowed CSS properties that deviate from the default policy.
     """
 
-    if vector.payload_context != "http_leak":
-        return {}
+    # Policy:
+    # 1. Start with implicit requirements from expected_tags (what the vector needs to pass structure checks).
+    # 2. Merge in explicit overrides from sanitizer_allow_tags (if any).
 
     allow_tags: set[str] = set()
     allow_attrs: dict[str, set[str]] = {}
-    for req in vector.sanitizer_allow_tags:
-        # Processing instructions are tracked for presence checks but cannot be
-        # expressed as allowlists in sanitizer libraries.
-        if req.tag.startswith("?"):
-            continue
-        allow_tags.add(req.tag)
-        if req.attrs:
-            allow_attrs[req.tag] = set(req.attrs)
+    allow_styles: dict[str, set[str]] = {}
 
-    return {"allow_tags": allow_tags, "allow_attrs": allow_attrs}
+    def _merge(req):
+        if req.tag.startswith("?"):
+            return
+
+        allow_tags.add(req.tag)
+
+        if req.attrs:
+            if req.tag not in allow_attrs:
+                allow_attrs[req.tag] = set()
+            allow_attrs[req.tag].update(req.attrs)
+
+        if req.allowed_styles:
+            if req.tag not in allow_styles:
+                allow_styles[req.tag] = set()
+            allow_styles[req.tag].update(req.allowed_styles)
+            # Ensure style attribute is allowed if properties are allowed
+            if req.tag not in allow_attrs:
+                allow_attrs[req.tag] = set()
+            allow_attrs[req.tag].add("style")
+
+    for req in vector.expected_tags or ():
+        _merge(req)
+
+    for req in vector.sanitizer_allow_tags or ():
+        _merge(req)
+
+    result = {
+        "allow_tags": allow_tags,
+        "allow_attrs": allow_attrs,
+        "allow_styles": allow_styles,
+    }
+
+    return result
 
 
 @dataclass(frozen=True, slots=True)
@@ -111,31 +141,31 @@ class _TagCollector:
                 t = tag.lower()
                 self._outer.tags.add(t)
                 if attrs is not None:
-                    s = set()
-                    for name, _value in attrs:
+                    d = {}
+                    for name, value in attrs:
                         if name:
-                            s.add(str(name).lower())
-                    self._outer.attr_sets_by_tag.setdefault(t, []).append(s)
-                    self._outer.elements.append((t, s))
+                            d[str(name).lower()] = str(value) if value else ""
+                    self._outer.attr_sets_by_tag.setdefault(t, []).append(d)
+                    self._outer.elements.append((t, d))
                 else:
-                    self._outer.elements.append((t, set()))
+                    self._outer.elements.append((t, {}))
 
             def handle_startendtag(self, tag: str, attrs) -> None:  # type: ignore[override]
                 t = tag.lower()
                 self._outer.tags.add(t)
                 if attrs is not None:
-                    s = set()
-                    for name, _value in attrs:
+                    d = {}
+                    for name, value in attrs:
                         if name:
-                            s.add(str(name).lower())
-                    self._outer.attr_sets_by_tag.setdefault(t, []).append(s)
-                    self._outer.elements.append((t, s))
+                            d[str(name).lower()] = str(value) if value else ""
+                    self._outer.attr_sets_by_tag.setdefault(t, []).append(d)
+                    self._outer.elements.append((t, d))
                 else:
-                    self._outer.elements.append((t, set()))
+                    self._outer.elements.append((t, {}))
 
         self.tags: set[str] = set()
-        self.attr_sets_by_tag: dict[str, list[set[str]]] = {}
-        self.elements: list[tuple[str, set[str]]] = []
+        self.attr_sets_by_tag: dict[str, list[dict[str, str]]] = {}
+        self.elements: list[tuple[str, dict[str, str]]] = []
         self._parser = _P(self)
 
     def feed(self, html: str) -> set[str]:
@@ -180,6 +210,48 @@ def _normalize_expected_attr_name(attr: str) -> str:
     return a
 
 
+def _split_nested_attrs(raw: str) -> list[str]:
+    """Split "a, b[c], d" by top-level commas."""
+    out = []
+    current = []
+    depth = 0
+    for char in raw:
+        if char == "[":
+            depth += 1
+            current.append(char)
+        elif char == "]":
+            depth -= 1
+            current.append(char)
+        elif char == "," and depth == 0:
+            out.append("".join(current).strip())
+            current = []
+        else:
+            current.append(char)
+    if current:
+        out.append("".join(current).strip())
+    return [x for x in out if x]
+
+
+def _extract_css_properties(style: str) -> set[str]:
+    props = set()
+    for decl in style.split(";"):
+        if ":" in decl:
+            prop = decl.split(":", 1)[0].strip().lower()
+            if prop:
+                props.add(prop)
+    return props
+
+
+def _parse_attr_item(item: str) -> tuple[str, frozenset[str]]:
+    """Parse 'attr' or 'attr[sub...]' item."""
+    if "[" in item and item.endswith("]"):
+        attr, inner = item[:-1].split("[", 1)
+        attr = attr.strip()
+        sub = [p.strip() for p in inner.split(",") if p.strip()]
+        return attr, frozenset(sub)
+    return item, frozenset()
+
+
 def _parse_expected_tag_spec(spec: str) -> ExpectedTag:
     tag_name, attrs_raw = _parse_tag_spec(
         spec=spec,
@@ -189,18 +261,27 @@ def _parse_expected_tag_spec(spec: str) -> ExpectedTag:
     )
 
     if not attrs_raw:
-        return ExpectedTag(tag=tag_name, attrs=frozenset())
+        return ExpectedTag(tag=tag_name, attrs=frozenset(), allowed_styles=frozenset())
 
-    parts = [p.strip() for p in attrs_raw.split(",")]
-    if any(p == "" for p in parts):
-        raise ValueError(f"Invalid expected_tags attribute list: {spec!r}")
-    attrs = {_normalize_expected_attr_name(p) for p in parts}
+    parts = _split_nested_attrs(attrs_raw)
+    attrs = set()
+    styles = set()
+
+    for p in parts:
+        attr, sub = _parse_attr_item(p)
+        attr_norm = _normalize_expected_attr_name(attr)
+        attrs.add(attr_norm)
+        if attr_norm == "style" and sub:
+            # We don't have a strict normalizer for CSS props yet, but lowercase is safe
+            styles.update(s.lower() for s in sub)
+        elif sub:
+            raise ValueError(f"Nested attributes only supported for 'style' (got '{attr}[...]'): {spec!r}")
 
     allowed = allowed_attributes_for_tag(tag_name)
     illegal = sorted(a for a in attrs if a not in allowed)
     if illegal:
         raise ValueError(f"Attributes not allowed by the shared sanitization policy for <{tag_name}>: {illegal}")
-    return ExpectedTag(tag=tag_name, attrs=frozenset(attrs))
+    return ExpectedTag(tag=tag_name, attrs=frozenset(attrs), allowed_styles=frozenset(styles))
 
 
 def _parse_sanitizer_allow_tag_spec(spec: str) -> ExpectedTag:
@@ -218,13 +299,20 @@ def _parse_sanitizer_allow_tag_spec(spec: str) -> ExpectedTag:
     )
 
     if not attrs_raw:
-        return ExpectedTag(tag=tag_name, attrs=frozenset())
+        return ExpectedTag(tag=tag_name, attrs=frozenset(), allowed_styles=frozenset())
 
-    parts = [p.strip() for p in attrs_raw.split(",")]
-    if any(p == "" for p in parts):
-        raise ValueError(f"Invalid sanitizer_allow_tags attribute list: {spec!r}")
-    attrs = {_normalize_expected_attr_name(p) for p in parts}
-    return ExpectedTag(tag=tag_name, attrs=frozenset(attrs))
+    parts = _split_nested_attrs(attrs_raw)
+    attrs = set()
+    styles = set()
+
+    for p in parts:
+        attr, sub = _parse_attr_item(p)
+        attr_norm = _normalize_expected_attr_name(attr)
+        attrs.add(attr_norm)
+        if attr_norm == "style" and sub:
+            styles.update(s.lower() for s in sub)
+
+    return ExpectedTag(tag=tag_name, attrs=frozenset(attrs), allowed_styles=frozenset(styles))
 
 
 def _parse_tag_spec(*, spec: str, allow_pi: bool, kind: str, example: str) -> tuple[str, str]:
@@ -263,7 +351,7 @@ def _parse_tag_spec(*, spec: str, allow_pi: bool, kind: str, example: str) -> tu
 def _expected_tags_allowed_for_context(payload_context: PayloadContext) -> bool:
     # expected_tags is a notion for HTML-fragment sanitization.
     # It is explicitly forbidden for href and all js* contexts.
-    if payload_context == "http_leak":
+    if payload_context in ("http_leak", "http_leak_style"):
         return False
     if payload_context == "href":
         return False
@@ -287,6 +375,14 @@ def _missing_allowlisted_primitives(*, required_tags: Iterable[ExpectedTag], san
     collector.feed(sanitized_html)
 
     def _fmt(req: ExpectedTag) -> str:
+        if req.allowed_styles:
+            parts = []
+            for a in sorted(req.attrs):
+                if a == "style":
+                    parts.append(f"style[{', '.join(sorted(req.allowed_styles))}]")
+                else:
+                    parts.append(a)
+            return f"{req.tag}[{', '.join(parts)}]"
         if req.attrs:
             return f"{req.tag}[{', '.join(sorted(req.attrs))}]"
         return req.tag
@@ -321,9 +417,25 @@ def _missing_allowlisted_primitives(*, required_tags: Iterable[ExpectedTag], san
         if not occurrences:
             missing.append(_fmt(req))
             continue
-        if req.attrs:
-            if not any(all(a in attrs for a in req.attrs) for attrs in occurrences):
-                missing.append(_fmt(req))
+
+        found = False
+        for attrs_dict in occurrences:
+            if not all(a in attrs_dict for a in req.attrs):
+                continue
+
+            if req.allowed_styles:
+                # If styles are required, 'style' attr must be present (covered by req.attrs check if consistent)
+                if "style" not in attrs_dict:
+                    continue
+                present = _extract_css_properties(attrs_dict["style"])
+                if not all(s in present for s in req.allowed_styles):
+                    continue
+
+            found = True
+            break
+
+        if not found:
+            missing.append(_fmt(req))
     return missing
 
 
@@ -337,22 +449,49 @@ def _missing_expected_tags(*, expected_tags: Iterable[ExpectedTag], sanitized_ht
     elements = list(collector.elements)
 
     def _fmt(exp: ExpectedTag) -> str:
+        if exp.allowed_styles:
+            parts = []
+            for a in sorted(exp.attrs):
+                if a == "style":
+                    parts.append(f"style[{', '.join(sorted(exp.allowed_styles))}]")
+                else:
+                    parts.append(a)
+            return f"{exp.tag}[{', '.join(parts)}]"
         if exp.attrs:
             return f"{exp.tag}[{', '.join(sorted(exp.attrs))}]"
         return exp.tag
 
-    def _fmt_el(tag: str, attrs: set[str]) -> str:
+    def _fmt_el(tag: str, attrs: dict[str, str]) -> str:
         if attrs:
-            return f"{tag}[{', '.join(sorted(attrs))}]"
+            parts = []
+            for k in sorted(attrs.keys()):
+                if k == "style":
+                    val = attrs[k]
+                    props = _extract_css_properties(val)
+                    parts.append(f"style[{', '.join(sorted(props))}]")
+                else:
+                    parts.append(k)
+            return f"{tag}[{', '.join(parts)}]"
         return tag
 
-    def _matches(exp: ExpectedTag, tag: str, attrs: set[str]) -> bool:
+    def _matches(exp: ExpectedTag, tag: str, attrs: dict[str, str]) -> bool:
         if tag != exp.tag:
             return False
         if exp.attrs:
-            return all(a in attrs for a in exp.attrs)
+            if not all(a in attrs for a in exp.attrs):
+                return False
+
+        if exp.allowed_styles:
+            if "style" not in attrs:
+                return False
+            present = _extract_css_properties(attrs["style"])
+            if not all(s in present for s in exp.allowed_styles):
+                return False
+
         # Bare tag means: no attributes are allowed.
-        return len(attrs) == 0
+        if not exp.attrs:
+            return len(attrs) == 0
+        return True
 
     # Exact mode (default): the sanitized output must contain exactly the
     # expected tags, in that order (no extras, and no skipping/re-using).
@@ -399,6 +538,7 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
         "html_head",
         "html_outer",
         "http_leak",
+        "http_leak_style",
         "href",
         "js",
         "js_arg",
@@ -522,7 +662,7 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
                         )
 
                 sanitizer_allow_tags: tuple[ExpectedTag, ...] = ()
-                if payload_context == "http_leak":
+                if payload_context in ("http_leak", "http_leak_style"):
                     if has_http_leak_required:
                         raise ValueError(
                             f"http_leak_required_tags is no longer supported; use sanitizer_allow_tags instead: {path}"
@@ -534,7 +674,9 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
                         )
 
                     if not has_sanitizer_allow_tags:
-                        raise ValueError(f"sanitizer_allow_tags is required for payload_context 'http_leak': {path}")
+                        raise ValueError(
+                            f"sanitizer_allow_tags is required for payload_context {payload_context!r}: {path}"
+                        )
 
                     if not isinstance(raw_sanitizer_allow_tags, list) or not all(
                         isinstance(x, str) for x in raw_sanitizer_allow_tags
@@ -544,14 +686,30 @@ def load_vectors(paths: Iterable[str | Path]) -> list[Vector]:
                         )
                     if len(raw_sanitizer_allow_tags) == 0:
                         raise ValueError(
-                            f"sanitizer_allow_tags must be non-empty for payload_context 'http_leak': {path}"
+                            f"sanitizer_allow_tags must be non-empty for payload_context {payload_context!r}: {path}"
                         )
 
                     sanitizer_allow_tags = tuple(_parse_sanitizer_allow_tag_spec(x) for x in raw_sanitizer_allow_tags)
                 else:
-                    if has_sanitizer_allow_tags or has_sanitizer_allow_attrs:
+                    # Generic Context (html, html_head, etc)
+                    # We allow sanitizer overrides here too, to support vectors that require specific
+                    # properties (like CSS) that are not in the default shared policy but considered safe
+                    # for that specific test case (e.g. to avoid Lossy results on safe keyframes).
+
+                    if has_sanitizer_allow_attrs:
                         raise ValueError(
-                            f"sanitizer_allow_tags/sanitizer_allow_attrs are only allowed for payload_context 'http_leak': {path}"
+                            f"sanitizer_allow_attrs is no longer supported; encode attrs in sanitizer_allow_tags like 'base[href]': {path}"
+                        )
+
+                    if has_sanitizer_allow_tags:
+                        if not isinstance(raw_sanitizer_allow_tags, list) or not all(
+                            isinstance(x, str) for x in raw_sanitizer_allow_tags
+                        ):
+                            raise ValueError(
+                                f"sanitizer_allow_tags must be a list of strings (got {type(raw_sanitizer_allow_tags)!r}): {path}"
+                            )
+                        sanitizer_allow_tags = tuple(
+                            _parse_sanitizer_allow_tag_spec(x) for x in raw_sanitizer_allow_tags
                         )
 
                 vectors.append(
@@ -586,6 +744,10 @@ def run_bench(
 ) -> BenchSummary:
     def _prepare_for_sanitizer(*, vector: Vector, sanitizer: Sanitizer) -> tuple[str, str, PayloadContext, str]:
         sanitizer_kwargs = sanitizer_overrides_for_vector(vector)
+        # Only pass context if the sanitizer declares support for it
+        # (otherwise it's a simple lambda that doesn't accept context)
+        if sanitizer.supported_contexts and vector.payload_context in sanitizer.supported_contexts:
+            sanitizer_kwargs["context"] = vector.payload_context
 
         if vector.payload_context == "onerror_attr":
             sanitizer_input_html = f'<img src="nonexistent://x" onerror="{vector.payload_html}">'

@@ -185,6 +185,39 @@ def test_load_vectors_accepts_bare_tag_expected_tags() -> None:
     assert vectors[0].expected_tags == (ExpectedTag("img"),)
 
 
+def test_load_vectors_accepts_http_leak_style_without_expected_tags() -> None:
+    from xssbench.bench import load_vectors
+
+    payload = {
+        "schema": "xssbench.vectorfile.v1",
+        "meta": {
+            "tool": "xssbench",
+            "source_url": "https://example.invalid/",
+            "license": {
+                "spdx": "MIT",
+                "url": "https://spdx.org/licenses/MIT.html",
+                "file": "vectors/example-LICENSE.txt",
+            },
+        },
+        "vectors": [
+            {
+                "id": "v1",
+                "description": "d",
+                "payload_html": "<style>@import 'https://example.invalid/x.css';</style>",
+                "payload_context": "http_leak_style",
+                "sanitizer_allow_tags": ["style"],
+            }
+        ],
+    }
+
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "vectors.json"
+        p.write_text(json.dumps(payload), encoding="utf-8")
+        vectors = load_vectors([p])
+
+    assert [v.payload_context for v in vectors] == ["http_leak_style"]
+
+
 def test_load_vectors_rejects_empty_bracket_expected_tags() -> None:
     from xssbench.bench import load_vectors
 

@@ -106,6 +106,9 @@ def _queue_worker_main(
 
     def _prepare_for_sanitizer(*, vector, sanitizer):
         sanitizer_kwargs = sanitizer_overrides_for_vector(vector)
+        # Only pass context if the sanitizer declares support for it
+        if sanitizer.supported_contexts and vector.payload_context in sanitizer.supported_contexts:
+            sanitizer_kwargs["context"] = vector.payload_context
 
         if vector.payload_context == "href":
             sanitizer_input_html = f'<a href="{vector.payload_html}">x</a>'
@@ -547,6 +550,10 @@ def _print_table(summary) -> None:
         c = str(ctx)
         return c.startswith("js") or c == "onerror_attr"
 
+    def _is_http_leak_context(ctx: str) -> bool:
+        c = str(ctx)
+        return c in ("http_leak", "http_leak_style")
+
     # Build per-sanitizer+browser counts.
     per = {}
     for r in summary.results:
@@ -588,7 +595,7 @@ def _print_table(summary) -> None:
             row["href_total"] += 1
             row["href_skipped"] += 1 if r.outcome == "skip" else 0
             row["href_xss"] += 1 if r.outcome == "xss" else 0
-        elif ctx == "http_leak":
+        elif _is_http_leak_context(ctx):
             row["http_leak_total"] += 1
             row["http_leak_skipped"] += 1 if r.outcome == "skip" else 0
             row["http_leak_hits"] += 1 if r.outcome == "http_leak" else 0

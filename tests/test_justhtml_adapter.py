@@ -15,8 +15,7 @@ def test_justhtml_resolves_protocol_relative_href():
     s = _get_justhtml_sanitizer_or_skip()
     out = s.sanitize('<a href="//example.com/path">x</a>')
 
-    assert 'href="https://example.com/path"' not in out
-    assert 'href="//example.com/path"' not in out
+    assert 'href="https://example.com/path"' in out
 
 
 def test_justhtml_strips_javascript_href():
@@ -33,7 +32,7 @@ def test_justhtml_keeps_absolute_img_src():
     out = s.sanitize(f'<img src="{url}">')
 
     assert "/img-proxy?" not in out
-    assert f'src="{url}"' not in out
+    assert f'src="{url}"' in out
 
 
 def test_justhtml_resolves_protocol_relative_img_src():
@@ -44,5 +43,4 @@ def test_justhtml_resolves_protocol_relative_img_src():
     out = s.sanitize(f'<img src="{url}">')
 
     assert "/img-proxy?" not in out
-    assert f'src="{resolved}"' not in out
-    assert f'src="{url}"' not in out
+    assert f'src="{resolved}"' in out

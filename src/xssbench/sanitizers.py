@@ -46,12 +46,16 @@ DEFAULT_ALLOWED_TAGS: tuple[str, ...] = (
     "img",
     # Tables
     "table",
+    "caption",
+    "colgroup",
+    "col",
     "thead",
     "tbody",
     "tfoot",
     "tr",
     "th",
     "td",
+    "frameset",
 )
 
 
@@ -62,13 +66,13 @@ _GLOBAL_ATTRS: frozenset[str] = frozenset({"class", "id", "title", "lang", "dir"
 
 _A_ATTRS: frozenset[str] = frozenset({"href", "title"})
 
-_IMG_ATTRS: frozenset[str] = frozenset({"src", "alt", "title", "width", "height", "loading"})
+_IMG_ATTRS: frozenset[str] = frozenset({"src", "alt", "title", "width", "height", "loading", "name"})
 
 _TABLE_CELL_ATTRS: frozenset[str] = frozenset({"colspan", "rowspan"})
 
 # Disallow all URL protocols by default.
 # (Relative URLs may still be allowed by some sanitizers depending on their API.)
-_URL_PROTOCOLS: tuple[str, ...] = ()
+_URL_PROTOCOLS: tuple[str, ...] = ("http", "https", "mailto", "tel")
 
 
 # Shared CSS allowlist (inline style sanitization)
@@ -99,6 +103,12 @@ DEFAULT_ALLOWED_CSS_PROPERTIES: tuple[str, ...] = (
     "white-space",
     "vertical-align",
     # Box model / layout
+    "position",
+    "top",
+    "right",
+    "bottom",
+    "left",
+    "z-index",
     "display",
     "float",
     "clear",
@@ -183,6 +193,8 @@ def allowed_attributes_for_tag(tag: str) -> frozenset[str]:
         return frozenset(set(_GLOBAL_ATTRS) | set(_A_ATTRS))
     if t == "img":
         return frozenset(set(_GLOBAL_ATTRS) | set(_IMG_ATTRS))
+    if t == "link":
+        return frozenset(set(_GLOBAL_ATTRS) | {"rel", "href", "type", "as", "crossorigin", "media"})
     if t in {"th", "td"}:
         return frozenset(set(_GLOBAL_ATTRS) | set(_TABLE_CELL_ATTRS))
     return _GLOBAL_ATTRS
@@ -214,7 +226,7 @@ def _override_allowlist_raw(
     return (allow_tags or frozenset()), (allow_attrs or {})
 
 
-def noop(html: str, *, allow_tags=None, allow_attrs=None) -> str:
+def noop(html: str, *, allow_tags=None, allow_attrs=None, allow_styles=None, context: str = "html") -> str:
     """No-op sanitizer.
 
     Useful as a baseline to verify that the harness correctly detects execution.
@@ -266,7 +278,7 @@ def _maybe_bleach() -> Sanitizer | None:
     base_cleaner = Cleaner(**base_cleaner_kwargs)
     override_cache: dict[tuple[tuple[str, ...], tuple[tuple[str, tuple[str, ...]], ...]], Cleaner] = {}
 
-    def _sanitize(html: str, *, allow_tags=None, allow_attrs=None) -> str:
+    def _sanitize(html: str, *, allow_tags=None, allow_attrs=None, allow_styles=None, context: str = "html") -> str:
         if allow_tags is None and allow_attrs is None:
             return base_cleaner.clean(html)
 
@@ -299,7 +311,7 @@ def _maybe_bleach() -> Sanitizer | None:
         description="bleach Cleaner shared allowlist (keep common markup; strip dangerous)",
         sanitize=_sanitize,
         # bleach is an HTML sanitizer; JS-string/JS-code and event-handler JS are out of scope.
-        supported_contexts={"html", "html_head", "html_outer", "http_leak"},
+        supported_contexts={"html", "html_head", "html_outer"},
     )
 
 
@@ -335,7 +347,7 @@ def _maybe_nh3() -> Sanitizer | None:
     # both `clean_content_tags` and the main `tags` allowlist.
     base_clean_content_tags: set[str] = {"script", "style"}
 
-    def _sanitize(html: str, *, allow_tags=None, allow_attrs=None) -> str:
+    def _sanitize(html: str, *, allow_tags=None, allow_attrs=None, allow_styles=None, context: str = "html") -> str:
         if allow_tags is None and allow_attrs is None:
             tags = base_allowed_tags
             attributes = base_allowed_attributes
@@ -369,7 +381,7 @@ def _maybe_nh3() -> Sanitizer | None:
         description="nh3 shared allowlist (keep common markup; strip dangerous)",
         sanitize=_sanitize,
         # nh3 is an HTML sanitizer; JS-string/JS-code and event-handler JS are out of scope.
-        supported_contexts={"html", "html_head", "html_outer", "http_leak"},
+        supported_contexts={"html", "html_head", "html_outer"},
     )
 
 
@@ -411,7 +423,7 @@ def _maybe_lxml_html_clean() -> Sanitizer | None:
 
     override_cache: dict[tuple[tuple[str, ...], tuple[str, ...]], Cleaner] = {}
 
-    def _sanitize(html: str, *, allow_tags=None, allow_attrs=None) -> str:
+    def _sanitize(html: str, *, allow_tags=None, allow_attrs=None, allow_styles=None, context: str = "html") -> str:
         if not html.strip():
             return ""
 
@@ -475,7 +487,7 @@ def _maybe_justhtml() -> Sanitizer | None:
     """
 
     try:
-        from justhtml import JustHTML  # type: ignore
+        from justhtml import JustHTML, HTMLContext  # type: ignore
         from justhtml.context import FragmentContext  # type: ignore
         from justhtml.sanitize import SanitizationPolicy, UrlPolicy, UrlRule  # type: ignore
     except Exception:
@@ -498,8 +510,35 @@ def _maybe_justhtml() -> Sanitizer | None:
         }
     )
 
-    def _make_policy(*, tags: AbstractSet[str], attrs: Mapping[str, AbstractSet[str]]) -> SanitizationPolicy:
+    DEFAULT_ATTRS_MAP = {
+        "*": set(_GLOBAL_ATTRS),
+        "a": set(_A_ATTRS),
+        "img": set(_IMG_ATTRS),
+        "link": {"rel", "href", "type", "as", "crossorigin", "media"},
+        "table": set(_GLOBAL_ATTRS),
+        "thead": set(_GLOBAL_ATTRS),
+        "tbody": set(_GLOBAL_ATTRS),
+        "tfoot": set(_GLOBAL_ATTRS),
+        "tr": set(_GLOBAL_ATTRS),
+        "th": set(_TABLE_CELL_ATTRS),
+        "td": set(_TABLE_CELL_ATTRS),
+        "col": set(_GLOBAL_ATTRS),
+        "colgroup": set(_GLOBAL_ATTRS),
+        "caption": set(_GLOBAL_ATTRS),
+        "frameset": set(_GLOBAL_ATTRS),
+        "svg": set(_GLOBAL_ATTRS),
+    }
+
+    def _make_policy(
+        *,
+        tags: AbstractSet[str],
+        attrs: Mapping[str, AbstractSet[str]],
+        styles: AbstractSet[str] | None = None,
+        allowed_protocols: AbstractSet[str] | None = None,
+    ) -> SanitizationPolicy:
         # Note: `justhtml` merges per-tag allowlists with the global "*" allowlist.
+        protocols = set(_URL_PROTOCOLS) if allowed_protocols is None else set(allowed_protocols)
+
         allow_rules = {}
         for tag, attrset in attrs.items():
             if tag == "*":
@@ -510,14 +549,14 @@ def _maybe_justhtml() -> Sanitizer | None:
                 allow_rules[(tag, attr)] = UrlRule(
                     allow_fragment=True,
                     resolve_protocol_relative="https",
-                    allowed_schemes=set(_URL_PROTOCOLS),
+                    allowed_schemes=protocols,
                     allowed_hosts=None,
                 )
 
         return SanitizationPolicy(
             allowed_tags=set(tags),
             allowed_attributes={k: set(v) for (k, v) in attrs.items()},
-            allowed_css_properties=set(DEFAULT_ALLOWED_CSS_PROPERTIES),
+            allowed_css_properties=set(DEFAULT_ALLOWED_CSS_PROPERTIES) if styles is None else set(styles),
             url_policy=UrlPolicy(
                 default_handling="allow",
                 default_allow_relative=True,
@@ -527,46 +566,109 @@ def _maybe_justhtml() -> Sanitizer | None:
 
     base_policy = _make_policy(
         tags=set(DEFAULT_ALLOWED_TAGS),
-        attrs={
-            "*": set(_GLOBAL_ATTRS),
-            "a": set(_A_ATTRS),
-            "img": set(_IMG_ATTRS),
-            "th": set(_TABLE_CELL_ATTRS),
-            "td": set(_TABLE_CELL_ATTRS),
-        },
+        attrs=DEFAULT_ATTRS_MAP,
     )
 
-    policy_cache: dict[tuple[tuple[str, ...], tuple[tuple[str, tuple[str, ...]], ...]], SanitizationPolicy] = {}
+    policy_cache: dict[
+        tuple[tuple[str, ...], tuple[tuple[str, tuple[str, ...]], ...], tuple[str, ...] | None, tuple[str, ...]],
+        SanitizationPolicy,
+    ] = {}
 
-    def _sanitize(html: str, *, allow_tags=None, allow_attrs=None) -> str:
+    def _sanitize(html: str, *, allow_tags=None, allow_attrs=None, allow_styles=None, context: str = "html") -> str:
         if not html:
             return ""
 
-        if allow_tags is None and allow_attrs is None:
+        # Handle JavaScript contexts with static methods
+        if context == "js_string":
+            # Safe for: const myHtml = "${safe}";
+            doc = JustHTML(html, fragment=True, fragment_context=fragment_context, safe=True, policy=base_policy)
+            return doc.to_html(context=HTMLContext.JS_STRING, pretty=False)
+
+        if context == "js_string_double":
+            # Same as js_string - both use double quotes in JS
+            doc = JustHTML(html, fragment=True, fragment_context=fragment_context, safe=True, policy=base_policy)
+            return doc.to_html(context=HTMLContext.JS_STRING, pretty=False)
+
+        if context == "href":
+            # URL in href attribute - use URL context with percent-encoding
+            doc = JustHTML(html, fragment=True, fragment_context=fragment_context, safe=True, policy=base_policy)
+            return doc.to_html(context=HTMLContext.URL, pretty=False)
+
+        if context == "onerror_attr":
+            # Event handler attribute - escape for attribute value
+            return JustHTML.escape_attr_value(html)
+
+        # HTML contexts
+        current_protocols = _URL_PROTOCOLS
+        if context in ("http_leak"):
+            current_protocols = ()
+
+        if allow_tags is None and allow_attrs is None and allow_styles is None and context not in ("http_leak"):
             policy = base_policy
         else:
-            tags_raw, attrs_map_raw = _override_allowlist_raw(allow_tags=allow_tags, allow_attrs=allow_attrs)
-            attrs_full: dict[str, AbstractSet[str]] = dict(attrs_map_raw)
+            if allow_tags is None and allow_attrs is None:
+                # If only styles are overridden, use default tags/attrs
+                tags_raw = set(DEFAULT_ALLOWED_TAGS)
+                attrs_full = DEFAULT_ATTRS_MAP
+            else:
+                tags_raw, attrs_map_raw = _override_allowlist_raw(allow_tags=allow_tags, allow_attrs=allow_attrs)
+                attrs_full = dict(attrs_map_raw)
+
+            styles_set: set[str] | None = None
+            if allow_styles:
+                styles_set = set()
+                for s in allow_styles.values():
+                    styles_set.update(s)
 
             key = (
                 tuple(sorted(tags_raw)),
                 tuple(sorted((t, tuple(sorted(a))) for (t, a) in attrs_full.items() if t != "*")),
+                tuple(sorted(styles_set)) if styles_set is not None else None,
+                tuple(sorted(current_protocols)),
             )
             policy = policy_cache.get(key)
             if policy is None:
-                policy = _make_policy(tags=set(tags_raw), attrs=attrs_full)
+                policy = _make_policy(
+                    tags=set(tags_raw),
+                    attrs=attrs_full,
+                    styles=styles_set,
+                    allowed_protocols=set(current_protocols),
+                )
                 policy_cache[key] = policy
 
-        # Parse as a fragment to avoid adding document/body wrappers.
-        doc = JustHTML(html, fragment=True, fragment_context=fragment_context)
-        # Keep output stable for the harness/expected_tags checks.
-        return doc.to_html(pretty=False, safe=True, policy=policy)
+        # Parse as a fragment for most contexts
+        if context in ("html", "http_leak"):
+            doc = JustHTML(html, fragment=True, fragment_context=fragment_context, safe=True, policy=policy)
+            return doc.to_html(pretty=False)
+
+        if context == "html_head":
+            # Head context - parse as fragment but may need head tags
+            doc = JustHTML(html, fragment=True, fragment_context=FragmentContext("head"), safe=True, policy=policy)
+            return doc.to_html(pretty=False)
+
+        if context == "html_outer":
+            # Full document context
+            doc = JustHTML(html, safe=True, policy=policy)
+            return doc.to_html(pretty=False)
+
+        # Default: treat as HTML fragment
+        doc = JustHTML(html, fragment=True, fragment_context=fragment_context, safe=True, policy=policy)
+        return doc.to_html(pretty=False)
 
     return Sanitizer(
         name="justhtml",
         description="justhtml sanitizer configured to shared allowlist policy",
         sanitize=_sanitize,
-        supported_contexts={"html", "html_head", "html_outer", "http_leak"},
+        supported_contexts={
+            "html",
+            "html_head",
+            "html_outer",
+            "http_leak",
+            "href",
+            "js_string",
+            "js_string_double",
+            "onerror_attr",
+        },
     )
 
 
@@ -586,6 +688,7 @@ def available_sanitizers() -> dict[str, Sanitizer]:
                 "html_head",
                 "html_outer",
                 "http_leak",
+                "http_leak_style",
                 "js",
                 "js_arg",
                 "js_string",

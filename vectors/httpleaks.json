@@ -614,56 +614,56 @@
 			"id": "httpleaks-css-style-9689853d47",
 			"description": "HTTPLeaks leak.html: CSS: <style> snippet (https://leaking.via/css-source-map).",
 			"payload_html": "<style>\n    /*# sourceMappingURL=https://leaking.via/css-source-map */\n</style>",
-			"payload_context": "http_leak",
+			"payload_context": "http_leak_style",
 			"sanitizer_allow_tags": ["style"]
 		},
 		{
 			"id": "httpleaks-css-style-11934c9941",
 			"description": "HTTPLeaks leak.html: CSS: <style> snippet (https://leaking.via/css-import-string).",
 			"payload_html": "<style>\n    @import 'https://leaking.via/css-import-string';\n    @import url(https://leaking.via/css-import-url);\n</style>",
-			"payload_context": "http_leak",
+			"payload_context": "http_leak_style",
 			"sanitizer_allow_tags": ["style"]
 		},
 		{
 			"id": "httpleaks-css-style-c3d4ce26d0",
 			"description": "HTTPLeaks leak.html: CSS: <style> snippet (https://leaking.via/css-after-content).",
 			"payload_html": "<style>\n    a:after {content: url(https://leaking.via/css-after-content)}\n    a::after {content: url(https://leaking.via/css-after-content-2)}\n    a:before {content: url(https://leaking.via/css-before-content)}\n    a::before {content: url(https://leaking.via/css-before-content-2)}    \n</style>\n<a href=\"#\">ABC</a>",
-			"payload_context": "http_leak",
+			"payload_context": "http_leak_style",
 			"sanitizer_allow_tags": ["style"]
 		},
 		{
 			"id": "httpleaks-css-style-417bd0cffb",
 			"description": "HTTPLeaks leak.html: CSS: <style> snippet (https://leaking.via/css-list-style).",
 			"payload_html": "<style>\n    big {\n        list-style: url(https://leaking.via/css-list-style);\n        list-style-image: url(https://leaking.via/css-list-style-image);\n        background: url(https://leaking.via/css-background);\n        background-image: url(https://leaking.via/css-background-image);\n        border-image: url(https://leaking.via/css-border-image);\n        -moz-border-image: url(https://leaking.via/css--moz-border-image-alias);\n        -webkit-border-image: url(https://leaking.via/css--webkit-border-image-alias);\n        border-image-source: url(https://leaking.via/css-border-image-source);\n        shape-outside: url(https://leaking.via/css-shape-outside);\n        -webkit-shape-outside: url(https://leaking.via/css--webkit-shape-outside-alias);\n        -webkit-mask-image: url(https://leaking.via/css--webkit-mask-image);\n        -webkit-mask-box-image: url(https://leaking.via/css--webkit-mask-box-image);\n        -webkit-mask-box-image-source: url(https://leaking.via/css--webkit-mask-box-image-source);\n        cursor: url(https://leaking.via/css-cursor), auto;\n    }\n</style>\n<big>DEF</big>",
-			"payload_context": "http_leak",
+			"payload_context": "http_leak_style",
 			"sanitizer_allow_tags": ["style"]
 		},
 		{
 			"id": "httpleaks-css-style-21ddfc1eab",
 			"description": "HTTPLeaks leak.html: CSS: <style> snippet (https://leaking.via/css-font-face-src).",
 			"payload_html": "<style>\n    /* Basic font-face */\n    @font-face {\n        font-family: leak;\n        src: url(https://leaking.via/css-font-face-src);\n    }\n    \n    /* \n    * Cross-browser font-face\n    * IE6-8 will use the EOT source, modern browsers will use WOFF(2) and fallback to TTF in case of error\n    * More info:\n    * http://www.paulirish.com/2009/bulletproof-font-face-implementation-syntax/\n    * http://caniuse.com/#search=eot\n    * http://caniuse.com/#search=woff2\n    * http://caniuse.com/#search=woff\n    * http://caniuse.com/#search=ttf\n    */\n    @font-face {\n      font-family: 'leak';\n      src: url('https://leaking.via/css-font-face-src-eot') format('eot'), url('https://leaking.via/css-font-face-src-woff') format('woff'), url('https://leaking.via/css-font-face-src-ttf') format('truetype');\n    }\n\n    big {\n        font-family: leak;\n    }\n</style>\n<big>GHI</big>\n<svg>",
-			"payload_context": "http_leak",
+			"payload_context": "http_leak_style",
 			"sanitizer_allow_tags": ["style"]
 		},
 		{
 			"id": "httpleaks-css-style-e253af6f8b",
 			"description": "HTTPLeaks leak.html: CSS: <style> snippet (https://leaking.via/svg-css-fill#foo).",
 			"payload_html": "    <style>\n        circle {\n            fill: url(https://leaking.via/svg-css-fill#foo);\n            mask: url(https://leaking.via/svg-css-mask#foo);\n            -webkit-mask: url(https://leaking.via/svg-css--webkit-mask#foo);\n            filter: url(https://leaking.via/svg-css-filter#foo);\n            clip-path: url(https://leaking.via/svg-css-clip-path#foo);\n        stroke: url(https://leaking.via/svg-inline-css-stroke#foo);\n        }\n    </style>\n    <circle r=\"40\"></circle>\n</svg>\n<s foo=\"https://leaking.via/css-attr-notation\">JKL</s>",
-			"payload_context": "http_leak",
+			"payload_context": "http_leak_style",
 			"sanitizer_allow_tags": ["style", "s[foo]"]
 		},
 		{
 			"id": "httpleaks-css-style-8ae6c248e7",
 			"description": "HTTPLeaks leak.html: CSS: <style> snippet (https://leaking.via/css-variables).",
 			"payload_html": "<style>\n    s {\n      --leak: url(https://leaking.via/css-variables);\n    }\n    s {\n      background: var(--leak);\n    }\n    s::after {\n      content: attr(foo url);\n    }    \n    s::before {\n      content: attr(notpresent, url(https://leaking.via/css-attr-fallback));\n    }\n</style>",
-			"payload_context": "http_leak",
+			"payload_context": "http_leak_style",
 			"sanitizer_allow_tags": ["style"]
 		},
 		{
 			"id": "httpleaks-css-style-f85ae6a768",
 			"description": "HTTPLeaks leak.html: CSS: <style> snippet (https://leaking.via/css-escape-url-1).",
 			"payload_html": "<style>\n    p#p1 {\n        background-image: \\75 \\72 \\6C (https://leaking.via/css-escape-url-1);\n    }\n    p#p2 {\n        background-image: \\000075\\000072\\00006C(https://leaking.via/css-escape-url-2);\n    }\n</style>\n<p id=\"p1\">bla</p>\n<p id=\"p2\">bla</p>",
-			"payload_context": "http_leak",
+			"payload_context": "http_leak_style",
 			"sanitizer_allow_tags": ["style"]
 		},
 		{
